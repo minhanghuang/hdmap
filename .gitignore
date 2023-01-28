@@ -1,0 +1,16 @@
+*.iml
+.idea
+.vscode
+.local
+.cache
+
+*.pyc
+*.log
+.DS_Store
+
+build/
+compile_commands.json
+
+__pycache__
+log/*
+
