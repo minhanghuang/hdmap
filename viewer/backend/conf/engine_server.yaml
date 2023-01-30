@@ -1,0 +1,4 @@
+opendrive_file: "/opt/owner/share/xodr/carla-simulator/Town07.xodr"
+log_path: "/var/log/engine_server/"
+server_port: 9070
+server_thread_num: 6
