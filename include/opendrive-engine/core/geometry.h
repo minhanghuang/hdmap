@@ -2,6 +2,7 @@
 #define OPENDRIVE_ENGINE_CORE_GEOMETRY_H_
 
 #include <string>
+#include <vector>
 
 #include "opendrive-cpp/opendrive.h"
 
@@ -19,6 +20,8 @@ struct Point3D {
   double y = 0.;
   double z = 0.;
 };
+
+typedef std::vector<Point3D> Polygon;
 
 }  // namespace core
 }  // namespace engine

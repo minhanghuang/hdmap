@@ -5,6 +5,7 @@
 #include <string>
 
 #include "opendrive-engine/common/param.h"
+#include "opendrive-engine/core/map.h"
 
 namespace opendrive {
 namespace engine {

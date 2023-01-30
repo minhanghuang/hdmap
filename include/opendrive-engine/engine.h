@@ -15,6 +15,7 @@ class Engine {
  public:
   typedef std::shared_ptr<EngineType> Ptr;
   typedef std::unique_ptr<EngineType> UPtr;
+  typedef std::unique_ptr<EngineType const> ConstPtr;
   ~Engine();
   explicit Engine(const common::Param& param);
   explicit Engine(common::Param::Ptr param);
@@ -23,6 +24,7 @@ class Engine {
   void Init();
   EngineImpl::Ptr impl_;
 };
+
 }  // namespace engine
 }  // namespace opendrive
 

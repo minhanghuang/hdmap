@@ -14,6 +14,9 @@ enum class ErrorCode {
   INIT_ERROR = 1000,
   INIT_MAPFILE_ERROR = 1001,
 
+  // convert
+  CONVERTOR_ERROR = 2000,
+  CONVERTOR_XMLPARSE_ERROR = 2001,
 };
 
 struct StatusBody {
