@@ -2,8 +2,8 @@
 #define OPENDRIVE_ENGINE_CORE_ID_H_
 
 #include <string>
+#include <unordered_set>
 
-#include "define.h"
 #include "opendrive-cpp/opendrive.h"
 
 namespace opendrive {

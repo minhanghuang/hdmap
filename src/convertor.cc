@@ -5,10 +5,12 @@
 namespace opendrive {
 namespace engine {
 
-common::Status Convertor::Start(const std::string& map_file,
-                                core::Map::Ptr core_map) {
-  core_map_ = core_map;
-  if (map_file.empty() || !common::FileExists(map_file) || !core_map_) {
+common::Status Convertor::Start(common::Param::ConstPtr param,
+                                core::Data::Ptr data) {
+  param_ = param;
+  data_ = data;
+  std::string map_file = param_->map_file;
+  if (map_file.empty() || !common::FileExists(map_file) || !data_) {
     return common::Status(common::ErrorCode::INIT_MAPFILE_ERROR,
                           "input file error: " + map_file);
   }

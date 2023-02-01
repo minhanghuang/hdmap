@@ -3,11 +3,23 @@
 namespace opendrive {
 namespace engine {
 
-EngineImpl::EngineImpl(const common::Param& param)
-    : param_(std::make_shared<common::Param>(param)) {}
-EngineImpl::EngineImpl(common::Param::ConstPtr param) : param_(param) {}
+EngineImpl::EngineImpl() {}
+
+int EngineImpl::Init(const common::Param& param) {
+  param_ = std::make_shared<common::Param>(param);
+  data_ = std::make_shared<core::Data>();
+  Clear();
+  ConvertData();
+  return 0;
+}
 
 void EngineImpl::Clear() {}
+
+int EngineImpl::ConvertData() {
+  Convertor convertor;
+  auto convert_ret = convertor.Start(param_, data_);
+  return 0;
+}
 
 }  // namespace engine
 }  // namespace opendrive

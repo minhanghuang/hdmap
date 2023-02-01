@@ -5,8 +5,9 @@
 #include <string>
 
 #include "opendrive-engine/common/common.hpp"
+#include "opendrive-engine/common/param.h"
 #include "opendrive-engine/common/status.h"
-#include "opendrive-engine/core/map.h"
+#include "opendrive-engine/core/define.h"
 
 namespace opendrive {
 namespace engine {
@@ -14,10 +15,11 @@ namespace engine {
 class Convertor {
  public:
   Convertor() = default;
-  common::Status Start(const std::string& map_file, core::Map::Ptr core_map);
+  common::Status Start(common::Param::ConstPtr param, core::Data::Ptr data);
 
  private:
-  core::Map::Ptr core_map_;
+  common::Param::ConstPtr param_;
+  core::Data::Ptr data_;
 };
 
 }  // namespace engine

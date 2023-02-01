@@ -16,12 +16,11 @@ class Engine {
   typedef std::shared_ptr<EngineType> Ptr;
   typedef std::unique_ptr<EngineType> UPtr;
   typedef std::unique_ptr<EngineType const> ConstPtr;
-  ~Engine();
-  explicit Engine(const common::Param& param);
-  explicit Engine(common::Param::Ptr param);
+  ~Engine() = default;
+  Engine();
+  int Init(const common::Param& param);
 
  private:
-  void Init();
   EngineImpl::Ptr impl_;
 };
 
