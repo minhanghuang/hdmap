@@ -1,4 +1,6 @@
 #include <gtest/gtest.h>
+#include <opendrive-engine/common/param.h>
+#include <opendrive-engine/engine.h>
 #include <tinyxml2.h>
 
 #include <cassert>
@@ -21,7 +23,14 @@ void TestEmpty::TearDownTestCase() {}
 void TestEmpty::TearDown() {}
 void TestEmpty::SetUp() {}
 
-TEST_F(TestEmpty, Test) {}
+TEST_F(TestEmpty, TestInit) {
+  const std::string map_file =
+      "/opt/xodr/share/xodr/carla-simulator/Town01.xodr";
+  opendrive::engine::common::Param param;
+  param.map_file = map_file;
+  opendrive::engine::Engine engine;
+  engine.Init(param);
+}
 
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);
