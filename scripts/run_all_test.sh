@@ -11,7 +11,7 @@ function test() {
   echo "---------------------------------------------------------------"
   cmake -B build -DBUILD_SHARED_LIBS=ON -DBUILD_OPENDRIVE_ENGINE_TEST=ON -DCMAKE_BUILD_TYPE=Debug .
   cmake --build build -j6
-  local bin_path="$current_path/../build/tests/"
+  local bin_path="$current_path/../build/tests"
   for file in $bin_path/*
   do
     case "$file" in
