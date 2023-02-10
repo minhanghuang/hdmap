@@ -21,6 +21,7 @@ typedef struct Data DataTypedef;
 struct Data {
   typedef std::shared_ptr<DataTypedef> Ptr;
   typedef std::shared_ptr<DataTypedef const> ConstPtr;
+  Header::Ptr header;
   LaneRoute lanes;
   SectionRoute sections;
   RoadRoute roads;

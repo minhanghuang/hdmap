@@ -33,7 +33,7 @@ struct Road {
   Ids predecessor_id;
   Ids successor_id;
   RoadRule rule = RoadRule::RHT;
-  RoadInfo info;
+  RoadInfos info;
 };
 
 }  // namespace core
