@@ -1,9 +1,13 @@
 #ifndef OPENDRIVE_ENGINE_IMPL_H_
 #define OPENDRIVE_ENGINE_IMPL_H_
 
+#include <cactus/cactus.h>
+#include <cactus/factory.h>
+
 #include <memory>
 #include <string>
 
+#include "opendrive-cpp/common/status.h"
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/convertor.h"
 #include "opendrive-engine/core/define.h"
@@ -17,13 +21,12 @@ class EngineImpl {
  public:
   typedef std::shared_ptr<EngineImplType> Ptr;
   EngineImpl();
-  int Init(const common::Param& param);
+  Status Init(const common::Param& param);
+  std::string GetXodrVersion() const;
 
  private:
-  void Clear();
-  int ConvertData();
-  common::Param::ConstPtr param_;
   core::Data::Ptr data_;
+  common::Param::ConstPtr param_;
 };
 
 }  // namespace engine

@@ -3,22 +3,26 @@
 namespace opendrive {
 namespace engine {
 
-EngineImpl::EngineImpl() {}
+EngineImpl::EngineImpl()
+    : param_(std::make_shared<common::Param>()),
+      data_(std::make_shared<core::Data>()) {}
 
-int EngineImpl::Init(const common::Param& param) {
-  param_ = std::make_shared<common::Param>(param);
-  data_ = std::make_shared<core::Data>();
-  Clear();
-  ConvertData();
-  return 0;
+Status EngineImpl::Init(const common::Param& param) {
+  // factory load
+  auto factory = cactus::Factory::Instance();
+  factory->Register<common::Param>(&param, "engine_param", true);
+  factory->Register<core::Data>("core_data", true);
+  param_ = factory->GetObject<common::Param>("engine_param");
+  data_ = factory->GetObject<core::Data>("core_data");
+
+  // convert data
+  Convertor convertor;
+  return convertor.Start();
 }
 
-void EngineImpl::Clear() {}
-
-int EngineImpl::ConvertData() {
-  Convertor convertor;
-  auto convert_ret = convertor.Start(param_, data_);
-  return 0;
+std::string EngineImpl::GetXodrVersion() const {
+  return data_->header->rev_major + "." + data_->header->rev_minor + "." +
+         data_->header->version;
 }
 
 }  // namespace engine

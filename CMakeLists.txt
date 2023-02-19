@@ -28,6 +28,7 @@ pkg_check_modules(Tinyxml2 REQUIRED tinyxml2)
 pkg_check_modules(OpenDriveCpp REQUIRED opendrive-cpp)
 pkg_check_modules(Flann REQUIRED flann)
 pkg_check_modules(LZ4 REQUIRED liblz4)
+pkg_check_modules(Cactus REQUIRED cactus)
 
 include_directories(
   include
@@ -35,6 +36,7 @@ include_directories(
   ${OpenDriveCpp_INCLUDE_DIRS}
   ${Flann_INCLUDE_DIRS}
   ${LZ4_INCLUDE_DIRS}
+  ${Cactus_INCLUDE_DIRS}
 )
 
 link_directories(
@@ -42,6 +44,7 @@ link_directories(
   ${OpenDriveCpp_LIBRARY_DIRS}
   ${Flann_LIBRARY_DIRS}
   ${LZ4_LIBRARY_DIRS}
+  ${Cactus_LIBRARY_DIRS}
 )
 
 file(GLOB OPENDRIVE_ENGINE_SRCS
@@ -57,6 +60,7 @@ target_link_libraries(${TARGET_NAME}
   ${OpenDriveCpp_LIBRARIES}
   ${Flann_LIBRARIES}
   ${LZ4_LIBRARIES}
+  ${Cactus_LIBRARIES}
 )
 
 if(BUILD_OPENDRIVE_ENGINE_TEST)

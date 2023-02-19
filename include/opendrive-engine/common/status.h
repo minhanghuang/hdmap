@@ -11,11 +11,12 @@ enum class ErrorCode {
 
   // init
   INIT_ERROR = 1000,
-  INIT_MAPFILE_ERROR = 1001,
+  INIT_FACTORY_ERROR,
+  INIT_MAPFILE_ERROR,
 
   // convert
   CONVERTOR_ERROR = 2000,
-  CONVERTOR_XMLPARSE_ERROR = 2001,
+  CONVERTOR_XMLPARSE_ERROR,
 };
 
 struct Status {

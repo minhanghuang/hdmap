@@ -3,6 +3,7 @@
 #include <memory>
 #include <string>
 
+#include "cactus/factory.h"
 #include "opendrive-engine/common/log.h"
 
 namespace opendrive {
@@ -17,13 +18,18 @@ inline bool Convertor::Next() const {
   return ErrorCode::OK == status_.error_code;
 }
 
-Status Convertor::Start(common::Param::ConstPtr param, core::Data::Ptr data) {
-  param_ = param;
-  data_ = data;
+Status Convertor::Start() {
+  auto factory = cactus::Factory::Instance();
+  param_ = factory->GetObject<common::Param>("engine_param");
+  data_ = factory->GetObject<core::Data>("core_data");
+  if (!param_ || !data_) {
+    SetStatus(ErrorCode::INIT_FACTORY_ERROR, "factory error.");
+    return status_;
+  }
   status_.error_code = ErrorCode::OK;
   status_.msg = "";
   std::string map_file = param_->map_file;
-  if (map_file.empty() || !common::FileExists(map_file) || !data_) {
+  if (map_file.empty() || !cactus::FileExists(map_file) || !data_) {
     SetStatus(ErrorCode::INIT_MAPFILE_ERROR, "input file error: " + map_file);
     return status_;
   }

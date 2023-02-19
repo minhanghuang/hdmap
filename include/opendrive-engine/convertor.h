@@ -1,6 +1,8 @@
 #ifndef OPENDRIVE_ENGINE_CONVERTOR_H_
 #define OPENDRIVE_ENGINE_CONVERTOR_H_
 
+#include <cactus/cactus.h>
+
 #include <memory>
 #include <string>
 
@@ -16,7 +18,7 @@ namespace engine {
 class Convertor {
  public:
   Convertor() = default;
-  Status Start(common::Param::ConstPtr param, core::Data::Ptr data);
+  Status Start();
 
  private:
   inline void SetStatus(ErrorCode code, const std::string& msg);
