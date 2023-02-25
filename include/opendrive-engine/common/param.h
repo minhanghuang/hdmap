@@ -13,7 +13,7 @@ struct Param {
   typedef std::shared_ptr<ParamType> Ptr;
   typedef std::shared_ptr<ParamType const> ConstPtr;
   std::string map_file;
-  float step = 0;
+  float step = 0.5;
 };
 
 }  // namespace common

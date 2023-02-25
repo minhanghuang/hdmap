@@ -8,6 +8,7 @@
 #include "opendrive-engine/common/status.h"
 #include "opendrive-engine/core/id.h"
 #include "opendrive-engine/core/lane.h"
+#include "opendrive-engine/core/road.h"
 #include "opendrive-engine/core/section.h"
 #include "opendrive-engine/engine_impl.h"
 
@@ -27,6 +28,10 @@ class Engine {
   core::Lane::ConstPtr GetLaneById(const core::Id& id);
   core::Section::ConstPtr GetSectionById(const core::Id& id);
   core::Road::ConstPtr GetRoadById(const core::Id& id);
+  core::Lane::ConstPtrs GetLanes();
+  core::Section::ConstPtrs GetSections();
+  core::Road::ConstPtrs GetRoads();
+  core::Header::ConstPtr GetHeader();
 
  private:
   EngineImpl::Ptr impl_;

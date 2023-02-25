@@ -147,6 +147,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
     section->s0 = ele_section.s0;
     section->s1 = ele_section.s1;
     section->length = ele_section.s1 - ele_section.s0;
+    data_->sections[section->id] = section;
 
     /// center lane
     if (1 != ele_section.center.lanes.size()) {
@@ -160,6 +161,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
       lane->parent_id = section->id;
       CenterLaneSampling(ele_road.plan_view.geometrys,
                          ele_road.lanes.lane_offsets, section, road_ds);
+      data_->lanes[lane->id] = lane;
     }
     // 参考线: 中心车道的左边界
     core::Curve::Line* refe_line =
@@ -167,11 +169,12 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
 
     /// left lanes
     for (const auto& ele_lane : ele_section.left.lanes) {
-      core::Lane::Ptr lane = std::make_shared<core::Lane>();
+      auto lane = std::make_shared<core::Lane>();
       section->left_lanes.emplace_back(lane);
       lane->id = section->id + "_" + std::to_string(ele_lane.attributes.id);
       lane->parent_id = section->id;
       LaneSampling(ele_lane, lane, refe_line);
+      data_->lanes[lane->id] = lane;
       refe_line = &lane->right_boundary.curve.pts;
     }
     // 参考线: 中心车道的右边界
@@ -179,11 +182,12 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
 
     /// right lanes
     for (const auto& ele_lane : ele_section.right.lanes) {
-      core::Lane::Ptr lane = std::make_shared<core::Lane>();
+      auto lane = std::make_shared<core::Lane>();
       section->right_lanes.emplace_back(lane);
       lane->id = section->id + "_" + std::to_string(ele_lane.attributes.id);
       lane->parent_id = section->id;
       LaneSampling(ele_lane, lane, refe_line);
+      data_->lanes[lane->id] = lane;
       refe_line = &lane->right_boundary.curve.pts;
     }
   }

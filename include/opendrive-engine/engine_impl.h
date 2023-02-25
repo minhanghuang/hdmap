@@ -11,6 +11,7 @@
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/convertor.h"
 #include "opendrive-engine/core/define.h"
+#include "opendrive-engine/core/header.h"
 #include "opendrive-engine/core/map.h"
 
 namespace opendrive {
@@ -23,6 +24,13 @@ class EngineImpl {
   EngineImpl();
   Status Init(const common::Param& param);
   std::string GetXodrVersion() const;
+  core::Lane::ConstPtr GetLaneById(const core::Id& id) const;
+  core::Section::ConstPtr GetSectionById(const core::Id& id) const;
+  core::Road::ConstPtr GetRoadById(const core::Id& id) const;
+  core::Lane::ConstPtrs GetLanes() const;
+  core::Section::ConstPtrs GetSections() const;
+  core::Road::ConstPtrs GetRoads() const;
+  core::Header::ConstPtr GetHeader() const;
 
  private:
   core::Data::Ptr data_;

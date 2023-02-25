@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/xodr/lib
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/xodr/lib
+export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:/opt/base/lib:/opt/xodr/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/base/lib:/opt/xodr/lib
 
 function main() {
   echo "---------------------------------------------------------------"

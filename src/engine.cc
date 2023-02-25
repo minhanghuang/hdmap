@@ -15,5 +15,40 @@ std::string Engine::GetXodrVersion() {
   return impl_->GetXodrVersion();
 }
 
+core::Lane::ConstPtr Engine::GetLaneById(const core::Id& id) {
+  cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetLaneById(id);
+}
+
+core::Section::ConstPtr Engine::GetSectionById(const core::Id& id) {
+  cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetSectionById(id);
+}
+
+core::Road::ConstPtr Engine::GetRoadById(const core::Id& id) {
+  cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetRoadById(id);
+}
+
+core::Lane::ConstPtrs Engine::GetLanes() {
+  cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetLanes();
+}
+
+core::Section::ConstPtrs Engine::GetSections() {
+  cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetSections();
+}
+
+core::Road::ConstPtrs Engine::GetRoads() {
+  cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetRoads();
+}
+
+core::Header::ConstPtr Engine::GetHeader() {
+  cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetHeader();
+}
+
 }  // namespace engine
 }  // namespace opendrive

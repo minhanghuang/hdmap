@@ -2,83 +2,26 @@
 
 namespace opendrive {
 namespace engine {
-namespace server {
 
-bool RequestBase::CheckRequestData(const RequiredKeys& keys,
-                                   const std::string& data,
-                                   Json& data_out) const {
-  if (data.empty()) return false;
-  try {
-    data_out = Json::parse(data);
-  } catch (const std::exception& e) {
-    return false;
-  }
-  for (const auto& item : keys) {
-    if (!data_out.contains(item.first)) {
-      return false;
-    }
-    if (data_out[item.first].type() != item.second) {
-      if (item.second == JsonValueType::number_float ||
-          item.second == JsonValueType::number_integer ||
-          item.second == JsonValueType::number_unsigned) {
-        if (IsNumberType(data_out[item.first])) {
-          continue;
-        }
-      }
-      return false;
-    }
-  }
-  return true;
+Server::Server() {}
+
+int Server::Init() {
+  auto global_data = server::GlobalData::Instance();
+  options_.num_threads = global_data->GetParam()->GetHttp().thread_num;
+  options_.port = global_data->GetParam()->GetHttp().port;
+  options_.root = "";
+  ok_ = std::make_shared<server::OkApi>();
+  global_map_ = std::make_shared<server::GlobalMapApi>();
+  return 0;
 }
 
-bool RequestBase::IsNumberType(const Json& value) const {
-  if (value.is_number_float() || value.is_number_integer() ||
-      value.is_number_unsigned()) {
-    return true;
-  }
-  return false;
-}
-
-std::string RequestBase::SetResponse(const Json& data, HttpStatusCode code,
-                                     const std::string& msg) {
-  Json response;
-  response["code"] = code;
-  response["msg"] = msg;
-  response["results"] = data;
-  return response.dump(0);
-}
-
-void OKApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
-  ENGINE_SERVER_INFO("HDMap Server OkApi Get Requets.");
-  Response(app, conn, "ok get");
-}
-
-void OKApi::Post(typhoon::Application* app, typhoon::Connection* conn) {
-  ENGINE_SERVER_INFO("HDMap Server OkApi Post Requets.");
-  Response(app, conn, "ok post");
-}
-
-void Server::Init(const std::string& yaml_file) {
-  assert(!yaml_file.empty());
-  GlobalData::Instance()->Init(yaml_file);
-  server::LogInit(server::GlobalData::Instance()->log_path());
-  ENGINE_SERVER_INFO("hdmap server yaml file:" << yaml_file);
-  ENGINE_SERVER_INFO(
-      "hdmap server log path: " << server::GlobalData::Instance()->log_path());
-}
-
-void Server::Start() {
-  typhoon::Options options;
-  options.port = server::GlobalData::Instance()->server_port();
-  options.num_threads = server::GlobalData::Instance()->server_thread_num();
-  options.root = "";
-  ENGINE_SERVER_INFO("hdmap server port: " << options.port);
-  ENGINE_SERVER_INFO("hdmap server threads: " << options.num_threads);
-  typhoon::Server server(options);
-  auto ok = std::make_shared<OKApi>();
+int Server::Start() {
+  typhoon::Server server(options_);
+  server.AddHandle("/opendrive/engine/ok/", ok_);
+  server.AddHandle("/opendrive/engine/map/", global_map_);
   server.Spin();
+  return 0;
 }
 
-}  // namespace server
 }  // namespace engine
 }  // namespace opendrive

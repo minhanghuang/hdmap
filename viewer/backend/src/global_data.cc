@@ -1,47 +1,36 @@
 #include "global_data.h"
 
+#include <memory>
+
+#include "opendrive-engine/common/status.h"
+
 namespace opendrive {
 namespace engine {
 namespace server {
 
-GlobalData* GlobalData::Instance() {
-  static GlobalData* instance = nullptr;
-  if (!instance) {
-    static std::once_flag flag;
-    std::call_once(flag, [&] { instance = new (std::nothrow) GlobalData(); });
+GlobalData::GlobalData() {}
+
+int GlobalData::Init(const std::string& yaml_path) {
+  // param load
+  param_ = std::make_shared<Param>();
+  if (param_->Load(yaml_path)) {
+    return -1;
   }
-  return instance;
+  param_->Print();
+
+  // engine init
+  engine_ = std::make_shared<engine::Engine>();
+  auto engine_status = engine_->Init(param_->GetEngine());
+  if (ErrorCode::OK != engine_status.error_code) {
+    std::cerr << engine_status.msg << std::endl;
+    return -1;
+  }
+  return 0;
 }
 
-void GlobalData::Init(const std::string& yaml_file) {
-  yaml_file_ = yaml_file;
-  auto param = std::make_shared<engine::common::Param>();
+Param::Ptr GlobalData::GetParam() { return param_; }
 
-  /// parse yaml
-  auto node = YAML::LoadFile(yaml_file_);
-  std::string map_file = node["opendrive_file"].as<std::string>();
-  log_path_ = node["log_path"].as<std::string>();
-  server_port_ = node["server_port"].as<int>();
-  server_thread_num_ = node["server_thread_num"].as<int>();
-  if (map_file.empty()) {
-    throw std::runtime_error("opendrive file is empty." + map_file);
-  }
-  if (server_port_ <= 0 || server_thread_num_ <= 0) {
-    throw std::runtime_error("server param error.");
-  }
-
-  /// instance
-  param->map_file = map_file;
-  engine_ = std::make_shared<engine::Engine>(param);
-}
-
-std::string GlobalData::log_path() { return log_path_; }
-
-size_t GlobalData::server_port() { return server_port_; }
-
-unsigned char GlobalData::server_thread_num() { return server_thread_num_; }
-
-engine::Engine::Ptr GlobalData::engine() { return engine_; }
+engine::Engine::Ptr GlobalData::GetEngine() { return engine_; }
 
 }  // namespace server
 }  // namespace engine

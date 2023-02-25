@@ -19,6 +19,7 @@ endif()
 message("---- option shared type:${OPENDRIVE_ENGINE_SHARED_TYPE}")
 message("---- option unittest:${BUILD_OPENDRIVE_ENGINE_TEST}")
 message("---- option build type:${CMAKE_BUILD_TYPE}")
+message("---- option view:${BUILD_OPENDRIVE_ENGINE_VIEWER}")
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)

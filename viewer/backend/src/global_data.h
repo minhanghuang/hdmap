@@ -1,14 +1,15 @@
 #ifndef OPENDRIVE_ENGINE_SERVER_GLOBAL_DATA_H_
 #define OPENDRIVE_ENGINE_SERVER_GLOBAL_DATA_H_
-
-#include <opendrive-engine/common/param.h>
+#include <cactus/cactus.h>
+#include <cactus/macros.h>
+#include <opendrive-engine/engine.h>
 #include <yaml-cpp/yaml.h>
 
-#include <chrono>
+#include <cstdlib>
 #include <iostream>
-#include <stdexcept>
 
-#include "opendrive-engine/engine.h"
+#include "opendrive-engine/common/param.h"
+#include "param.h"
 
 namespace opendrive {
 namespace engine {
@@ -16,23 +17,14 @@ namespace server {
 
 class GlobalData {
  public:
-  static GlobalData* Instance();
-  void Init(const std::string& yaml_file);
-  std::string log_path();
-  size_t server_port();
-  unsigned char server_thread_num();
-  engine::Engine::Ptr engine();
+  int Init(const std::string& yaml_path);
+  Param::Ptr GetParam();
+  engine::Engine::Ptr GetEngine();
 
  private:
-  GlobalData() = default;
-  ~GlobalData() = default;
-  GlobalData(const GlobalData&) = delete;
-  GlobalData& operator=(const GlobalData&) = delete;
-  std::string yaml_file_;
-  std::string log_path_;
-  size_t server_port_;
-  unsigned char server_thread_num_;
   engine::Engine::Ptr engine_;
+  Param::Ptr param_;
+  CACTUS_DECLARE_SINGLETON(GlobalData)  // 注册单例
 };
 
 }  // namespace server
