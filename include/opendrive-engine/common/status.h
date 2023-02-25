@@ -17,6 +17,7 @@ enum class ErrorCode {
   // convert
   CONVERTOR_ERROR = 2000,
   CONVERTOR_XMLPARSE_ERROR,
+  CONVERTOR_CENTERLANE_ERROR,
 };
 
 struct Status {
