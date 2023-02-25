@@ -22,7 +22,7 @@ struct Section {
   double s0 = 0.;
   double s1 = 0.;
   double length = 0.;
-  Lane::Ptrs center_lane;
+  Lane::Ptr center_lane;
   Lane::Ptrs left_lanes;
   Lane::Ptrs right_lanes;
 };

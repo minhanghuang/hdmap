@@ -16,8 +16,9 @@ namespace core {
 struct Curve {
   struct Point : public Point3D {
     double s;
-    double heading;
+    double hdg;
   };
+  typedef std::vector<Point> Points;
   typedef std::vector<Point> Line;
   Line pts;
   double length = 0.;

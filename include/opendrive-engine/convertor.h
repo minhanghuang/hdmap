@@ -6,11 +6,13 @@
 #include <memory>
 #include <string>
 
+#include "opendrive-cpp/geometry/element.h"
 #include "opendrive-engine/common/common.hpp"
 #include "opendrive-engine/common/log.h"
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/common/status.h"
 #include "opendrive-engine/core/define.h"
+#include "opendrive-engine/core/lane.h"
 
 namespace opendrive {
 namespace engine {
@@ -22,14 +24,26 @@ class Convertor {
 
  private:
   inline void SetStatus(ErrorCode code, const std::string& msg);
-  inline bool Next() const;
+  inline bool Continue() const;
   Convertor& ConvertHeader(element::Map::Ptr ele_map);
-  Convertor& ConvertRoad(element::Map::Ptr ele_map);
-  Convertor& ConvertRoadAttr(const element::Road& ele_road,
-                             core::Road::Ptr road);
   Convertor& ConvertJunction(element::Map::Ptr ele_map);
   Convertor& ConvertJunctionAttr(const element::Junction& ele_junction,
                                  core::Junction::Ptr junction);
+  Convertor& ConvertRoad(element::Map::Ptr ele_map);
+  Convertor& ConvertRoadAttr(const element::Road& ele_road,
+                             core::Road::Ptr road);
+  Convertor& ConvertSection(const element::Road& ele_road,
+                            core::Road::Ptr road);
+  void CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
+                          const element::LaneOffsets& lane_offsets,
+                          core::Section::Ptr section, double& road_ds);
+  void LaneSampling(const element::Lane& ele_lane, core::Lane::Ptr lane,
+                    const core::Curve::Line* refe_line);
+  element::Geometry::Ptr GetGeometry(const element::Geometry::Ptrs& geometrys,
+                                     double road_ds);
+  double GetLaneOffsetValue(const element::LaneOffsets& offsets,
+                            double road_ds);
+  float step_;
   Status status_;
   common::Param::ConstPtr param_;
   core::Data::Ptr data_;
