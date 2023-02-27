@@ -56,16 +56,16 @@ Convertor& Convertor::ConvertHeader(opendrive::element::Map::Ptr ele_map) {
   if (!Continue()) return *this;
   ENGINE_INFO("Convert Header Start")
   auto header = std::make_shared<core::Header>();
-  header->rev_major = ele_map->header.rev_major;
-  header->rev_minor = ele_map->header.rev_minor;
-  header->name = ele_map->header.name;
-  header->version = ele_map->header.version;
-  header->date = ele_map->header.date;
-  header->north = ele_map->header.north;
-  header->south = ele_map->header.south;
-  header->west = ele_map->header.west;
-  header->east = ele_map->header.east;
-  header->vendor = ele_map->header.vendor;
+  header->set_rev_major(ele_map->header.rev_major);
+  header->set_rev_minor(ele_map->header.rev_minor);
+  header->set_name(ele_map->header.name);
+  header->set_version(ele_map->header.version);
+  header->set_date(ele_map->header.date);
+  header->set_north(ele_map->header.north);
+  header->set_south(ele_map->header.south);
+  header->set_west(ele_map->header.west);
+  header->set_east(ele_map->header.east);
+  header->set_vendor(ele_map->header.vendor);
   data_->header = header;
   ENGINE_INFO("Convert Header End")
   return *this;
@@ -78,7 +78,7 @@ Convertor& Convertor::ConvertJunction(opendrive::element::Map::Ptr ele_map) {
     if (ele_junction.attributes.id < 0) continue;
     auto junction = std::make_shared<core::Junction>();
     ConvertJunctionAttr(ele_junction, junction);
-    data_->junctions[junction->id] = junction;
+    data_->junctions[junction->id()] = junction;
   }
   ENGINE_INFO("Convert Junction End")
   return *this;
@@ -87,9 +87,9 @@ Convertor& Convertor::ConvertJunction(opendrive::element::Map::Ptr ele_map) {
 Convertor& Convertor::ConvertJunctionAttr(const element::Junction& ele_junction,
                                           core::Junction::Ptr junction) {
   if (!Continue()) return *this;
-  junction->id = std::to_string(ele_junction.attributes.id);
-  junction->name = ele_junction.attributes.name;
-  junction->type = ele_junction.attributes.type;
+  junction->set_id(std::to_string(ele_junction.attributes.id));
+  junction->set_name(ele_junction.attributes.name);
+  junction->set_type(ele_junction.attributes.type);
   return *this;
 }
 
@@ -157,11 +157,11 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
     } else {
       auto lane = std::make_shared<core::Lane>();
       section->center_lane = lane;
-      lane->id = section->id + "_0";
+      lane->id_ = section->id + "_0";
       lane->parent_id = section->id;
       CenterLaneSampling(ele_road.plan_view.geometrys,
                          ele_road.lanes.lane_offsets, section, road_ds);
-      data_->lanes[lane->id] = lane;
+      data_->lanes[lane->id_] = lane;
     }
     // 参考线: 中心车道的左边界
     core::Curve::Line* refe_line =
@@ -171,10 +171,10 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
     for (const auto& ele_lane : ele_section.left.lanes) {
       auto lane = std::make_shared<core::Lane>();
       section->left_lanes.emplace_back(lane);
-      lane->id = section->id + "_" + std::to_string(ele_lane.attributes.id);
+      lane->id_ = section->id + "_" + std::to_string(ele_lane.attributes.id);
       lane->parent_id = section->id;
       LaneSampling(ele_lane, lane, refe_line);
-      data_->lanes[lane->id] = lane;
+      data_->lanes[lane->id_] = lane;
       refe_line = &lane->right_boundary.curve.pts;
     }
     // 参考线: 中心车道的右边界
@@ -184,10 +184,10 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
     for (const auto& ele_lane : ele_section.right.lanes) {
       auto lane = std::make_shared<core::Lane>();
       section->right_lanes.emplace_back(lane);
-      lane->id = section->id + "_" + std::to_string(ele_lane.attributes.id);
+      lane->id_ = section->id + "_" + std::to_string(ele_lane.attributes.id);
       lane->parent_id = section->id;
       LaneSampling(ele_lane, lane, refe_line);
-      data_->lanes[lane->id] = lane;
+      data_->lanes[lane->id_] = lane;
       refe_line = &lane->right_boundary.curve.pts;
     }
   }
@@ -242,7 +242,7 @@ void Convertor::LaneSampling(const element::Lane& ele_lane,
                              const core::Curve::Line* refe_line) {
   core::Curve::Point right_point;
   core::Curve::Point center_point;
-  auto lane_idx = opendrive::common::Split(lane->id, "_");
+  auto lane_idx = opendrive::common::Split(lane->id_, "_");
   const int lane_dir = lane_idx.at(2) > "0" ? 1 : -1;
   for (const auto& refe_point : *refe_line) {
     double lane_width = ele_lane.GetLaneWidth(refe_point.s) * lane_dir;

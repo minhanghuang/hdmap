@@ -10,13 +10,22 @@ namespace opendrive {
 namespace engine {
 namespace core {
 
-typedef struct Junction JunctionTypedef;
-struct Junction {
-  typedef std::shared_ptr<JunctionTypedef> Ptr;
-  typedef std::shared_ptr<JunctionTypedef const> ConstPtr;
-  Id id;
-  std::string name;
-  JunctionType type = JunctionType::DEFAULT;
+class Junction {
+ public:
+  Junction() = default;
+  typedef std::shared_ptr<Junction> Ptr;
+  typedef std::shared_ptr<Junction const> ConstPtr;
+  void set_id(const Id& s) { id_ = s; }
+  void set_name(const std::string& s) { name_ = s; }
+  void set_type(JunctionType t) { type_ = t; }
+  const Id& id() { return id_; }
+  const std::string& name() { return name_; }
+  JunctionType type() { return type_; }
+
+ private:
+  Id id_;
+  std::string name_;
+  JunctionType type_ = JunctionType::DEFAULT;
 };
 
 }  // namespace core

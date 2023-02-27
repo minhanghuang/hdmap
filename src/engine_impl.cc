@@ -22,8 +22,8 @@ Status EngineImpl::Init(const common::Param& param) {
 }
 
 std::string EngineImpl::GetXodrVersion() const {
-  return data_->header->rev_major + "." + data_->header->rev_minor + "." +
-         data_->header->version;
+  return data_->header->rev_major() + "." + data_->header->rev_minor() + "." +
+         data_->header->version();
 }
 
 core::Lane::ConstPtr EngineImpl::GetLaneById(const core::Id& id) const {
