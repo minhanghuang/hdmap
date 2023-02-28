@@ -11,20 +11,46 @@ namespace opendrive {
 namespace engine {
 namespace core {
 
-typedef struct Section SectionTypedef;
-struct Section {
-  typedef std::shared_ptr<SectionTypedef> Ptr;
-  typedef std::shared_ptr<SectionTypedef const> ConstPtr;
+class Section {
+ public:
+  typedef std::shared_ptr<Section> Ptr;
+  typedef std::shared_ptr<Section const> ConstPtr;
   typedef std::vector<Ptr> Ptrs;
   typedef std::vector<ConstPtr> ConstPtrs;
-  Id id;
-  Id parent_id;  // road id
-  double s0 = 0.;
-  double s1 = 0.;
-  double length = 0.;
-  Lane::Ptr center_lane;
-  Lane::Ptrs left_lanes;
-  Lane::Ptrs right_lanes;
+  void set_id(const std::string& s) { id_ = s; }
+  void set_parent_id(const std::string& s) { parent_id_ = s; }
+  void set_start_position(double d) { start_position_ = d; }
+  void set_end_position(double d) { end_position_ = d; }
+  void set_length(double d) { length_ = d; }
+  Lane::Ptr& mutable_center_lane() { return center_lane_; }
+  Lane::Ptrs& mutable_left_lanes() { return left_lanes_; }
+  Lane::Ptrs& mutable_right_lanes() { return right_lanes_; }
+  const Id& id() const { return id_; }
+  const Id& parent_id() const { return parent_id_; }
+  double start_position() const { return start_position_; }
+  double end_position() const { return end_position_; }
+  double length() const { return length_; }
+  Lane::ConstPtr center_lane() const { return center_lane_; }
+  Lane::ConstPtrs left_lanes() const {
+    Lane::ConstPtrs lanes;
+    for (const auto& lane : left_lanes_) lanes.emplace_back(lane);
+    return lanes;
+  }
+  Lane::ConstPtrs right_lanes() const {
+    Lane::ConstPtrs lanes;
+    for (const auto& lane : right_lanes_) lanes.emplace_back(lane);
+    return lanes;
+  }
+
+ private:
+  Id id_;
+  Id parent_id_;  // road id
+  double start_position_ = 0;
+  double end_position_ = 0;
+  double length_ = 0;
+  Lane::Ptr center_lane_;
+  Lane::Ptrs left_lanes_;
+  Lane::Ptrs right_lanes_;
 };
 
 }  // namespace core

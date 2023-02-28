@@ -142,53 +142,60 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
   for (const auto& ele_section : ele_road.lanes.lane_sections) {
     auto section = std::make_shared<core::Section>();
     road->sections.emplace_back(section);
-    section->id = road_id + "_" + std::to_string(section_idx++);
-    section->parent_id = road_id;
-    section->s0 = ele_section.s0;
-    section->s1 = ele_section.s1;
-    section->length = ele_section.s1 - ele_section.s0;
-    data_->sections[section->id] = section;
+    section->set_id(road_id + "_" + std::to_string(section_idx++));
+    section->set_parent_id(road_id);
+    section->set_start_position(ele_section.s0);
+    section->set_end_position(ele_section.s1);
+    section->set_length(ele_section.s1 - ele_section.s0);
+    data_->sections[section->id()] = section;
 
     /// center lane
     if (1 != ele_section.center.lanes.size()) {
       SetStatus(ErrorCode::CONVERTOR_CENTERLANE_ERROR,
-                section->id + " center lane size not equal 1.");
+                section->id() + " center lane size not equal 1.");
       return *this;
     } else {
       auto lane = std::make_shared<core::Lane>();
-      section->center_lane = lane;
-      lane->id_ = section->id + "_0";
-      lane->parent_id = section->id;
+      section->mutable_center_lane() = lane;
+      lane->set_id(section->id() + "_0");
+      lane->set_parent_id(section->id());
       CenterLaneSampling(ele_road.plan_view.geometrys,
                          ele_road.lanes.lane_offsets, section, road_ds);
-      data_->lanes[lane->id_] = lane;
+      data_->lanes[lane->id()] = lane;
     }
     // 参考线: 中心车道的左边界
-    core::Curve::Line* refe_line =
-        &section->center_lane->left_boundary.curve.pts;
+    core::Curve::Line& refe_line = section->mutable_center_lane()
+                                       ->mutable_left_boundary()
+                                       .mutable_curve()
+                                       .mutable_pts();
 
     /// left lanes
     for (const auto& ele_lane : ele_section.left.lanes) {
       auto lane = std::make_shared<core::Lane>();
-      section->left_lanes.emplace_back(lane);
-      lane->id_ = section->id + "_" + std::to_string(ele_lane.attributes.id);
-      lane->parent_id = section->id;
+      section->mutable_left_lanes().emplace_back(lane);
+      lane->set_id(section->id() + "_" +
+                   std::to_string(ele_lane.attributes.id));
+      lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
-      data_->lanes[lane->id_] = lane;
-      refe_line = &lane->right_boundary.curve.pts;
+      data_->lanes[lane->id()] = lane;
+      refe_line = lane->mutable_right_boundary().mutable_curve().mutable_pts();
     }
     // 参考线: 中心车道的右边界
-    refe_line = &section->center_lane->right_boundary.curve.pts;
+    refe_line = section->mutable_center_lane()
+                    ->mutable_right_boundary()
+                    .mutable_curve()
+                    .mutable_pts();
 
     /// right lanes
     for (const auto& ele_lane : ele_section.right.lanes) {
       auto lane = std::make_shared<core::Lane>();
-      section->right_lanes.emplace_back(lane);
-      lane->id_ = section->id + "_" + std::to_string(ele_lane.attributes.id);
-      lane->parent_id = section->id;
+      section->mutable_right_lanes().emplace_back(lane);
+      lane->set_id(section->id() + "_" +
+                   std::to_string(ele_lane.attributes.id));
+      lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
-      data_->lanes[lane->id_] = lane;
-      refe_line = &lane->right_boundary.curve.pts;
+      data_->lanes[lane->id()] = lane;
+      refe_line = lane->mutable_right_boundary().mutable_curve().mutable_pts();
     }
   }
 
@@ -204,10 +211,10 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
   core::Curve::Point point;
   element::Point refe_point;
   element::Point offset_point;
-  section->center_lane->central_curve.pts.clear();
+  section->mutable_center_lane()->mutable_central_curve().mutable_pts().clear();
 
   while (true) {
-    if (section_ds >= section->length) {
+    if (section_ds >= section->length()) {
       break;
     }
     geometry = GetGeometry(geometrys, road_ds);
@@ -228,9 +235,20 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
       point.hdg = refe_point.hdg;
       point.s = section_ds;
     }
-    section->center_lane->central_curve.pts.emplace_back(point);
-    section->center_lane->left_boundary.curve.pts.emplace_back(point);
-    section->center_lane->right_boundary.curve.pts.emplace_back(point);
+    section->mutable_center_lane()
+        ->mutable_central_curve()
+        .mutable_pts()
+        .emplace_back(point);
+    section->mutable_center_lane()
+        ->mutable_left_boundary()
+        .mutable_curve()
+        .mutable_pts()
+        .emplace_back(point);
+    section->mutable_center_lane()
+        ->mutable_right_boundary()
+        .mutable_curve()
+        .mutable_pts()
+        .emplace_back(point);
 
     section_ds += step_;
     road_ds += step_;
@@ -239,19 +257,21 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
 
 void Convertor::LaneSampling(const element::Lane& ele_lane,
                              core::Lane::Ptr lane,
-                             const core::Curve::Line* refe_line) {
+                             const core::Curve::Line& refe_line) {
   core::Curve::Point right_point;
   core::Curve::Point center_point;
-  auto lane_idx = opendrive::common::Split(lane->id_, "_");
+  auto lane_idx = opendrive::common::Split(lane->id(), "_");
   const int lane_dir = lane_idx.at(2) > "0" ? 1 : -1;
-  for (const auto& refe_point : *refe_line) {
+  for (const auto& refe_point : refe_line) {
     double lane_width = ele_lane.GetLaneWidth(refe_point.s) * lane_dir;
     center_point =
         opendrive::common::GetOffsetPoint(refe_point, lane_width / 2.0);
     right_point = opendrive::common::GetOffsetPoint(refe_point, lane_width);
-    lane->left_boundary.curve.pts.emplace_back(refe_point);
-    lane->central_curve.pts.emplace_back(center_point);
-    lane->right_boundary.curve.pts.emplace_back(right_point);
+    lane->mutable_left_boundary().mutable_curve().mutable_pts().emplace_back(
+        refe_point);
+    lane->mutable_central_curve().mutable_pts().emplace_back(center_point);
+    lane->mutable_right_boundary().mutable_curve().mutable_pts().emplace_back(
+        right_point);
   }
 }
 
