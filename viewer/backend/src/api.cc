@@ -61,7 +61,7 @@ void OkApi::Post(typhoon::Application* app, typhoon::Connection* conn) {
 void GlobalMapApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
   auto engine = GlobalData::Instance()->GetEngine();
   for (const auto& lane : engine->GetLanes()) {
-    std::cout << "lane: " << lane->id << std::endl;
+    std::cout << "lane: " << lane->id() << std::endl;
   }
   Response(app, conn, "ok post");
 }

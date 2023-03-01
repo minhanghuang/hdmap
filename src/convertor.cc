@@ -100,7 +100,7 @@ Convertor& Convertor::ConvertRoad(opendrive::element::Map::Ptr ele_map) {
     if (ele_road.attributes.id < 0) continue;
     auto road = std::make_shared<core::Road>();
     ConvertRoadAttr(ele_road, road).ConvertSection(ele_road, road);
-    data_->roads[road->id] = road;
+    data_->roads[road->id()] = road;
   }
   ENGINE_INFO("Convert Road End")
   return *this;
@@ -109,25 +109,25 @@ Convertor& Convertor::ConvertRoad(opendrive::element::Map::Ptr ele_map) {
 Convertor& Convertor::ConvertRoadAttr(const element::Road& ele_road,
                                       core::Road::Ptr road) {
   if (!Continue()) return *this;
-  road->id = std::to_string(ele_road.attributes.id);
-  road->name = ele_road.attributes.name;
-  road->junction_id = -1 == ele_road.attributes.junction
-                          ? ""
-                          : std::to_string(ele_road.attributes.junction);
-  road->length = ele_road.attributes.length;
-  road->rule = ele_road.attributes.rule;
+  road->set_id(std::to_string(ele_road.attributes.id));
+  road->set_name(ele_road.attributes.name);
+  road->set_junction_id(std::to_string(ele_road.attributes.junction));
+  road->set_length(ele_road.attributes.length);
+  road->set_rule(ele_road.attributes.rule);
   if (-1 != ele_road.link.predecessor.id) {
     // road predecessor/successor range 0~1 in opendrive.
-    road->predecessor_id.emplace(std::to_string(ele_road.link.predecessor.id));
+    road->mutable_predecessor_ids().emplace(
+        std::to_string(ele_road.link.predecessor.id));
   }
   if (-1 != ele_road.link.successor.id) {
-    road->successor_id.emplace(std::to_string(ele_road.link.successor.id));
+    road->mutable_successor_ids().emplace(
+        std::to_string(ele_road.link.successor.id));
   }
   for (const auto& ele_info : ele_road.type_info) {
     core::RoadInfo road_info;
-    road_info.s = ele_info.s;
-    road_info.type = ele_info.type;
-    road->info.emplace_back(road_info);
+    road_info.set_s(ele_info.s);
+    road_info.set_type(ele_info.type);
+    road->mutable_info().emplace_back(road_info);
   }
   return *this;
 }
@@ -141,7 +141,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
   int section_idx = 0;
   for (const auto& ele_section : ele_road.lanes.lane_sections) {
     auto section = std::make_shared<core::Section>();
-    road->sections.emplace_back(section);
+    road->mutable_sections().emplace_back(section);
     section->set_id(road_id + "_" + std::to_string(section_idx++));
     section->set_parent_id(road_id);
     section->set_start_position(ele_section.s0);

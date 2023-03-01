@@ -18,9 +18,9 @@ class Junction {
   void set_id(const Id& s) { id_ = s; }
   void set_name(const std::string& s) { name_ = s; }
   void set_type(JunctionType t) { type_ = t; }
-  const Id& id() { return id_; }
-  const std::string& name() { return name_; }
-  JunctionType type() { return type_; }
+  const Id& id() const { return id_; }
+  const std::string& name() const { return name_; }
+  JunctionType type() const { return type_; }
 
  private:
   Id id_;

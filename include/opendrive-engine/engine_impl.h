@@ -12,7 +12,6 @@
 #include "opendrive-engine/convertor.h"
 #include "opendrive-engine/core/define.h"
 #include "opendrive-engine/core/header.h"
-#include "opendrive-engine/core/map.h"
 
 namespace opendrive {
 namespace engine {

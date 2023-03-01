@@ -6,7 +6,12 @@
 #include <unordered_set>
 #include <vector>
 
-#include "map.h"
+#include "header.h"
+#include "id.h"
+#include "junction.h"
+#include "lane.h"
+#include "road.h"
+#include "section.h"
 
 namespace opendrive {
 namespace engine {
