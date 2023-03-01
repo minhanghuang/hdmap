@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "global_data.h"
+#include "util.h"
 
 namespace opendrive {
 namespace engine {
@@ -15,11 +16,6 @@ enum class HttpStatusCode {
   FAILED,
   PARAM,
 };
-
-typedef nlohmann::json Json;
-typedef nlohmann::json::value_t JsonValueType;
-typedef std::string Data;
-typedef std::unordered_map<std::string, JsonValueType> RequiredKeys;
 
 class RequestBase {
  public:

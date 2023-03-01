@@ -11,6 +11,7 @@ namespace server {
 GlobalData::GlobalData() {}
 
 int GlobalData::Init(const std::string& yaml_path) {
+  std::cout << "GlobalData Init Start." << std::endl;
   // param load
   param_ = std::make_shared<Param>();
   if (param_->Load(yaml_path)) {
@@ -25,6 +26,7 @@ int GlobalData::Init(const std::string& yaml_path) {
     std::cerr << engine_status.msg << std::endl;
     return -1;
   }
+  std::cout << "GlobalData Init End." << std::endl;
   return 0;
 }
 
