@@ -21,7 +21,7 @@ int GlobalData::Init(const std::string& yaml_path) {
 
   // engine init
   engine_ = std::make_shared<engine::Engine>();
-  auto engine_status = engine_->Init(param_->GetEngine());
+  auto engine_status = engine_->Init(param_->engine_param());
   if (ErrorCode::OK != engine_status.error_code) {
     std::cerr << engine_status.msg << std::endl;
     return -1;

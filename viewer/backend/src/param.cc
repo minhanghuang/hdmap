@@ -42,9 +42,9 @@ void Param::Print() {
   std::cout << "param http thread_num: " << http_.thread_num << std::endl;
 }
 
-const HttpConfig& Param::GetHttp() const { return http_; }
+const HttpConfig& Param::http() const { return http_; }
 
-const common::Param& Param::GetEngine() const { return engine_param_; }
+const common::Param& Param::engine_param() const { return engine_param_; }
 
 }  // namespace server
 }  // namespace engine

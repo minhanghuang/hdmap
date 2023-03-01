@@ -18,16 +18,15 @@ struct HttpConfig {
   int thread_num;
 };
 
-typedef struct Param ParamType;
 class Param {
  public:
-  typedef std::shared_ptr<ParamType> Ptr;
-  typedef std::shared_ptr<ParamType const> ConstPtr;
+  typedef std::shared_ptr<Param> Ptr;
+  typedef std::shared_ptr<Param const> ConstPtr;
   Param() = default;
   int Load(const std::string& yaml_path);
   void Print();
-  const HttpConfig& GetHttp() const;
-  const common::Param& GetEngine() const;
+  const HttpConfig& http() const;
+  const common::Param& engine_param() const;
 
  private:
   HttpConfig http_;
