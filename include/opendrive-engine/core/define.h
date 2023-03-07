@@ -22,10 +22,9 @@ typedef std::unordered_map<Id, Section::Ptr> SectionRoute;
 typedef std::unordered_map<Id, Road::Ptr> RoadRoute;
 typedef std::unordered_map<Id, Junction::Ptr> JunctionRoute;
 
-typedef struct Data DataTypedef;
 struct Data {
-  typedef std::shared_ptr<DataTypedef> Ptr;
-  typedef std::shared_ptr<DataTypedef const> ConstPtr;
+  typedef std::shared_ptr<Data> Ptr;
+  typedef std::shared_ptr<Data const> ConstPtr;
   Header::Ptr header;
   LaneRoute lanes;
   SectionRoute sections;

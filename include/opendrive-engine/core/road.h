@@ -14,17 +14,22 @@ namespace core {
 
 class RoadInfo {
  public:
-  void set_s(double d) { s_ = d; }
-  void set_type(RoadType t) { type_ = t; }
+  RoadInfo() : start_position_(0), type_(RoadType::TOWN), speed_limit_(0) {}
+  void set_s(double d) { start_position_ = d; }
+  void set_type(RoadType i) { type_ = i; }
   void set_speed_limit(double d) { speed_limit_ = d; }
-  double s() const { return s_; }
+  double& mutable_start_position() { return start_position_; }
+  RoadType& mutable_type() { return type_; }
+  double& mutable_speed_limit() { return speed_limit_; }
+  double start_position() const { return start_position_; }
   RoadType type() const { return type_; }
   double speed_limit() const { return speed_limit_; }
 
  private:
-  double s_ = 0.;
-  RoadType type_ = RoadType::TOWN;
-  double speed_limit_;  // meters per second
+  double start_position_;
+  RoadType type_;
+  // meters per second
+  double speed_limit_;
 };
 typedef std::vector<RoadInfo> RoadInfos;
 
@@ -34,6 +39,12 @@ class Road {
   typedef std::shared_ptr<Road const> ConstPtr;
   typedef std::vector<Ptr> Ptrs;
   typedef std::vector<ConstPtr> ConstPtrs;
+  Road()
+      : id_(""),
+        name_(""),
+        junction_id_(""),
+        length_(0),
+        rule_(RoadRule::RHT) {}
   void set_id(const Id& s) { id_ = s; }
   void set_name(const std::string& s) { name_ = s; }
   void set_junction_id(const Id& s) { junction_id_ = "-1" == s ? "" : s; }
@@ -63,11 +74,11 @@ class Road {
   Id id_;
   std::string name_;
   Id junction_id_;
-  double length_ = 0;
+  double length_;
+  RoadRule rule_;
   Section::Ptrs sections_;
   Ids predecessor_ids_;
   Ids successor_ids_;
-  RoadRule rule_ = RoadRule::RHT;
   RoadInfos info_;
 };
 

@@ -225,15 +225,15 @@ void Convertor::CenterLaneSampling(
     double offset = GetLaneOffsetValue(lane_offsets, road_ds);
     if (0 != offset) {
       offset_point = opendrive::common::GetOffsetPoint(refe_point, offset);
-      point.x = offset_point.x;
-      point.y = offset_point.y;
-      point.hdg = offset_point.hdg;
-      point.s = section_ds;
+      point.mutable_x() = offset_point.x();
+      point.mutable_y() = offset_point.y();
+      point.mutable_heading() = offset_point.heading();
+      point.mutable_start_position() = section_ds;
     } else {
-      point.x = refe_point.x;
-      point.y = refe_point.y;
-      point.hdg = refe_point.hdg;
-      point.s = section_ds;
+      point.mutable_x() = refe_point.x();
+      point.mutable_y() = refe_point.y();
+      point.mutable_heading() = refe_point.heading();
+      point.mutable_start_position() = section_ds;
     }
     section->mutable_center_lane()
         ->mutable_central_curve()
@@ -263,7 +263,8 @@ void Convertor::LaneSampling(const element::Lane& ele_lane,
   auto lane_idx = opendrive::common::Split(lane->id(), "_");
   const int lane_dir = lane_idx.at(2) > "0" ? 1 : -1;
   for (const auto& refe_point : refe_line) {
-    double lane_width = ele_lane.GetLaneWidth(refe_point.s) * lane_dir;
+    double lane_width =
+        ele_lane.GetLaneWidth(refe_point.start_position()) * lane_dir;
     center_point =
         opendrive::common::GetOffsetPoint(refe_point, lane_width / 2.0);
     right_point = opendrive::common::GetOffsetPoint(refe_point, lane_width);

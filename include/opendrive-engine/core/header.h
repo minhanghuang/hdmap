@@ -23,6 +23,16 @@ class Header {
   void set_west(double d) { west_ = d; }
   void set_east(double d) { east_ = d; }
   void set_vendor(const std::string& s) { vendor_ = s; }
+  std::string& mutable_rev_major() { return rev_major_; }
+  std::string& mutable_rev_minor() { return rev_minor_; }
+  std::string& mutable_version() { return version_; }
+  std::string& mutable_name() { return name_; }
+  std::string& mutable_date() { return date_; }
+  std::string& mutable_vendor() { return vendor_; }
+  double& mutable_north() { return north_; }
+  double& mutable_south() { return south_; }
+  double& mutable_west() { return west_; }
+  double& mutable_east() { return east_; }
   const std::string& rev_major() const { return rev_major_; }
   const std::string& rev_minor() const { return rev_minor_; }
   const std::string& name() const { return name_; }

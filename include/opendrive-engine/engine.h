@@ -15,12 +15,11 @@
 namespace opendrive {
 namespace engine {
 
-typedef class Engine EngineType;
 class Engine {
  public:
-  typedef std::shared_ptr<EngineType> Ptr;
-  typedef std::unique_ptr<EngineType> UPtr;
-  typedef std::shared_ptr<EngineType const> ConstPtr;
+  typedef std::shared_ptr<Engine> Ptr;
+  typedef std::unique_ptr<Engine> UPtr;
+  typedef std::shared_ptr<Engine const> ConstPtr;
   ~Engine() = default;
   Engine();
   Status Init(const common::Param& param);

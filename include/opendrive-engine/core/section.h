@@ -17,11 +17,25 @@ class Section {
   typedef std::shared_ptr<Section const> ConstPtr;
   typedef std::vector<Ptr> Ptrs;
   typedef std::vector<ConstPtr> ConstPtrs;
-  void set_id(const std::string& s) { id_ = s; }
-  void set_parent_id(const std::string& s) { parent_id_ = s; }
+  Section()
+      : id_(""),
+        parent_id_(""),
+        start_position_(0),
+        end_position_(0),
+        length_(0) {}
+  void set_id(const Id& s) { id_ = s; }
+  void set_parent_id(const Id& s) { parent_id_ = s; }
   void set_start_position(double d) { start_position_ = d; }
   void set_end_position(double d) { end_position_ = d; }
   void set_length(double d) { length_ = d; }
+  void set_center_lane(Lane::Ptr p) { center_lane_ = p; }
+  void set_left_lanes(Lane::Ptrs v) { left_lanes_ = v; }
+  void set_right_lanes(Lane::Ptrs v) { right_lanes_ = v; }
+  Id& mutable_id() { return id_; }
+  Id& mutable_parent_id() { return parent_id_; }
+  double& mutable_start_position() { return start_position_; }
+  double& mutable_end_position() { return end_position_; }
+  double& mutable_length() { return length_; }
   Lane::Ptr& mutable_center_lane() { return center_lane_; }
   Lane::Ptrs& mutable_left_lanes() { return left_lanes_; }
   Lane::Ptrs& mutable_right_lanes() { return right_lanes_; }

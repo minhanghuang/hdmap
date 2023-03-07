@@ -16,10 +16,9 @@
 namespace opendrive {
 namespace engine {
 
-typedef class EngineImpl EngineImplType;
 class EngineImpl {
  public:
-  typedef std::shared_ptr<EngineImplType> Ptr;
+  typedef std::shared_ptr<EngineImpl> Ptr;
   EngineImpl();
   Status Init(const common::Param& param);
   std::string GetXodrVersion() const;
