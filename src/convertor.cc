@@ -56,16 +56,16 @@ Convertor& Convertor::ConvertHeader(opendrive::element::Map::Ptr ele_map) {
   if (!Continue()) return *this;
   ENGINE_INFO("Convert Header Start")
   auto header = std::make_shared<core::Header>();
-  header->set_rev_major(ele_map->header.rev_major);
-  header->set_rev_minor(ele_map->header.rev_minor);
-  header->set_name(ele_map->header.name);
-  header->set_version(ele_map->header.version);
-  header->set_date(ele_map->header.date);
-  header->set_north(ele_map->header.north);
-  header->set_south(ele_map->header.south);
-  header->set_west(ele_map->header.west);
-  header->set_east(ele_map->header.east);
-  header->set_vendor(ele_map->header.vendor);
+  header->set_rev_major(ele_map->header().rev_major());
+  header->set_rev_minor(ele_map->header().rev_minor());
+  header->set_name(ele_map->header().name());
+  header->set_version(ele_map->header().version());
+  header->set_date(ele_map->header().date());
+  header->set_north(ele_map->header().north());
+  header->set_south(ele_map->header().south());
+  header->set_west(ele_map->header().west());
+  header->set_east(ele_map->header().east());
+  header->set_vendor(ele_map->header().vendor());
   data_->header = header;
   ENGINE_INFO("Convert Header End")
   return *this;
@@ -74,8 +74,8 @@ Convertor& Convertor::ConvertHeader(opendrive::element::Map::Ptr ele_map) {
 Convertor& Convertor::ConvertJunction(opendrive::element::Map::Ptr ele_map) {
   if (!Continue()) return *this;
   ENGINE_INFO("Convert Junction Start")
-  for (const auto& ele_junction : ele_map->junctions) {
-    if (ele_junction.attributes.id < 0) continue;
+  for (const auto& ele_junction : ele_map->junctions()) {
+    if (ele_junction.attribute().id() < 0) continue;
     auto junction = std::make_shared<core::Junction>();
     ConvertJunctionAttr(ele_junction, junction);
     data_->junctions[junction->id()] = junction;
@@ -87,17 +87,17 @@ Convertor& Convertor::ConvertJunction(opendrive::element::Map::Ptr ele_map) {
 Convertor& Convertor::ConvertJunctionAttr(const element::Junction& ele_junction,
                                           core::Junction::Ptr junction) {
   if (!Continue()) return *this;
-  junction->set_id(std::to_string(ele_junction.attributes.id));
-  junction->set_name(ele_junction.attributes.name);
-  junction->set_type(ele_junction.attributes.type);
+  junction->set_id(std::to_string(ele_junction.attribute().id()));
+  junction->set_name(ele_junction.attribute().name());
+  junction->set_type(ele_junction.attribute().type());
   return *this;
 }
 
 Convertor& Convertor::ConvertRoad(opendrive::element::Map::Ptr ele_map) {
   if (!Continue()) return *this;
   ENGINE_INFO("Convert Road Start")
-  for (const auto& ele_road : ele_map->roads) {
-    if (ele_road.attributes.id < 0) continue;
+  for (const auto& ele_road : ele_map->roads()) {
+    if (ele_road.attribute().id() < 0) continue;
     auto road = std::make_shared<core::Road>();
     ConvertRoadAttr(ele_road, road).ConvertSection(ele_road, road);
     data_->roads[road->id()] = road;
@@ -109,24 +109,24 @@ Convertor& Convertor::ConvertRoad(opendrive::element::Map::Ptr ele_map) {
 Convertor& Convertor::ConvertRoadAttr(const element::Road& ele_road,
                                       core::Road::Ptr road) {
   if (!Continue()) return *this;
-  road->set_id(std::to_string(ele_road.attributes.id));
-  road->set_name(ele_road.attributes.name);
-  road->set_junction_id(std::to_string(ele_road.attributes.junction));
-  road->set_length(ele_road.attributes.length);
-  road->set_rule(ele_road.attributes.rule);
-  if (-1 != ele_road.link.predecessor.id) {
+  road->set_id(std::to_string(ele_road.attribute().id()));
+  road->set_name(ele_road.attribute().name());
+  road->set_junction_id(std::to_string(ele_road.attribute().junction_id()));
+  road->set_length(ele_road.attribute().length());
+  road->set_rule(ele_road.attribute().rule());
+  if (-1 != ele_road.link().predecessor().id()) {
     // road predecessor/successor range 0~1 in opendrive.
     road->mutable_predecessor_ids().emplace(
-        std::to_string(ele_road.link.predecessor.id));
+        std::to_string(ele_road.link().predecessor().id()));
   }
-  if (-1 != ele_road.link.successor.id) {
+  if (-1 != ele_road.link().successor().id()) {
     road->mutable_successor_ids().emplace(
-        std::to_string(ele_road.link.successor.id));
+        std::to_string(ele_road.link().successor().id()));
   }
-  for (const auto& ele_info : ele_road.type_info) {
+  for (const auto& ele_info : ele_road.type_info()) {
     core::RoadInfo road_info;
-    road_info.set_s(ele_info.s);
-    road_info.set_type(ele_info.type);
+    road_info.set_s(ele_info.start_position());
+    road_info.set_type(ele_info.type());
     road->mutable_info().emplace_back(road_info);
   }
   return *this;
@@ -136,21 +136,22 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
                                      core::Road::Ptr road) {
   if (!Continue()) return *this;
 
-  std::string road_id = std::to_string(ele_road.attributes.id);
+  std::string road_id = std::to_string(ele_road.attribute().id());
   double road_ds = 0;
   int section_idx = 0;
-  for (const auto& ele_section : ele_road.lanes.lane_sections) {
+  for (const auto& ele_section : ele_road.lanes().lane_sections()) {
     auto section = std::make_shared<core::Section>();
     road->mutable_sections().emplace_back(section);
     section->set_id(road_id + "_" + std::to_string(section_idx++));
     section->set_parent_id(road_id);
-    section->set_start_position(ele_section.s0);
-    section->set_end_position(ele_section.s1);
-    section->set_length(ele_section.s1 - ele_section.s0);
+    section->set_start_position(ele_section.start_position());
+    section->set_end_position(ele_section.end_position());
+    section->set_length(ele_section.end_position() -
+                        ele_section.start_position());
     data_->sections[section->id()] = section;
 
     /// center lane
-    if (1 != ele_section.center.lanes.size()) {
+    if (1 != ele_section.center().lanes().size()) {
       SetStatus(ErrorCode::CONVERTOR_CENTERLANE_ERROR,
                 section->id() + " center lane size not equal 1.");
       return *this;
@@ -159,8 +160,8 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
       section->mutable_center_lane() = lane;
       lane->set_id(section->id() + "_0");
       lane->set_parent_id(section->id());
-      CenterLaneSampling(ele_road.plan_view.geometrys,
-                         ele_road.lanes.lane_offsets, section, road_ds);
+      CenterLaneSampling(ele_road.plan_view().geometrys(),
+                         ele_road.lanes().lane_offsets(), section, road_ds);
       data_->lanes[lane->id()] = lane;
     }
     // 参考线: 中心车道的左边界
@@ -170,11 +171,11 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
                                        .mutable_pts();
 
     /// left lanes
-    for (const auto& ele_lane : ele_section.left.lanes) {
+    for (const auto& ele_lane : ele_section.left().lanes()) {
       auto lane = std::make_shared<core::Lane>();
       section->mutable_left_lanes().emplace_back(lane);
       lane->set_id(section->id() + "_" +
-                   std::to_string(ele_lane.attributes.id));
+                   std::to_string(ele_lane.attribute().id()));
       lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
       data_->lanes[lane->id()] = lane;
@@ -187,11 +188,11 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
                     .mutable_pts();
 
     /// right lanes
-    for (const auto& ele_lane : ele_section.right.lanes) {
+    for (const auto& ele_lane : ele_section.right().lanes()) {
       auto lane = std::make_shared<core::Lane>();
       section->mutable_right_lanes().emplace_back(lane);
       lane->set_id(section->id() + "_" +
-                   std::to_string(ele_lane.attributes.id));
+                   std::to_string(ele_lane.attribute().id()));
       lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
       data_->lanes[lane->id()] = lane;
@@ -202,12 +203,11 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
   return *this;
 }
 
-void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
-                                   const element::LaneOffsets& lane_offsets,
-                                   core::Section::Ptr section,
-                                   double& road_ds) {
+void Convertor::CenterLaneSampling(
+    const element::Geometry::ConstPtrs& geometrys,
+    const element::LaneOffsets& lane_offsets, core::Section::Ptr section,
+    double& road_ds) {
   double section_ds = 0;
-  element::Geometry::Ptr geometry = nullptr;
   core::Curve::Point point;
   element::Point refe_point;
   element::Point offset_point;
@@ -217,7 +217,7 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
     if (section_ds >= section->length()) {
       break;
     }
-    geometry = GetGeometry(geometrys, road_ds);
+    element::Geometry::ConstPtr geometry = GetGeometry(geometrys, road_ds);
     if (!geometry) {
       break;
     }
@@ -275,8 +275,8 @@ void Convertor::LaneSampling(const element::Lane& ele_lane,
   }
 }
 
-element::Geometry::Ptr Convertor::GetGeometry(
-    const element::Geometry::Ptrs& geometrys, double road_ds) {
+element::Geometry::ConstPtr Convertor::GetGeometry(
+    const element::Geometry::ConstPtrs& geometrys, double road_ds) {
   auto geometry_idx = opendrive::common::GetGtPtrPoloy3(geometrys, road_ds);
   if (geometry_idx < 0) {
     SetStatus(ErrorCode::CONVERTOR_CENTERLANE_ERROR,
