@@ -30,6 +30,7 @@ TEST_F(TestEmpty, TestInit) {
   param.map_file = map_file;
   opendrive::engine::Engine engine;
   engine.Init(param);
+  ASSERT_TRUE(engine.GetLanes().size() > 0);
 }
 
 int main(int argc, char* argv[]) {

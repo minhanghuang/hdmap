@@ -31,7 +31,7 @@ Status Convertor::Start() {
   }
   step_ = std::max<float>(0.1, param_->step);
   status_.error_code = ErrorCode::OK;
-  status_.msg = "";
+  status_.msg = "ok";
   std::string map_file = param_->map_file;
   if (map_file.empty() || !cactus::FileExists(map_file) || !data_) {
     SetStatus(ErrorCode::INIT_MAPFILE_ERROR, "input file error: " + map_file);
@@ -49,6 +49,9 @@ Status Convertor::Start() {
   std::cout << "Convert Start" << std::endl;
 
   ConvertHeader(ele_map).ConvertRoad(ele_map).ConvertJunction(ele_map);
+  
+  std::cout << "Convert End" << std::endl;
+  std::cout << "Convert msg: " << status_.msg << std::endl;
   return status_;
 }
 
@@ -221,6 +224,7 @@ void Convertor::CenterLaneSampling(
     if (!geometry) {
       break;
     }
+    std::cout << "---1-" << std::endl;
     refe_point = geometry->GetPoint(road_ds);
     double offset = GetLaneOffsetValue(lane_offsets, road_ds);
     if (0 != offset) {
@@ -284,6 +288,7 @@ element::Geometry::ConstPtr Convertor::GetGeometry(
               "get geometry index execption.");
     return nullptr;
   }
+  std::cout << "geometry_idx: " << geometry_idx << std::endl;
   if (geometry_idx && geometry_idx < geometrys.size()) {
     return geometrys.at(geometry_idx);
   }
