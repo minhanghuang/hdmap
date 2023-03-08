@@ -33,7 +33,7 @@ class Point3D : public Point2D {
   double& mutable_z() { return z_; }
   double z() const { return z_; }
 
- private:
+ protected:
   double z_;
 };
 

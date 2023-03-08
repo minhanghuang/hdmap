@@ -66,7 +66,7 @@ Convertor& Convertor::ConvertHeader(opendrive::element::Map::Ptr ele_map) {
   header->set_west(ele_map->header().west());
   header->set_east(ele_map->header().east());
   header->set_vendor(ele_map->header().vendor());
-  data_->header = header;
+  data_->set_header(header);
   ENGINE_INFO("Convert Header End")
   return *this;
 }
@@ -78,7 +78,7 @@ Convertor& Convertor::ConvertJunction(opendrive::element::Map::Ptr ele_map) {
     if (ele_junction.attribute().id() < 0) continue;
     auto junction = std::make_shared<core::Junction>();
     ConvertJunctionAttr(ele_junction, junction);
-    data_->junctions[junction->id()] = junction;
+    data_->mutable_junction()[junction->id()] = junction;
   }
   ENGINE_INFO("Convert Junction End")
   return *this;
@@ -100,7 +100,7 @@ Convertor& Convertor::ConvertRoad(opendrive::element::Map::Ptr ele_map) {
     if (ele_road.attribute().id() < 0) continue;
     auto road = std::make_shared<core::Road>();
     ConvertRoadAttr(ele_road, road).ConvertSection(ele_road, road);
-    data_->roads[road->id()] = road;
+    data_->mutable_roads()[road->id()] = road;
   }
   ENGINE_INFO("Convert Road End")
   return *this;
@@ -148,7 +148,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
     section->set_end_position(ele_section.end_position());
     section->set_length(ele_section.end_position() -
                         ele_section.start_position());
-    data_->sections[section->id()] = section;
+    data_->mutable_sections()[section->id()] = section;
 
     /// center lane
     if (1 != ele_section.center().lanes().size()) {
@@ -162,7 +162,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
       lane->set_parent_id(section->id());
       CenterLaneSampling(ele_road.plan_view().geometrys(),
                          ele_road.lanes().lane_offsets(), section, road_ds);
-      data_->lanes[lane->id()] = lane;
+      data_->mutable_lanes()[lane->id()] = lane;
     }
     // 参考线: 中心车道的左边界
     core::Curve::Line& refe_line = section->mutable_center_lane()
@@ -178,7 +178,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
                    std::to_string(ele_lane.attribute().id()));
       lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
-      data_->lanes[lane->id()] = lane;
+      data_->mutable_lanes()[lane->id()] = lane;
       refe_line = lane->mutable_right_boundary().mutable_curve().mutable_pts();
     }
     // 参考线: 中心车道的右边界
@@ -195,7 +195,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
                    std::to_string(ele_lane.attribute().id()));
       lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
-      data_->lanes[lane->id()] = lane;
+      data_->mutable_lanes()[lane->id()] = lane;
       refe_line = lane->mutable_right_boundary().mutable_curve().mutable_pts();
     }
   }
