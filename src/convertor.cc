@@ -49,7 +49,7 @@ Status Convertor::Start() {
   std::cout << "Convert Start" << std::endl;
 
   ConvertHeader(ele_map).ConvertRoad(ele_map).ConvertJunction(ele_map);
-  
+
   std::cout << "Convert End" << std::endl;
   std::cout << "Convert msg: " << status_.msg << std::endl;
   return status_;
@@ -224,7 +224,6 @@ void Convertor::CenterLaneSampling(
     if (!geometry) {
       break;
     }
-    std::cout << "---1-" << std::endl;
     refe_point = geometry->GetPoint(road_ds);
     double offset = GetLaneOffsetValue(lane_offsets, road_ds);
     if (0 != offset) {
@@ -288,8 +287,7 @@ element::Geometry::ConstPtr Convertor::GetGeometry(
               "get geometry index execption.");
     return nullptr;
   }
-  std::cout << "geometry_idx: " << geometry_idx << std::endl;
-  if (geometry_idx && geometry_idx < geometrys.size()) {
+  if (geometry_idx < geometrys.size()) {
     return geometrys.at(geometry_idx);
   }
   return nullptr;
