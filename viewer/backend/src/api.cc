@@ -1,6 +1,7 @@
 #include "api.h"
 
 #include "global_data.h"
+#include "log.h"
 #include "util.h"
 
 namespace opendrive {
@@ -60,14 +61,12 @@ void OkApi::Post(typhoon::Application* app, typhoon::Connection* conn) {
 }
 
 void GlobalMapApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
-  std::cout << "[Http Request] GlobalMapApi Get" << std::endl;
+  ELOG_INFO("Http Request GlobalMapApi Get");
   auto engine = GlobalData::Instance()->GetEngine();
   Json response;
   for (const auto& lane : engine->GetLanes()) {
-    std::cout << "lane: " << lane->id() << std::endl;
     Json lane_json;
     ConvertLaneToPts(lane, lane_json);
-    std::cout << "lane_json:" << lane_json << std::endl;
     response.emplace_back(lane_json);
   }
   Response(app, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));

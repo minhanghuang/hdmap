@@ -11,9 +11,6 @@ bool ConvertLaneToPts(core::Lane::ConstPtr lane, Json& lane_json) {
       std::min(std::min(lane->central_curve().pts().size(),
                         lane->left_boundary().curve().pts().size()),
                lane->right_boundary().curve().pts().size());
-  std::cout << "l:" << lane->left_boundary().curve().pts().size() << std::endl;
-  std::cout << "c:" << lane->central_curve().pts().size() << std::endl;
-  std::cout << "r:" << lane->right_boundary().curve().pts().size() << std::endl;
   for (int i = 0; i < lane_length; i++) {
     lane_json[0][i][0] = lane->left_boundary().curve().pts().at(i).x();
     lane_json[0][i][1] = lane->left_boundary().curve().pts().at(i).y();

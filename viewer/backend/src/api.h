@@ -5,6 +5,7 @@
 #include <nlohmann/json.hpp>
 
 #include "global_data.h"
+#include "log.h"
 #include "util.h"
 
 namespace opendrive {
