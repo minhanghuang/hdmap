@@ -64,10 +64,14 @@ void GlobalMapApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
   ELOG_INFO("Http Request GlobalMapApi Get");
   auto engine = GlobalData::Instance()->GetEngine();
   Json response;
+  Json line_json;
   for (const auto& lane : engine->GetLanes()) {
-    Json lane_json;
-    ConvertLaneToPts(lane, lane_json);
-    response.emplace_back(lane_json);
+    ConvertLineToPts(lane->left_boundary().curve(), line_json);
+    response.emplace_back(line_json);
+    ConvertLineToPts(lane->central_curve(), line_json);
+    response.emplace_back(line_json);
+    ConvertLineToPts(lane->right_boundary().curve(), line_json);
+    response.emplace_back(line_json);
   }
   Response(app, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
 }

@@ -17,9 +17,7 @@ typedef nlohmann::json::value_t JsonValueType;
 typedef std::string Data;
 typedef std::unordered_map<std::string, JsonValueType> RequiredKeys;
 
-bool ConvertLaneToPts(core::Lane::ConstPtr lane, Json& lane_json);
-
-bool ConvertSectionToPts(core::Section::ConstPtr section, Json& section_json);
+bool ConvertLineToPts(const core::Curve& line, Json& line_json);
 
 }  // namespace server
 }  // namespace engine
