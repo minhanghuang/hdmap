@@ -18,20 +18,32 @@ class Curve {
  public:
   class Point : public element::Point {
    public:
-    Point() : start_position_(0) {}
-    Point(double x, double y) : element::Point(x, y), start_position_(0) {}
+    Point() : start_position_(0), id_("") {}
+    Point(double x, double y)
+        : element::Point(x, y), start_position_(0), id_("") {}
     Point(double x, double y, double z)
-        : element::Point(x, y, z), start_position_(0) {}
+        : element::Point(x, y, z), start_position_(0), id_("") {}
     Point(double x, double y, double z, double heading)
-        : element::Point(x, y, z, heading), start_position_(0) {}
+        : element::Point(x, y, z, heading), start_position_(0), id_("") {}
     Point(double x, double y, double z, double heading, double start_position)
-        : element::Point(x, y, z, heading), start_position_(start_position) {}
+        : element::Point(x, y, z, heading),
+          start_position_(start_position),
+          id_("") {}
+    Point(double x, double y, double z, double heading, double start_position,
+          const Id& id)
+        : element::Point(x, y, z, heading),
+          start_position_(start_position),
+          id_(id) {}
     void set_start_position(double d) { start_position_ = d; }
+    void set_id(const Id& s) { id_ = s; }
     double& mutable_start_position() { return start_position_; }
+    Id& mutable_id() { return id_; }
     double start_position() const { return start_position_; }
+    const Id& id() const { return id_; }
 
    private:
     double start_position_;
+    Id id_;
   };
   typedef std::vector<Point> Points;
   typedef std::vector<Point> Line;
@@ -87,7 +99,7 @@ class LaneBoundary {
 class SpeedLimit {
  public:
   SpeedLimit() : start_position_(0), value_(0) {}
-  void set_s(double d) { start_position_ = d; }
+  void set_start_position(double d) { start_position_ = d; }
   void set_value(double d) { value_ = d; }
   double& mutable_start_position() { return start_position_; }
   double& mutable_value() { return value_; }
@@ -99,6 +111,23 @@ class SpeedLimit {
   double value_;  // meters per second
 };
 typedef std::vector<SpeedLimit> SpeedLimits;
+
+class Geomotry {
+ public:
+  typedef opendrive::GeometryType Type;
+  Geomotry() : type_(Type::LINE) {}
+  void set_type(Type i) { type_ = i; }
+  void set_point(const Curve::Point& point) { point_ = point; }
+  Type& mutable_type() { return type_; }
+  Curve::Point& mutable_point() { return point_; }
+  Type type() const { return type_; }
+  Curve::Point point() const { return point_; }
+
+ private:
+  Type type_;
+  Curve::Point point_;
+};
+typedef std::vector<Geomotry> Geomotrys;
 
 class Lane {
  public:
@@ -119,6 +148,7 @@ class Lane {
   void set_left_boundary(const LaneBoundary& v) { left_boundary_ = v; }
   void set_right_boundary(const LaneBoundary& v) { right_boundary_ = v; }
   void set_speed_limits(const SpeedLimits& v) { speed_limits_ = v; }
+  void set_geometrys(const Geomotrys& v) { geometrys_ = v; }
   Id& mutable_id() { return id_; }
   Id& mutable_parent_id() { return parent_id_; }
   Ids& mutable_predecessor_ids() { return predecessor_ids_; }
@@ -127,6 +157,7 @@ class Lane {
   LaneBoundary& mutable_left_boundary() { return left_boundary_; }
   LaneBoundary& mutable_right_boundary() { return right_boundary_; }
   SpeedLimits& mutable_speed_limits() { return speed_limits_; }
+  Geomotrys& mutable_geometrys() { return geometrys_; }
   const Id& id() const { return id_; }
   const Id& parent_id() const { return parent_id_; }
   const Ids& predecessor_ids() const { return predecessor_ids_; }
@@ -139,6 +170,7 @@ class Lane {
   const LaneBoundary& left_boundary() const { return left_boundary_; }
   const LaneBoundary& right_boundary() const { return right_boundary_; }
   const SpeedLimits& speed_limits() const { return speed_limits_; }
+  const Geomotrys& geometrys() const { return geometrys_; }
 
  private:
   Id id_;
@@ -151,6 +183,7 @@ class Lane {
   LaneBoundary left_boundary_;
   LaneBoundary right_boundary_;
   SpeedLimits speed_limits_;
+  Geomotrys geometrys_;
 };
 
 }  // namespace core

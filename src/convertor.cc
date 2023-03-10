@@ -161,6 +161,7 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
     } else {
       auto lane = std::make_shared<core::Lane>();
       section->mutable_center_lane() = lane;
+      // lane attr
       lane->set_id(section->id() + "_0");
       lane->set_parent_id(section->id());
       CenterLaneSampling(ele_road.plan_view().geometrys(),
@@ -214,13 +215,16 @@ void Convertor::CenterLaneSampling(
   core::Curve::Point point;
   element::Point refe_point;
   element::Point offset_point;
+  element::Geometry::ConstPtr geometry = nullptr;
+  int geometry_type = -1;
+  size_t point_idx = 0;
   section->mutable_center_lane()->mutable_central_curve().mutable_pts().clear();
 
   while (true) {
     if (section_ds >= section->length()) {
       break;
     }
-    element::Geometry::ConstPtr geometry = GetGeometry(geometrys, road_ds);
+    geometry = GetGeometry(geometrys, road_ds);
     if (!geometry) {
       break;
     }
@@ -232,11 +236,24 @@ void Convertor::CenterLaneSampling(
       point.mutable_y() = offset_point.y();
       point.mutable_heading() = offset_point.heading();
       point.mutable_start_position() = section_ds;
+      point.mutable_id() =
+          section->center_lane()->id() + "_" + std::to_string(point_idx++);
     } else {
       point.mutable_x() = refe_point.x();
       point.mutable_y() = refe_point.y();
       point.mutable_heading() = refe_point.heading();
       point.mutable_start_position() = section_ds;
+      point.mutable_id() =
+          section->center_lane()->id() + "_" + std::to_string(point_idx++);
+    }
+    if (geometry_type != static_cast<int>(geometry->type())) {
+      // new geometry
+      core::Geomotry core_geo;
+      core_geo.set_type(geometry->type());
+      core_geo.set_point(point);
+      section->mutable_center_lane()->mutable_geometrys().emplace_back(
+          core_geo);
+      geometry_type = static_cast<int>(geometry->type());
     }
     section->mutable_center_lane()
         ->mutable_central_curve()
