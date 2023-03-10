@@ -278,21 +278,32 @@ void Convertor::CenterLaneSampling(
 void Convertor::LaneSampling(const element::Lane& ele_lane,
                              core::Lane::Ptr lane,
                              const core::Curve::Line& refe_line) {
-  core::Curve::Point right_point;
-  core::Curve::Point center_point;
+  core::Curve::Point point;
+  int point_idx = 0;
   auto lane_idx = opendrive::common::Split(lane->id(), "_");
   const int lane_dir = lane_idx.at(2) > "0" ? 1 : -1;
+  double lane_width = 0;
+  core::Id point_id = "";
   for (const auto& refe_point : refe_line) {
-    double lane_width =
-        ele_lane.GetLaneWidth(refe_point.start_position()) * lane_dir;
-    center_point =
-        opendrive::common::GetOffsetPoint(refe_point, lane_width / 2.0);
-    right_point = opendrive::common::GetOffsetPoint(refe_point, lane_width);
+    lane_width = ele_lane.GetLaneWidth(refe_point.start_position()) * lane_dir;
+    point_id = lane->id() + "_" + std::to_string(point_idx++);
+
+    // left boundary point
+    point = refe_point;
+    point.mutable_id() = point_id;
     lane->mutable_left_boundary().mutable_curve().mutable_pts().emplace_back(
-        refe_point);
-    lane->mutable_central_curve().mutable_pts().emplace_back(center_point);
+        point);
+
+    // center line point
+    point = opendrive::common::GetOffsetPoint(refe_point, lane_width / 2.0);
+    point.mutable_id() = point_id;
+    lane->mutable_central_curve().mutable_pts().emplace_back(point);
+
+    // right boundary point
+    point = opendrive::common::GetOffsetPoint(refe_point, lane_width);
+    point.mutable_id() = point_id;
     lane->mutable_right_boundary().mutable_curve().mutable_pts().emplace_back(
-        right_point);
+        point);
   }
 }
 

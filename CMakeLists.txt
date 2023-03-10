@@ -82,7 +82,7 @@ configure_file(include/opendrive-engine/version.h.in
 # #################################################################################
 # config
 # #################################################################################
-configure_file("cmake/${TARGET_NAME}.pc.in" 
+configure_file("cmake/${TARGET_NAME}.pc.in"
   "${PROJECT_BINARY_DIR}/pkgconfig/${TARGET_NAME}.pc" @ONLY)
 
 configure_package_config_file(
