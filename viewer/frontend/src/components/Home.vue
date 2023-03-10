@@ -2,7 +2,11 @@
   <div class="layout">
     <Layout>
       <Content :style="{ background: 'rgba(231,231,231,1)' }">
-        <div class="left"></div>
+        <div class="left">
+          <div id="map">
+            <div id="mouse-position"></div>
+          </div>
+        </div>
         <div id="tool">
           <br />
           <Button type="success">剩余距离</Button>
@@ -36,6 +40,7 @@ export default {
     return {
       username: "xodr-engine",
       map: {},
+      styles: {},
       layers: {},
       view_center: [0, 0],
       mouse_x: 0,
@@ -44,15 +49,18 @@ export default {
   },
   created() {},
   mounted() {
-    this.Init();
+    this.init();
   },
   methods: {
-    Init() {
-      this.initOpenLayer();
-      this.showGlobalMap();
+    init() {
+      var self = this;
+      self.initOl();
+      self.initOlStyle();
+      self.showGlobalMap();
     },
-    initOpenLayer() {
+    initOl() {
       console.log("initOpenLayer()");
+      var self = this;
       var mousePositionControl = new MousePosition({
         coordinateFormat: createStringXY(4),
         projection: "EPSG:3857",
@@ -60,49 +68,54 @@ export default {
         target: document.getElementById("mouse-position"),
         undefinedHTML: "&nbsp;",
       });
-      this.map = new Map({
+      self.map = new Map({
         controls: defaultControls().extend([mousePositionControl]),
         layers: [],
         target: "map",
         projection: "EPSG:3857",
         view: new View({
           // https://openlayers.org/en/latest/apidoc/module-ol_View-View.html
-          center: this.view_center,
+          center: self.view_center,
           zoom: 18.5,
           rotation: 0, // 视图的初始旋转以弧度为单位（顺时针正旋转，0 表示北）。
           maxZoom: 40,
           minZoom: 1,
         }),
       }); // map
-      const dblClickInteraction = this.map
+      const dblClickInteraction = self.map
         .getInteractions()
         .getArray()
         .find((interaction) => {
           return interaction instanceof DoubleClickZoom;
         });
-      this.map.removeInteraction(dblClickInteraction); // 双击禁止放大
-      this.map.on("pointermove", function () {
-        var mouseText = document
-          .getElementById("mouse-position")
-          .textContent.split(", ");
-        this.mouse_x = parseFloat(mouseText[0]);
-        this.mouse_y = parseFloat(mouseText[1]);
-        this.getCursorData();
-      });
-      this.map.on("click", function () {});
-      this.map.on("singleclick", function () {
+      self.map.removeInteraction(dblClickInteraction); // 双击禁止放大
+      self.map.on("pointermove", function () {});
+      self.map.on("click", function () {});
+      self.map.on("singleclick", function () {
         console.log("singleclick");
-        this.getNearsetPoint();
+        self.getNearsetPoint();
       });
-      this.map.on("dblclick", function () {
+      self.map.on("dblclick", function () {
         console.log("dblclick");
       });
       mousePositionControl.setProjection("EPSG:3857");
       mousePositionControl.setCoordinateFormat(createStringXY(4));
     },
+    initOlStyle() {
+      console.log("initOlStyle()");
+      var self = this;
+      var lineStringGlobalMapStyle = new Style({
+        stroke: new Stroke({
+          color: "rgba(90, 200, 254, 0.9)",
+          width: 2,
+        }),
+      });
+      self.styles["lineStringGlobalMapStyle"] = lineStringGlobalMapStyle;
+    },
     showGlobalMap() {
       console.log("showGlobalMap()");
-      this.$api.api_all
+      var self = this;
+      self.$api.api_all
         .get_global_map()
         .then((response) => {
           console.log("GlobalMap Data: ", response);
@@ -111,14 +124,54 @@ export default {
             console.log("response exec: ", data.code);
             return;
           }
+          self.view_center = data.results[0][0][0];
+          console.log(data.results[1])
+          self.showLines(
+            "global_map",
+            /* data.results[1], */
+            data.results,
+            "lineStringGlobalMapStyle",
+            1,
+            true
+          );
         })
         .catch((error) => {});
     }, // showGlobalMap() end
-    showLine(layer_name, data, color, z, remove = true, type = "LineString") {
-      if (remove && this.layers[layer_name]) {
-        this.map.removeLayer(this.layers[layer_name]);
+    showLines(
+      layer_name,
+      data /*[[[1,2], [3,4]], [[2,4], [5,8]]]*/,
+      style,
+      z,
+      remove = true
+    ) {
+      var self = this;
+      if (!self.styles[style]) {
+        console.log("style不存在");
+        return;
       }
-
+      if (remove && self.layers[layer_name]) {
+        self.map.removeLayer(self.layers[layer_name]);
+      }
+      var source = {
+        type: "FeatureCollection",
+        features: [],
+      };
+      for (var i = 0; i < data.length; i++) {
+        source["features"].push({
+          type: "Feature",
+          geometry: { type: "LineString", coordinates: data[i] },
+        });
+      }
+      var vectorSource = new VectorSource({
+        features: new GeoJSON().readFeatures(source),
+      });
+      var vectorLayer = new VectorLayer({
+        source: vectorSource,
+        style: self.styles[style],
+        zIndex: z,
+      });
+      self.map.addLayer(vectorLayer);
+      self.layers[layer_name] = vectorLayer;
     }, // showLine() end
   },
 };
