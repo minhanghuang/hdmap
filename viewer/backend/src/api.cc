@@ -8,6 +8,8 @@ namespace opendrive {
 namespace engine {
 namespace server {
 
+RequestBase::RequestBase() { engine_ = GlobalData::Instance()->GetEngine(); }
+
 bool RequestBase::CheckRequestData(
     const std::unordered_map<std::string, nlohmann::json::value_t>& keys,
     const std::string& data, Json& data_out) {
@@ -62,13 +64,10 @@ void OkApi::Post(typhoon::Application* app, typhoon::Connection* conn) {
 
 void GlobalMapApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
   ELOG_INFO("Http Request GlobalMapApi Get");
-  auto engine = GlobalData::Instance()->GetEngine();
   Json response;
   Json line_json;
-  for (const auto& lane : engine->GetLanes()) {
+  for (const auto& lane : engine_->GetLanes()) {
     ConvertLineToPts(lane->left_boundary().curve(), line_json);
-    response.emplace_back(line_json);
-    ConvertLineToPts(lane->central_curve(), line_json);
     response.emplace_back(line_json);
     ConvertLineToPts(lane->right_boundary().curve(), line_json);
     response.emplace_back(line_json);

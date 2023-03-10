@@ -20,6 +20,7 @@ enum class HttpStatusCode {
 
 class RequestBase {
  public:
+  RequestBase();
   virtual ~RequestBase() = default;
 
  protected:
@@ -30,6 +31,7 @@ class RequestBase {
   virtual std::string SetResponse(const Json& data,
                                   HttpStatusCode code = HttpStatusCode::SUCCESS,
                                   const std::string& msg = "ok") final;
+  engine::Engine::Ptr engine_;
 };
 
 class OkApi : public typhoon::RequestHandler, public RequestBase {
