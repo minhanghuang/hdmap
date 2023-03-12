@@ -334,6 +334,10 @@ double Polygon2d::ComputeIoU(const Polygon2d& other_polygon) const {
   return intersection_area / union_area;
 }
 
+AABox2d Polygon2d::AABoundingBox() const {
+  return AABox2d({min_x_, min_y_}, {max_x_, max_y_});
+}
+
 bool Polygon2d::HasOverlap(const LineSegment2d& line_segment) const {
   if ((line_segment.start().x() < min_x_ && line_segment.end().x() < min_x_) ||
       (line_segment.start().x() > max_x_ && line_segment.end().x() > max_x_) ||

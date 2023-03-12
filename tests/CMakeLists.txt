@@ -33,6 +33,7 @@ link_directories (
 
 SET(TEST_SOURCES
   engine_test
+  kdtree_test
 )
 
 FOREACH(test_src ${TEST_SOURCES})

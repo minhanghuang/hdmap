@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "opendrive-engine/geometry/aabox2d.h"
 #include "opendrive-engine/geometry/line_segment2d.h"
 #include "opendrive-engine/geometry/vec2d.h"
 #include "opendrive-engine/math/math.h"
@@ -32,6 +33,12 @@ class Box2d {
    * to the heading direction.
    */
   Box2d(const LineSegment2d& axis, const double width);
+
+  /**
+   * @brief Constructor which takes an AABox2d (axes-aligned box).
+   * @param aabox The input AABox2d.
+   */
+  explicit Box2d(const AABox2d& aabox);
 
   /**
    * @brief Getter of the center of the box

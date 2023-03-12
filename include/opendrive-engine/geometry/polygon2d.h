@@ -251,6 +251,12 @@ class Polygon2d {
    * @brief Get the axis-aligned bound box of the polygon.
    * @return The axis-aligned bound box of the polygon.
    */
+  AABox2d AABoundingBox() const;
+
+  /**
+   * @brief Get the axis-aligned bound box of the polygon.
+   * @return The axis-aligned bound box of the polygon.
+   */
   // AABox2d AABoundingBox() const;
 
   /**
