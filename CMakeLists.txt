@@ -50,6 +50,8 @@ link_directories(
 
 file(GLOB OPENDRIVE_ENGINE_SRCS
   "src/*.cc"
+  "src/math/*.cc"
+  "src/geometry/*.cc"
 )
 
 add_library(${TARGET_NAME} ${OPENDRIVE_ENGINE_SHARED_TYPE}

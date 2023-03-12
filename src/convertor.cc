@@ -231,7 +231,8 @@ void Convertor::CenterLaneSampling(
     refe_point = geometry->GetPoint(road_ds);
     double offset = GetLaneOffsetValue(lane_offsets, road_ds);
     if (0 != offset) {
-      offset_point = opendrive::common::GetOffsetPoint(refe_point, offset);
+      offset_point =
+          opendrive::common::GetOffsetPoint<element::Point>(refe_point, offset);
       point.mutable_x() = offset_point.x();
       point.mutable_y() = offset_point.y();
       point.mutable_heading() = offset_point.heading();
@@ -295,12 +296,14 @@ void Convertor::LaneSampling(const element::Lane& ele_lane,
         point);
 
     // center line point
-    point = opendrive::common::GetOffsetPoint(refe_point, lane_width / 2.0);
+    point = opendrive::common::GetOffsetPoint<core::Curve::Point>(
+        refe_point, lane_width / 2.0);
     point.mutable_id() = point_id;
     lane->mutable_central_curve().mutable_pts().emplace_back(point);
 
     // right boundary point
-    point = opendrive::common::GetOffsetPoint(refe_point, lane_width);
+    point = opendrive::common::GetOffsetPoint<core::Curve::Point>(refe_point,
+                                                                  lane_width);
     point.mutable_id() = point_id;
     lane->mutable_right_boundary().mutable_curve().mutable_pts().emplace_back(
         point);

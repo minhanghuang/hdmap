@@ -3,8 +3,8 @@
 
 #include <memory>
 
-#include "geometry.h"
 #include "id.h"
+#include "opendrive-engine/geometry/geometry.h"
 
 namespace opendrive {
 namespace engine {

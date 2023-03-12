@@ -7,7 +7,6 @@
 #include <string>
 
 #include "opendrive-cpp/geometry/element.h"
-#include "opendrive-engine/common/common.hpp"
 #include "opendrive-engine/common/log.h"
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/common/status.h"

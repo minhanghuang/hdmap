@@ -7,8 +7,8 @@
 #include <memory>
 #include <vector>
 
-#include "geometry.h"
 #include "id.h"
+#include "opendrive-engine/geometry/geometry.h"
 
 namespace opendrive {
 namespace engine {
@@ -16,22 +16,22 @@ namespace core {
 
 class Curve {
  public:
-  class Point : public element::Point {
+  class Point : public geometry::Point4D {
    public:
     Point() : start_position_(0), id_("") {}
     Point(double x, double y)
-        : element::Point(x, y), start_position_(0), id_("") {}
+        : geometry::Point4D(x, y), start_position_(0), id_("") {}
     Point(double x, double y, double z)
-        : element::Point(x, y, z), start_position_(0), id_("") {}
+        : geometry::Point4D(x, y, z), start_position_(0), id_("") {}
     Point(double x, double y, double z, double heading)
-        : element::Point(x, y, z, heading), start_position_(0), id_("") {}
+        : geometry::Point4D(x, y, z, heading), start_position_(0), id_("") {}
     Point(double x, double y, double z, double heading, double start_position)
-        : element::Point(x, y, z, heading),
+        : geometry::Point4D(x, y, z, heading),
           start_position_(start_position),
           id_("") {}
     Point(double x, double y, double z, double heading, double start_position,
           const Id& id)
-        : element::Point(x, y, z, heading),
+        : geometry::Point4D(x, y, z, heading),
           start_position_(start_position),
           id_(id) {}
     void set_start_position(double d) { start_position_ = d; }
@@ -41,7 +41,7 @@ class Curve {
     double start_position() const { return start_position_; }
     const Id& id() const { return id_; }
 
-   private:
+   protected:
     double start_position_;
     Id id_;
   };
