@@ -27,24 +27,20 @@ include(GNUInstallDirs)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Tinyxml2 REQUIRED tinyxml2)
 pkg_check_modules(OpenDriveCpp REQUIRED opendrive-cpp)
-pkg_check_modules(Flann REQUIRED flann)
-pkg_check_modules(LZ4 REQUIRED liblz4)
+pkg_check_modules(NanoFlann REQUIRED nanoflann)
 pkg_check_modules(Cactus REQUIRED cactus)
 
 include_directories(
   include
   ${Tinyxml2_INCLUDE_DIRS}
   ${OpenDriveCpp_INCLUDE_DIRS}
-  ${Flann_INCLUDE_DIRS}
-  ${LZ4_INCLUDE_DIRS}
+  ${NanoFlann_INCLUDE_DIRS}
   ${Cactus_INCLUDE_DIRS}
 )
 
 link_directories(
   ${Tinyxml2_LIBRARY_DIRS}
   ${OpenDriveCpp_LIBRARY_DIRS}
-  ${Flann_LIBRARY_DIRS}
-  ${LZ4_LIBRARY_DIRS}
   ${Cactus_LIBRARY_DIRS}
 )
 
@@ -52,6 +48,7 @@ file(GLOB OPENDRIVE_ENGINE_SRCS
   "src/*.cc"
   "src/math/*.cc"
   "src/geometry/*.cc"
+  "src/algo/kdtree/*.cc"
 )
 
 add_library(${TARGET_NAME} ${OPENDRIVE_ENGINE_SHARED_TYPE}
@@ -61,8 +58,6 @@ add_library(${TARGET_NAME} ${OPENDRIVE_ENGINE_SHARED_TYPE}
 target_link_libraries(${TARGET_NAME}
   ${Tinyxml2_LIBRARIES}
   ${OpenDriveCpp_LIBRARIES}
-  ${Flann_LIBRARIES}
-  ${LZ4_LIBRARIES}
   ${Cactus_LIBRARIES}
 )
 
