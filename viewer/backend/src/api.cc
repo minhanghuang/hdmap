@@ -67,10 +67,7 @@ void GlobalMapApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
   Json response;
   Json line_json;
   for (const auto& lane : engine_->GetLanes()) {
-    ConvertLineToPts(lane->left_boundary().curve(), line_json);
-    response.emplace_back(line_json);
-    ConvertLineToPts(lane->right_boundary().curve(), line_json);
-    response.emplace_back(line_json);
+    ConvertLaneToSimplePts(lane, response);
   }
   Response(app, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
 }

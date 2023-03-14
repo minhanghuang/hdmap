@@ -13,6 +13,18 @@ core::Id GetLaneIdById(const core::Id& point_id) {
   return split_ret[0] + "_" + split_ret[1] + "_" + split_ret[2];
 }
 
+bool IsLineGeometry(core::Lane::ConstPtr lane) {
+  if (0 == lane->geometrys().size()) {
+    return false;
+  }
+  for (const auto& geometry : lane->geometrys()) {
+    if (core::Geomotry::Type::LINE != geometry.type()) {
+      return false;
+    }
+  }
+  return true;
+}
+
 }  // namespace common
 }  // namespace engine
 }  // namespace opendrive

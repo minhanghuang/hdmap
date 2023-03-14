@@ -13,6 +13,8 @@ namespace common {
 
 core::Id GetLaneIdById(const core::Id& point_id);
 
+bool IsLineGeometry(core::Lane::ConstPtr lane);
+
 }  // namespace common
 }  // namespace engine
 }  // namespace opendrive
