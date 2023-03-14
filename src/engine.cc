@@ -15,8 +15,10 @@ std::string Engine::GetXodrVersion() {
   return impl_->GetXodrVersion();
 }
 
-core::Curve::Point Engine::GetPointById(const core::Id& id) {
+bool Engine::GetPointById(const core::Id& point_id,
+                          core::Curve::Point& out_point) {
   cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->GetPointById(point_id, out_point);
 }
 
 core::Lane::ConstPtr Engine::GetLaneById(const core::Id& id) {

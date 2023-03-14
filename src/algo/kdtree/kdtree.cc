@@ -15,10 +15,8 @@ double KDTreeAdaptor::kdtree_get_pt(size_t idx, size_t dim) const {
 }
 
 void KDTreeAdaptor::Init(const SamplePoints& samples) {
-  matrix_.clear();
-  ids_.clear();
-  matrix_.reserve(samples.size());
-  ids_.reserve(samples.size());
+  KDTreeNodes().swap(matrix_);
+  KDTreeIds().swap(ids_);
   KDTreeNode node(2);
   for (const auto& point : samples) {
     node[0] = point.x();

@@ -8,10 +8,9 @@ namespace opendrive {
 namespace engine {
 namespace common {
 
-typedef struct Param ParamType;
 struct Param {
-  typedef std::shared_ptr<ParamType> Ptr;
-  typedef std::shared_ptr<ParamType const> ConstPtr;
+  typedef std::shared_ptr<Param> Ptr;
+  typedef std::shared_ptr<Param const> ConstPtr;
   Param() : map_file(""), step(0.5) {}
   std::string map_file;
   float step;

@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "opendrive-cpp/common/common.hpp"
+#include "opendrive-engine/geometry/geometry.h"
 
 class TestEmpty : public testing::Test {
  public:
@@ -78,6 +79,19 @@ TEST_F(TestEmpty, TestPointId) {
     ASSERT_EQ(split.at(2), right_split.at(2));
     ASSERT_EQ(split.at(3), right_split.at(3));
   }
+}
+
+TEST_F(TestEmpty, TestGetNearestPoint) {
+  auto engine = TestEmpty::GetEngine();
+  ASSERT_TRUE(nullptr != engine);
+  opendrive::engine::geometry::Point2D point2d{88.4121,
+                                               -330.582};  // id 207_1_-1_17_2
+  auto search_ret = engine->GetNearestPoints(point2d, 1);
+  ASSERT_TRUE(1 == search_ret.size());
+  ASSERT_FLOAT_EQ(88.4121, search_ret.front().x);
+  ASSERT_FLOAT_EQ(-330.582, search_ret.front().y);
+  ASSERT_TRUE(search_ret.front().dist < 0.001);
+  ASSERT_EQ("207_1_-1_17_2", search_ret.front().id);
 }
 
 int main(int argc, char* argv[]) {
