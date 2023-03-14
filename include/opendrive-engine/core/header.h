@@ -12,7 +12,17 @@ class Header {
  public:
   typedef std::shared_ptr<Header> Ptr;
   typedef std::shared_ptr<Header const> ConstPtr;
-  Header() : north_(0), south_(0), west_(0), east_(0) {}
+  Header()
+      : rev_major_(""),
+        rev_minor_(""),
+        name_(""),
+        version_(""),
+        date_(""),
+        vendor_(""),
+        north_(0),
+        south_(0),
+        west_(0),
+        east_(0) {}
   void set_rev_major(const std::string& s) { rev_major_ = s; }
   void set_rev_minor(const std::string& s) { rev_minor_ = s; }
   void set_name(const std::string& s) { name_ = s; }

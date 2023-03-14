@@ -59,9 +59,9 @@ class Section {
  private:
   Id id_;
   Id parent_id_;  // road id
-  double start_position_ = 0;
-  double end_position_ = 0;
-  double length_ = 0;
+  double start_position_;
+  double end_position_;
+  double length_;
   Lane::Ptr center_lane_;
   Lane::Ptrs left_lanes_;
   Lane::Ptrs right_lanes_;
