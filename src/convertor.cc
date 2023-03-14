@@ -240,8 +240,14 @@ void Convertor::CenterLaneSampling(
   section->mutable_center_lane()->mutable_central_curve().mutable_pts().clear();
 
   while (true) {
-    if (section_ds >= section->length()) {
-      break;
+    if (section_ds > section->length()) {
+      // TODO: section_ds - section->length() 不等于 step_
+      if (section_ds - section->length() >= step_ - 1e-10) {
+        break;
+      } else {
+        section_ds = section->length();
+        road_ds = road_ds - (section_ds - section->length());
+      }
     }
     geometry = GetGeometry(geometrys, road_ds);
     if (!geometry) {

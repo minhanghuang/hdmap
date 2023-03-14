@@ -43,6 +43,17 @@ class Engine {
     return impl_->GetNearestPoints(query_point.x(), query_point.y(),
                                    num_closest);
   }
+  template <typename T>
+  core::Lane::ConstPtrs GetNearestLanes(T x, T y, size_t num_closest) {
+    return impl_->GetNearestLanes(static_cast<double>(x),
+                                  static_cast<double>(y), num_closest);
+  }
+  template <typename T>
+  core::Lane::ConstPtrs GetNearestLanes(const T& query_point,
+                                        size_t num_closest) {
+    return impl_->GetNearestLanes(query_point.x(), query_point.y(),
+                                  num_closest);
+  }
 
  private:
   EngineImpl::Ptr impl_;

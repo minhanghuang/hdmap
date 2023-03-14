@@ -103,5 +103,18 @@ kdtree::KDTreeResults EngineImpl::GetNearestPoints(double x, double y,
   return kdtree_->Query(x, y, num_closest);
 }
 
+core::Lane::ConstPtrs EngineImpl::GetNearestLanes(double x, double y,
+                                                  size_t num_closest) {
+  core::Lane::ConstPtrs lanes;
+  auto search_ret = kdtree_->Query(x, y, num_closest);
+  for (const auto& it : search_ret) {
+    core::Id lane_id = common::GetLaneIdById(it.id);
+    if (!lane_id.empty()) {
+      lanes.emplace_back(data_->lanes().at(lane_id));
+    }
+  }
+  return lanes;
+}
+
 }  // namespace engine
 }  // namespace opendrive
