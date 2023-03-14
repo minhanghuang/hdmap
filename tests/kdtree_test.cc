@@ -59,13 +59,11 @@ TEST_F(TestKDTree, TestKDTreeAll) {
   kdtree.Init(samples);
   opendrive::engine::kdtree::SamplePoint target_node(1, 2);
   auto knn_ret = kdtree.Query(target_node, 2);
-  ASSERT_EQ(2, knn_ret.dists.size());
-  ASSERT_EQ(2, knn_ret.pts.size());
-  ASSERT_EQ(2, knn_ret.ids.size());
-  ASSERT_EQ(1, knn_ret.pts.front().at(0));
-  ASSERT_EQ(2, knn_ret.pts.front().at(1));
-  ASSERT_EQ("1", knn_ret.ids.front());
-  ASSERT_DOUBLE_EQ(0, knn_ret.dists.front());
+  ASSERT_EQ(2, knn_ret.size());
+  ASSERT_EQ(1, knn_ret.front().x);
+  ASSERT_EQ(2, knn_ret.front().y);
+  ASSERT_EQ("1", knn_ret.front().id);
+  ASSERT_DOUBLE_EQ(0, knn_ret.front().dist);
 }
 
 int main(int argc, char* argv[]) {

@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "cactus/rw_lock.h"
 #include "opendrive-engine/core/id.h"
 #include "opendrive-engine/core/lane.h"
 
@@ -33,10 +34,13 @@ struct KDTreeParam {
 };
 
 struct KDTreeResult {
-  KDTreeNodes pts;
-  KDTreeIds ids;
-  KDTreeDists dists;  // not sqr
+  KDTreeResult() : x(0), y(0), dist(0), id("") {}
+  double x;
+  double y;
+  double dist;  // not sqr
+  core::Id id;
 };
+typedef std::vector<KDTreeResult> KDTreeResults;
 
 class KDTreeAdaptor {
  public:
@@ -59,6 +63,7 @@ class KDTreeAdaptor {
 
 class KDTree {
  public:
+  typedef std::shared_ptr<KDTree> Ptr;
   typedef nanoflann::KDTreeSingleIndexAdaptor<
       nanoflann::metric_L2::template traits<double, KDTreeAdaptor>::distance_t,
       KDTreeAdaptor, 2 /* dimensionality */, size_t /* index type */>
@@ -69,24 +74,24 @@ class KDTree {
             const KDTreeParam& param = KDTreeParam());
 
   template <typename PointType>
-  KDTreeResult Query(const PointType& query_point, size_t num_closest) {
-    std::lock_guard<std::mutex> guard(mutex_);
-    KDTreeResult result;
+  KDTreeResults Query(const PointType& query_point, size_t num_closest) {
+    cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+    KDTreeResults result;
     Search(query_point.x(), query_point.y(), num_closest, result);
     return result;
   }
 
   template <typename T>
-  KDTreeResult Query(T x, T y, size_t num_closest) {
-    std::lock_guard<std::mutex> guard(mutex_);
-    KDTreeResult result;
+  KDTreeResults Query(T x, T y, size_t num_closest) {
+    cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+    KDTreeResults result;
     Search(static_cast<double>(x), static_cast<double>(y), num_closest, result);
     return result;
   }
 
  private:
-  int Search(double x, double y, size_t num_closest, KDTreeResult& result);
-  std::mutex mutex_;
+  int Search(double x, double y, size_t num_closest, KDTreeResults& result);
+  cactus::AtomicRWLock rw_lock_;  // read and write lock
   KDTreeParam param_;
   KDTreeAdaptor adaptor_;
   std::shared_ptr<KDTreeIndex> index_;

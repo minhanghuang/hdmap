@@ -36,33 +36,28 @@ KDTree::~KDTree() {}
 KDTree::KDTree() : index_(nullptr) {}
 
 int KDTree::Search(double x, double y, size_t num_closest,
-                   KDTreeResult& result) {
-  result.ids.clear();
-  result.pts.clear();
-  result.dists.clear();
-  result.ids.reserve(num_closest);
-  result.pts.reserve(num_closest);
-  result.dists.reserve(num_closest);
-  std::vector<size_t> indices(num_closest);  // 必须设置长度
-  std::vector<double> dists(num_closest);    // 必须设置长度
+                   KDTreeResults& results) {
+  results.clear();
+  KDTreeIndices indices(num_closest);  // 必须设置长度
+  KDTreeDists dists(num_closest);      // 必须设置长度
   KDTreeNode query_node{x, y};
   index_->knnSearch(&query_node[0], num_closest, &indices[0], &dists[0]);
   if (indices.size() > adaptor_.matrix().size()) {
     return -1;
   }
-  KDTreeNode node(2);
+  KDTreeResult result;
   for (int i = 0; i < indices.size(); i++) {
-    node[0] = adaptor_.matrix().at(indices.at(i))[0];
-    node[1] = adaptor_.matrix().at(indices.at(i))[1];
-    result.pts.emplace_back(node);
-    result.ids.emplace_back(adaptor_.ids().at(indices.at(i)));
-    result.dists.emplace_back(std::sqrt(dists.at(i)));
+    result.x = adaptor_.matrix().at(indices.at(i))[0];
+    result.y = adaptor_.matrix().at(indices.at(i))[1];
+    result.id = adaptor_.ids().at(indices.at(i));
+    result.dist = std::sqrt(dists.at(i));
+    results.emplace_back(result);
   }
   return 0;
 }
 
 void KDTree::Init(const SamplePoints& samples, const KDTreeParam& param) {
-  std::lock_guard<std::mutex> guard(mutex_);
+  cactus::WriteLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
   nanoflann::KDTreeSingleIndexAdaptorParams adaptor_params;
   adaptor_params.flags = param.flags;
   adaptor_params.leaf_max_size = param.leaf_max_size;
