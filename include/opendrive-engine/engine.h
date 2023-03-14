@@ -24,6 +24,7 @@ class Engine {
   Engine();
   Status Init(const common::Param& param);
   std::string GetXodrVersion();
+  core::Curve::Point GetPointById(const core::Id& id);
   core::Lane::ConstPtr GetLaneById(const core::Id& id);
   core::Section::ConstPtr GetSectionById(const core::Id& id);
   core::Road::ConstPtr GetRoadById(const core::Id& id);
@@ -31,6 +32,17 @@ class Engine {
   core::Section::ConstPtrs GetSections();
   core::Road::ConstPtrs GetRoads();
   core::Header::ConstPtr GetHeader();
+  template <typename T>
+  kdtree::KDTreeResults GetNearestPoints(T x, T y, size_t num_closest) {
+    return impl_->GetNearestPoints(static_cast<double>(x),
+                                   static_cast<double>(y), num_closest);
+  }
+  template <typename T>
+  kdtree::KDTreeResults GetNearestPoints(const T& query_point,
+                                         size_t num_closest) {
+    return impl_->GetNearestPoints(query_point.x(), query_point.y(),
+                                   num_closest);
+  }
 
  private:
   EngineImpl::Ptr impl_;

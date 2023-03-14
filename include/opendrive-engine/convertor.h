@@ -7,6 +7,7 @@
 #include <string>
 
 #include "opendrive-cpp/geometry/element.h"
+#include "opendrive-engine/algo/kdtree/kdtree.h"
 #include "opendrive-engine/common/log.h"
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/common/status.h"
@@ -24,6 +25,7 @@ class Convertor {
  private:
   inline void SetStatus(ErrorCode code, const std::string& msg);
   inline bool Continue() const;
+  void End();
   Convertor& ConvertHeader(element::Map::Ptr ele_map);
   Convertor& ConvertJunction(element::Map::Ptr ele_map);
   Convertor& ConvertJunctionAttr(const element::Junction& ele_junction,
@@ -33,6 +35,8 @@ class Convertor {
                              core::Road::Ptr road);
   Convertor& ConvertSection(const element::Road& ele_road,
                             core::Road::Ptr road);
+  Convertor& BuildKDTree();
+  void AppendKDTreeSample(const core::Curve::Point& point);
   void CenterLaneSampling(const element::Geometry::ConstPtrs& geometrys,
                           const element::LaneOffsets& lane_offsets,
                           core::Section::Ptr section, double& road_ds);
@@ -46,6 +50,7 @@ class Convertor {
   Status status_;
   common::Param::ConstPtr param_;
   core::Data::Ptr data_;
+  core::Curve::Points center_line_pts_;
 };
 
 }  // namespace engine

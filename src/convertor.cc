@@ -25,6 +25,7 @@ Status Convertor::Start() {
   auto factory = cactus::Factory::Instance();
   param_ = factory->GetObject<common::Param>("engine_param");
   data_ = factory->GetObject<core::Data>("core_data");
+  center_line_pts_.clear();
   if (!param_ || !data_) {
     SetStatus(ErrorCode::INIT_FACTORY_ERROR, "factory error.");
     return status_;
@@ -46,13 +47,19 @@ Status Convertor::Start() {
     SetStatus(ErrorCode::INIT_MAPFILE_ERROR, "input file error: " + map_file);
     return status_;
   }
-  std::cout << "Convert Start" << std::endl;
 
-  ConvertHeader(ele_map).ConvertRoad(ele_map).ConvertJunction(ele_map);
+  ConvertHeader(ele_map)
+      .ConvertRoad(ele_map)
+      .ConvertJunction(ele_map)
+      .BuildKDTree()
+      .End();
 
-  std::cout << "Convert End" << std::endl;
-  std::cout << "Convert msg: " << status_.msg << std::endl;
   return status_;
+}
+
+void Convertor::End() {
+  if (!Continue()) return;
+  core::Curve::Points().swap(center_line_pts_);
 }
 
 Convertor& Convertor::ConvertHeader(opendrive::element::Map::Ptr ele_map) {
@@ -207,6 +214,18 @@ Convertor& Convertor::ConvertSection(const element::Road& ele_road,
   return *this;
 }
 
+Convertor& Convertor::BuildKDTree() {
+  if (!Continue()) return *this;
+  auto factory = cactus::Factory::Instance();
+  auto kdtree = factory->GetObject<kdtree::KDTree>("kdtree");
+  kdtree->Init(center_line_pts_);
+  return *this;
+}
+
+void Convertor::AppendKDTreeSample(const core::Curve::Point& point) {
+  center_line_pts_.emplace_back(point);
+}
+
 void Convertor::CenterLaneSampling(
     const element::Geometry::ConstPtrs& geometrys,
     const element::LaneOffsets& lane_offsets, core::Section::Ptr section,
@@ -291,20 +310,21 @@ void Convertor::LaneSampling(const element::Lane& ele_lane,
 
     // left boundary point
     point = refe_point;
-    point.mutable_id() = point_id;
+    point.mutable_id() = point_id + "_1";
     lane->mutable_left_boundary().mutable_curve().mutable_pts().emplace_back(
         point);
 
     // center line point
     point = opendrive::common::GetOffsetPoint<core::Curve::Point>(
         refe_point, lane_width / 2.0);
-    point.mutable_id() = point_id;
+    point.mutable_id() = point_id + "_2";
     lane->mutable_central_curve().mutable_pts().emplace_back(point);
+    AppendKDTreeSample(point);
 
     // right boundary point
     point = opendrive::common::GetOffsetPoint<core::Curve::Point>(refe_point,
                                                                   lane_width);
-    point.mutable_id() = point_id;
+    point.mutable_id() = point_id + "_3";
     lane->mutable_right_boundary().mutable_curve().mutable_pts().emplace_back(
         point);
   }

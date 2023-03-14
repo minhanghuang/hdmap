@@ -59,15 +59,15 @@ TEST_F(TestEmpty, TestPointId) {
   for (int i = 0; i < point_size; i++) {
     auto split =
         opendrive::common::Split(lane->central_curve().pts().at(i).id(), "_");
-    ASSERT_EQ(4, split.size());
+    ASSERT_EQ(5, split.size());
     ASSERT_EQ(i, std::atoi(split.at(3).c_str()));
     auto left_split = opendrive::common::Split(
         lane->left_boundary().curve().pts().at(i).id(), "_");
-    ASSERT_EQ(4, left_split.size());
+    ASSERT_EQ(5, left_split.size());
     ASSERT_EQ(i, std::atoi(left_split.at(3).c_str()));
     auto right_split = opendrive::common::Split(
         lane->right_boundary().curve().pts().at(i).id(), "_");
-    ASSERT_EQ(4, right_split.size());
+    ASSERT_EQ(5, right_split.size());
     ASSERT_EQ(i, std::atoi(right_split.at(3).c_str()));
     ASSERT_EQ(split.at(0), left_split.at(0));
     ASSERT_EQ(split.at(1), left_split.at(1));

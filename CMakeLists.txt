@@ -46,6 +46,7 @@ link_directories(
 
 file(GLOB OPENDRIVE_ENGINE_SRCS
   "src/*.cc"
+  "src/common/*.cc"
   "src/math/*.cc"
   "src/geometry/*.cc"
   "src/algo/kdtree/*.cc"
