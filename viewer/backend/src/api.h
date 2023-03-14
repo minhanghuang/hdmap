@@ -24,9 +24,8 @@ class RequestBase {
   virtual ~RequestBase() = default;
 
  protected:
-  virtual bool CheckRequestData(
-      const std::unordered_map<std::string, nlohmann::json::value_t>& keys,
-      const std::string& data, Json& data_out) final;
+  virtual bool CheckRequestData(const RequiredKeys& keys,
+                                const std::string& data, Json& data_out) final;
   virtual bool IsNumberType(const Json& value) const final;
   virtual std::string SetResponse(const Json& data,
                                   HttpStatusCode code = HttpStatusCode::SUCCESS,
@@ -46,6 +45,18 @@ class GlobalMapApi : public typhoon::RequestHandler, public RequestBase {
  public:
   virtual void Get(typhoon::Application* app,
                    typhoon::Connection* conn) override;
+};
+
+class NearestLane : public typhoon::RequestHandler, public RequestBase {
+ public:
+  virtual void Post(typhoon::Application* app,
+                    typhoon::Connection* conn) override;
+
+ private:
+  RequiredKeys required_keys_{
+      std::make_pair("x", nlohmann::json::value_t::number_float),
+      std::make_pair("y", nlohmann::json::value_t::number_float),
+  };
 };
 
 }  // namespace server

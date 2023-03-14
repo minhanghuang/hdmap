@@ -10,9 +10,8 @@ namespace server {
 
 RequestBase::RequestBase() { engine_ = GlobalData::Instance()->GetEngine(); }
 
-bool RequestBase::CheckRequestData(
-    const std::unordered_map<std::string, nlohmann::json::value_t>& keys,
-    const std::string& data, Json& data_out) {
+bool RequestBase::CheckRequestData(const RequiredKeys& keys,
+                                   const std::string& data, Json& data_out) {
   if (data.empty()) return false;
   try {
     data_out = Json::parse(data);
@@ -42,7 +41,7 @@ bool RequestBase::IsNumberType(const Json& value) const {
       value.is_number_unsigned()) {
     return true;
   }
-  return true;
+  return false;
 }
 
 std::string RequestBase::SetResponse(const Json& data, HttpStatusCode code,
@@ -70,6 +69,33 @@ void GlobalMapApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
     ConvertLaneToSimplePts(lane, response);
   }
   Response(app, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
+}
+
+void NearestLane::Post(typhoon::Application* app, typhoon::Connection* conn) {
+  ELOG_INFO("Http Request NearestLane Post");
+  Json response;
+  std::string req_data = typhoon::RequestHandler::GetRequestData(conn);
+  ELOG_INFO("Request Data: " << req_data);
+  nlohmann::json data_json;
+  if (!CheckRequestData(required_keys_, req_data, data_json)) {
+    typhoon::RequestHandler::Response(
+        app, conn,
+        SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
+                    "Request数据异常"));
+    return;
+  }
+  auto lanes = engine_->GetNearestLanes(data_json["x"], data_json["y"], 1);
+  if (1 != lanes.size()) {
+    typhoon::RequestHandler::Response(
+        app, conn,
+        SetResponse(nlohmann::json(), HttpStatusCode::FAILED,
+                    "Query Nearest Lanes Fault."));
+  }
+  auto lane = lanes.front();
+  ELOG_INFO("Nearest Lane Id: " << lane->id());
+  ConvertLaneToSimplePts(lane, response);
+  Response(app, conn,
+           SetResponse(response, HttpStatusCode::SUCCESS, "get nearest lane"));
 }
 
 }  // namespace server

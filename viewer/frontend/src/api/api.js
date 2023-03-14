@@ -7,6 +7,17 @@ const api_all = {
       method: 'GET'
     })
   },
+  get_nearest_lane(x, y) {
+    return axios({
+      url: '/opendrive/engine/nearest_lane/',
+      method: 'POST',
+      data: {
+        "x": x,
+        "y": y,
+      }
+
+    })
+  },
 };
 
 export default api_all

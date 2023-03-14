@@ -43,8 +43,7 @@ export default {
       styles: {},
       layers: {},
       view_center: [0, 0],
-      mouse_x: 0,
-      mouse_y: 0,
+      singleclick_mouse: [0, 0],
     };
   },
   created() {},
@@ -93,7 +92,12 @@ export default {
       self.map.on("click", function () {});
       self.map.on("singleclick", function () {
         console.log("singleclick");
-        self.getNearsetPoint();
+        var mouseText = document
+          .getElementById("mouse-position")
+          .textContent.split(", ");
+        self.singleclick_mouse[0] = parseFloat(mouseText[0]);
+        self.singleclick_mouse[1] = parseFloat(mouseText[1]);
+        self.showNearestLane();
       });
       self.map.on("dblclick", function () {
         console.log("dblclick");
@@ -110,7 +114,15 @@ export default {
           width: 2,
         }),
       });
+      var lineStringNearestLaneStyle = new Style({
+        stroke: new Stroke({
+          color: "#DB7093",
+          width: 2,
+        }),
+      });
+
       self.styles["lineStringGlobalMapStyle"] = lineStringGlobalMapStyle;
+      self.styles["lineStringNearestLaneStyle"] = lineStringNearestLaneStyle;
     },
     showGlobalMap() {
       console.log("showGlobalMap()");
@@ -125,7 +137,7 @@ export default {
             return;
           }
           self.view_center = data.results[0][0][0];
-          console.log(data.results[1])
+          console.log(data.results[1]);
           self.showLines(
             "global_map",
             /* data.results[1], */
@@ -137,6 +149,28 @@ export default {
         })
         .catch((error) => {});
     }, // showGlobalMap() end
+    showNearestLane() {
+      console.log("showNearestLane()");
+      var self = this;
+      self.$api.api_all
+        .get_nearest_lane(self.singleclick_mouse[0], self.singleclick_mouse[1])
+        .then((response) => {
+          console.log("NearestLane Data: ", response);
+          const data = response.data;
+          if (data.code != 1000) {
+            console.log("response exec: ", data.code);
+            return;
+          }
+          self.showLines(
+            "nearest_lane",
+            data.results,
+            "lineStringNearestLaneStyle",
+            1,
+            true
+          );
+        })
+        .catch((error) => {});
+    }, // showNearestLane() end
     showLines(
       layer_name,
       data /*[[[1,2], [3,4]], [[2,4], [5,8]]]*/,

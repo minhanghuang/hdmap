@@ -24,6 +24,7 @@ class Server {
   typhoon::Options options_;
   std::shared_ptr<server::OkApi> ok_;
   std::shared_ptr<server::GlobalMapApi> global_map_;
+  std::shared_ptr<server::NearestLane> nearest_lane_;
 };
 
 }  // namespace engine
