@@ -33,7 +33,7 @@ class EngineImpl {
   core::Section::ConstPtrs GetSections() const;
   core::Road::ConstPtrs GetRoads() const;
   core::Header::ConstPtr GetHeader() const;
-  kdtree::KDTreeResults GetNearestPoints(double x, double y,
+  kdtree::SearchResults GetNearestPoints(double x, double y,
                                          size_t num_closest);
   core::Lane::ConstPtrs GetNearestLanes(double x, double y, size_t num_closest);
 

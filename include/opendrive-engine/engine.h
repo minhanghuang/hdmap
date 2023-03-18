@@ -33,12 +33,12 @@ class Engine {
   core::Road::ConstPtrs GetRoads();
   core::Header::ConstPtr GetHeader();
   template <typename T>
-  kdtree::KDTreeResults GetNearestPoints(T x, T y, size_t num_closest) {
+  kdtree::SearchResults GetNearestPoints(T x, T y, size_t num_closest) {
     return impl_->GetNearestPoints(static_cast<double>(x),
                                    static_cast<double>(y), num_closest);
   }
   template <typename T>
-  kdtree::KDTreeResults GetNearestPoints(const T& query_point,
+  kdtree::SearchResults GetNearestPoints(const T& query_point,
                                          size_t num_closest) {
     return impl_->GetNearestPoints(query_point.x(), query_point.y(),
                                    num_closest);

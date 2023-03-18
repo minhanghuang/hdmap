@@ -33,14 +33,14 @@ struct KDTreeParam {
   nanoflann::KDTreeSingleIndexAdaptorFlags flags;
 };
 
-struct KDTreeResult {
-  KDTreeResult() : x(0), y(0), dist(0), id("") {}
+struct SearchResult {
+  SearchResult() : x(0), y(0), dist(0), id("") {}
   double x;
   double y;
   double dist;  // not sqr
   core::Id id;
 };
-typedef std::vector<KDTreeResult> KDTreeResults;
+typedef std::vector<SearchResult> SearchResults;
 
 class KDTreeAdaptor {
  public:
@@ -74,23 +74,23 @@ class KDTree {
             const KDTreeParam& param = KDTreeParam());
 
   template <typename PointType>
-  KDTreeResults Query(const PointType& query_point, size_t num_closest) {
+  SearchResults Query(const PointType& query_point, size_t num_closest) {
     cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
-    KDTreeResults result;
+    SearchResults result;
     Search(query_point.x(), query_point.y(), num_closest, result);
     return result;
   }
 
   template <typename T>
-  KDTreeResults Query(T x, T y, size_t num_closest) {
+  SearchResults Query(T x, T y, size_t num_closest) {
     cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
-    KDTreeResults result;
+    SearchResults result;
     Search(static_cast<double>(x), static_cast<double>(y), num_closest, result);
     return result;
   }
 
  private:
-  int Search(double x, double y, size_t num_closest, KDTreeResults& result);
+  int Search(double x, double y, size_t num_closest, SearchResults& result);
   cactus::AtomicRWLock rw_lock_;  // read and write lock
   KDTreeParam param_;
   KDTreeAdaptor adaptor_;

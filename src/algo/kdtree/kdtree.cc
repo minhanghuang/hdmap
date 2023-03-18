@@ -34,7 +34,7 @@ KDTree::~KDTree() {}
 KDTree::KDTree() : index_(nullptr) {}
 
 int KDTree::Search(double x, double y, size_t num_closest,
-                   KDTreeResults& results) {
+                   SearchResults& results) {
   results.clear();
   KDTreeIndices indices(num_closest);  // 必须设置长度
   KDTreeDists dists(num_closest);      // 必须设置长度

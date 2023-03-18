@@ -98,7 +98,7 @@ core::Road::ConstPtrs EngineImpl::GetRoads() const {
 
 core::Header::ConstPtr EngineImpl::GetHeader() const { return data_->header(); }
 
-kdtree::KDTreeResults EngineImpl::GetNearestPoints(double x, double y,
+kdtree::SearchResults EngineImpl::GetNearestPoints(double x, double y,
                                                    size_t num_closest) {
   return kdtree_->Query(x, y, num_closest);
 }
