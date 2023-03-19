@@ -43,7 +43,7 @@ int KDTree::Search(double x, double y, size_t num_closest,
   if (indices.size() > adaptor_.matrix().size()) {
     return -1;
   }
-  KDTreeResult result;
+  SearchResult result;
   for (int i = 0; i < indices.size(); i++) {
     result.x = adaptor_.matrix().at(indices.at(i))[0];
     result.y = adaptor_.matrix().at(indices.at(i))[1];
