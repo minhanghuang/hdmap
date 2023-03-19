@@ -13,4 +13,5 @@ compile_commands.json
 
 __pycache__
 log/*
-
+third_party
+install
