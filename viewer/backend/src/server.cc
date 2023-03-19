@@ -17,11 +17,12 @@ int Server::Init() {
 }
 
 int Server::Start() {
-  typhoon::Server server(options_);
-  server.AddHandle("/opendrive/engine/ok/", ok_);
-  server.AddHandle("/opendrive/engine/map/", global_map_);
-  server.AddHandle("/opendrive/engine/nearest_lane/", nearest_lane_);
-  server.Spin();
+  cyclone::web::Application app;
+  app.Init(options_);
+  app.AddHandler("/opendrive/engine/ok/", ok_);
+  app.AddHandler("/opendrive/engine/map/", global_map_);
+  app.AddHandler("/opendrive/engine/nearest_lane/", nearest_lane_);
+  app.Spin();
   return 0;
 }
 

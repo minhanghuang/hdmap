@@ -1,9 +1,10 @@
 #ifndef OPENDRIVE_ENGINE_SERVER_API_H_
 #define OPENDRIVE_ENGINE_SERVER_API_H_
-#include <typhoon/typhoon.h>
+#include <cyclone/cyclone.h>
 
 #include <nlohmann/json.hpp>
 
+#include "cyclone/define.h"
 #include "global_data.h"
 #include "log.h"
 #include "util.h"
@@ -33,24 +34,20 @@ class RequestBase {
   engine::Engine::Ptr engine_;
 };
 
-class OkApi : public typhoon::RequestHandler, public RequestBase {
+class OkApi : public cyclone::web::RequestHandler, public RequestBase {
  public:
-  virtual void Get(typhoon::Application* app,
-                   typhoon::Connection* conn) override;
-  virtual void Post(typhoon::Application* app,
-                    typhoon::Connection* conn) override;
+  virtual void Get() override;
+  virtual void Post() override;
 };
 
-class GlobalMapApi : public typhoon::RequestHandler, public RequestBase {
+class GlobalMapApi : public cyclone::web::RequestHandler, public RequestBase {
  public:
-  virtual void Get(typhoon::Application* app,
-                   typhoon::Connection* conn) override;
+  virtual void Get() override;
 };
 
-class NearestLane : public typhoon::RequestHandler, public RequestBase {
+class NearestLane : public cyclone::web::RequestHandler, public RequestBase {
  public:
-  virtual void Post(typhoon::Application* app,
-                    typhoon::Connection* conn) override;
+  virtual void Post() override;
 
  private:
   RequiredKeys required_keys_{

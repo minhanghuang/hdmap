@@ -53,49 +53,40 @@ std::string RequestBase::SetResponse(const Json& data, HttpStatusCode code,
   return response.dump(0);
 }
 
-void OkApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
-  Response(app, conn, "ok get");
-}
+void OkApi::Get() { Response("ok get"); }
 
-void OkApi::Post(typhoon::Application* app, typhoon::Connection* conn) {
-  Response(app, conn, "ok post");
-}
+void OkApi::Post() { Response("ok post"); }
 
-void GlobalMapApi::Get(typhoon::Application* app, typhoon::Connection* conn) {
+void GlobalMapApi::Get() {
   ELOG_INFO("Http Request GlobalMapApi Get");
   Json response;
   Json line_json;
   for (const auto& lane : engine_->GetLanes()) {
     ConvertLaneToSimplePts(lane, response);
   }
-  Response(app, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
+  Response(SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
 }
 
-void NearestLane::Post(typhoon::Application* app, typhoon::Connection* conn) {
+void NearestLane::Post() {
   ELOG_INFO("Http Request NearestLane Post");
   Json response;
-  std::string req_data = typhoon::RequestHandler::GetRequestData(conn);
+  std::string req_data = GetRequestData();
   ELOG_INFO("Request Data: " << req_data);
   nlohmann::json data_json;
   if (!CheckRequestData(required_keys_, req_data, data_json)) {
-    typhoon::RequestHandler::Response(
-        app, conn,
-        SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
-                    "Request数据异常"));
+    Response(SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
+                         "Request数据异常"));
     return;
   }
   auto lanes = engine_->GetNearestLanes(data_json["x"], data_json["y"], 1);
   if (1 != lanes.size()) {
-    typhoon::RequestHandler::Response(
-        app, conn,
-        SetResponse(nlohmann::json(), HttpStatusCode::FAILED,
-                    "Query Nearest Lanes Fault."));
+    Response(SetResponse(nlohmann::json(), HttpStatusCode::FAILED,
+                         "Query Nearest Lanes Fault."));
   }
   auto lane = lanes.front();
   ELOG_INFO("Nearest Lane Id: " << lane->id());
   ConvertLaneToSimplePts(lane, response);
-  Response(app, conn,
-           SetResponse(response, HttpStatusCode::SUCCESS, "get nearest lane"));
+  Response(SetResponse(response, HttpStatusCode::SUCCESS, "get nearest lane"));
 }
 
 }  // namespace server

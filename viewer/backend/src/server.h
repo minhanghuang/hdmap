@@ -1,6 +1,7 @@
 #ifndef OPENDRIVE_ENGINE_SERVER_H_
 #define OPENDRIVE_ENGINE_SERVER_H_
-#include <typhoon/typhoon.h>
+#include <cyclone/cyclone.h>
+#include <cyclone/options.h>
 
 #include <iostream>
 #include <memory>
@@ -21,7 +22,7 @@ class Server {
   int Start();
 
  private:
-  typhoon::Options options_;
+  cyclone::Options options_;
   std::shared_ptr<server::OkApi> ok_;
   std::shared_ptr<server::GlobalMapApi> global_map_;
   std::shared_ptr<server::NearestLane> nearest_lane_;
