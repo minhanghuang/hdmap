@@ -36,18 +36,20 @@ class RequestBase {
 
 class OkApi : public cyclone::web::RequestHandler, public RequestBase {
  public:
-  virtual void Get() override;
-  virtual void Post() override;
+  virtual void Get(cyclone::Server* server, cyclone::Connection* conn) override;
+  virtual void Post(cyclone::Server* server,
+                    cyclone::Connection* conn) override;
 };
 
 class GlobalMapApi : public cyclone::web::RequestHandler, public RequestBase {
  public:
-  virtual void Get() override;
+  virtual void Get(cyclone::Server* server, cyclone::Connection* conn) override;
 };
 
 class NearestLane : public cyclone::web::RequestHandler, public RequestBase {
  public:
-  virtual void Post() override;
+  virtual void Post(cyclone::Server* server,
+                    cyclone::Connection* conn) override;
 
  private:
   RequiredKeys required_keys_{

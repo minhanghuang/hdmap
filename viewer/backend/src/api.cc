@@ -1,9 +1,5 @@
 #include "api.h"
 
-#include "global_data.h"
-#include "log.h"
-#include "util.h"
-
 namespace opendrive {
 namespace engine {
 namespace server {
@@ -53,40 +49,47 @@ std::string RequestBase::SetResponse(const Json& data, HttpStatusCode code,
   return response.dump(0);
 }
 
-void OkApi::Get() { Response("ok get"); }
+void OkApi::Get(cyclone::Server* server, cyclone::Connection* conn) {
+  Response(server, conn, "ok get");
+}
 
-void OkApi::Post() { Response("ok post"); }
+void OkApi::Post(cyclone::Server* server, cyclone::Connection* conn) {
+  Response(server, conn, "ok post");
+}
 
-void GlobalMapApi::Get() {
+void GlobalMapApi::Get(cyclone::Server* server, cyclone::Connection* conn) {
   ELOG_INFO("Http Request GlobalMapApi Get");
   Json response;
   Json line_json;
   for (const auto& lane : engine_->GetLanes()) {
     ConvertLaneToSimplePts(lane, response);
   }
-  Response(SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
+  Response(server, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
 }
 
-void NearestLane::Post() {
+void NearestLane::Post(cyclone::Server* server, cyclone::Connection* conn) {
   ELOG_INFO("Http Request NearestLane Post");
   Json response;
-  std::string req_data = GetRequestData();
+  std::string req_data = GetRequestData(conn);
   ELOG_INFO("Request Data: " << req_data);
   nlohmann::json data_json;
   if (!CheckRequestData(required_keys_, req_data, data_json)) {
-    Response(SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
+    Response(server, conn,
+             SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
                          "Request数据异常"));
     return;
   }
   auto lanes = engine_->GetNearestLanes(data_json["x"], data_json["y"], 1);
   if (1 != lanes.size()) {
-    Response(SetResponse(nlohmann::json(), HttpStatusCode::FAILED,
+    Response(server, conn,
+             SetResponse(nlohmann::json(), HttpStatusCode::FAILED,
                          "Query Nearest Lanes Fault."));
   }
   auto lane = lanes.front();
   ELOG_INFO("Nearest Lane Id: " << lane->id());
   ConvertLaneToSimplePts(lane, response);
-  Response(SetResponse(response, HttpStatusCode::SUCCESS, "get nearest lane"));
+  Response(server, conn,
+           SetResponse(response, HttpStatusCode::SUCCESS, "get nearest lane"));
 }
 
 }  // namespace server
