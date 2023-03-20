@@ -109,7 +109,7 @@ Convertor& Convertor::ConvertRoad(opendrive::element::Map::Ptr ele_map) {
   for (const auto& ele_road : ele_map->roads()) {
     if (ele_road.attribute().id() < 0) continue;
     auto road = std::make_shared<core::Road>();
-    ConvertRoadAttr(ele_road, road).ConvertSection(ele_road, road);
+    ConvertRoadAttr(ele_road, road).ConvertSections(ele_road, road);
     data_->mutable_roads()[road->id()] = road;
   }
   ENGINE_INFO("Convert Road End")
@@ -142,8 +142,8 @@ Convertor& Convertor::ConvertRoadAttr(const element::Road& ele_road,
   return *this;
 }
 
-Convertor& Convertor::ConvertSection(const element::Road& ele_road,
-                                     core::Road::Ptr road) {
+Convertor& Convertor::ConvertSections(const element::Road& ele_road,
+                                      core::Road::Ptr road) {
   if (!Continue()) return *this;
 
   std::string road_id = std::to_string(ele_road.attribute().id());
@@ -237,18 +237,10 @@ void Convertor::CenterLaneSampling(
   element::Geometry::ConstPtr geometry = nullptr;
   int geometry_type = -1;
   size_t point_idx = 0;
+  bool last_point = false;
   section->mutable_center_lane()->mutable_central_curve().mutable_pts().clear();
 
   while (true) {
-    if (section_ds > section->length()) {
-      // TODO: section_ds - section->length() 不等于 step_
-      if (section_ds - section->length() >= step_ - 1e-10) {
-        break;
-      } else {
-        section_ds = section->length();
-        road_ds = road_ds - (section_ds - section->length());
-      }
-    }
     geometry = GetGeometry(geometrys, road_ds);
     if (!geometry) {
       break;
@@ -296,8 +288,17 @@ void Convertor::CenterLaneSampling(
         .mutable_pts()
         .emplace_back(point);
 
-    section_ds += step_;
-    road_ds += step_;
+    if (last_point) {
+      break;
+    } else if (section_ds - section->length() >= 1e-10) {
+      //  last point
+      road_ds -= (section_ds - section->length());
+      section_ds = section->length();
+      last_point = true;
+    } else {
+      section_ds += step_;
+      road_ds += step_;
+    }
   }
 }
 

@@ -33,8 +33,8 @@ class Convertor {
   Convertor& ConvertRoad(element::Map::Ptr ele_map);
   Convertor& ConvertRoadAttr(const element::Road& ele_road,
                              core::Road::Ptr road);
-  Convertor& ConvertSection(const element::Road& ele_road,
-                            core::Road::Ptr road);
+  Convertor& ConvertSections(const element::Road& ele_road,
+                             core::Road::Ptr road);
   Convertor& BuildKDTree();
   void AppendKDTreeSample(const core::Curve::Point& point);
   void CenterLaneSampling(const element::Geometry::ConstPtrs& geometrys,
