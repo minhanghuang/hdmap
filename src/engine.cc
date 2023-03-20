@@ -10,6 +10,11 @@ Status Engine::Init(const common::Param& param) {
   return impl_->Init(param);
 }
 
+Status Engine::HotUpdate(const common::Param& param) {
+  cactus::WriteLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+  return impl_->Init(param);
+}
+
 std::string Engine::GetXodrVersion() {
   cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
   return impl_->GetXodrVersion();

@@ -57,6 +57,7 @@ class KDTreeAdaptor {
   const KDTreeIds& ids() const;
 
  private:
+  void Clear();
   KDTreeNodes matrix_;
   KDTreeIds ids_;
 };

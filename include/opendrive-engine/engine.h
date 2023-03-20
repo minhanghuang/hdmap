@@ -23,6 +23,7 @@ class Engine {
   ~Engine() = default;
   Engine();
   Status Init(const common::Param& param);
+  Status HotUpdate(const common::Param& param);
   std::string GetXodrVersion();
   bool GetPointById(const core::Id& point_id, core::Curve::Point& out_point);
   core::Lane::ConstPtr GetLaneById(const core::Id& id);

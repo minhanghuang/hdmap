@@ -8,6 +8,11 @@ KDTreeAdaptor::~KDTreeAdaptor() {}
 
 KDTreeAdaptor::KDTreeAdaptor() {}
 
+void KDTreeAdaptor::Clear() {
+  KDTreeNodes().swap(matrix_);
+  KDTreeIds().swap(ids_);
+}
+
 size_t KDTreeAdaptor::kdtree_get_point_count() const { return matrix_.size(); }
 
 double KDTreeAdaptor::kdtree_get_pt(size_t idx, size_t dim) const {
@@ -15,8 +20,7 @@ double KDTreeAdaptor::kdtree_get_pt(size_t idx, size_t dim) const {
 }
 
 void KDTreeAdaptor::Init(const SamplePoints& samples) {
-  KDTreeNodes().swap(matrix_);
-  KDTreeIds().swap(ids_);
+  Clear();
   KDTreeNode node(2);
   for (const auto& point : samples) {
     node[0] = point.x();
