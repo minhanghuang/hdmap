@@ -1,5 +1,8 @@
 #include "api.h"
 
+#include "opendrive-engine/common/param.h"
+#include "opendrive-engine/common/status.h"
+
 namespace opendrive {
 namespace engine {
 namespace server {
@@ -63,6 +66,28 @@ void GlobalMapApi::Get(cyclone::Server* server, cyclone::Connection* conn) {
   Json line_json;
   for (const auto& lane : engine_->GetLanes()) {
     ConvertLaneToSimplePts(lane, response);
+  }
+  Response(server, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
+}
+
+void HotUpdate::Post(cyclone::Server* server, cyclone::Connection* conn) {
+  ELOG_INFO("Http Request HotUpdate Post");
+  Json response;
+  std::string req_data = GetRequestData(conn);
+  ELOG_INFO("Request Data: " << req_data);
+  nlohmann::json data_json;
+  if (!CheckRequestData(required_keys_, req_data, data_json)) {
+    Response(server, conn,
+             SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
+                         "Request数据异常"));
+    return;
+  }
+  auto param = common::Param();
+  param.map_file = data_json["file"];
+  auto status = engine_->HotUpdate(param);
+  if (ErrorCode::OK != status.error_code) {
+    Response(server, conn,
+             SetResponse(response, HttpStatusCode::FAILED, status.msg));
   }
   Response(server, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
 }

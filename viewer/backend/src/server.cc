@@ -13,6 +13,7 @@ int Server::Init() {
   ok_ = std::make_shared<server::OkApi>();
   global_map_ = std::make_shared<server::GlobalMapApi>();
   nearest_lane_ = std::make_shared<server::NearestLane>();
+  hot_update_ = std::make_shared<server::HotUpdate>();
   return 0;
 }
 
@@ -22,6 +23,7 @@ int Server::Start() {
   app.AddHandler("/opendrive/engine/ok/", ok_);
   app.AddHandler("/opendrive/engine/map/", global_map_);
   app.AddHandler("/opendrive/engine/nearest_lane/", nearest_lane_);
+  app.AddHandler("/opendrive/engine/hot_update/", hot_update_);
   app.Spin();
   return 0;
 }

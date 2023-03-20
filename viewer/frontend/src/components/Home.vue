@@ -42,8 +42,10 @@ export default {
       map: {},
       styles: {},
       layers: {},
+      point_layers: {},
       view_center: [0, 0],
       singleclick_mouse: [0, 0],
+      way_points: [], // 途经点
     };
   },
   created() {},
@@ -97,7 +99,8 @@ export default {
           .textContent.split(", ");
         self.singleclick_mouse[0] = parseFloat(mouseText[0]);
         self.singleclick_mouse[1] = parseFloat(mouseText[1]);
-        self.showNearestLane();
+        self.showNearestLane(); // 显示最近车道
+        self.showWayPoint("way_points", self.singleclick_mouse, 10, false); // 显示最近点
       });
       self.map.on("dblclick", function () {
         console.log("dblclick");
@@ -171,6 +174,7 @@ export default {
         })
         .catch((error) => {});
     }, // showNearestLane() end
+
     showLines(
       layer_name,
       data /*[[[1,2], [3,4]], [[2,4], [5,8]]]*/,
@@ -207,6 +211,52 @@ export default {
       self.map.addLayer(vectorLayer);
       self.layers[layer_name] = vectorLayer;
     }, // showLine() end
+    showWayPoint(layer_name, data /*[2,4]*/, z, remove = true) {
+      var self = this;
+      if (remove || self.point_layers[layer_name]) {
+        self.map.removeLayer(self.point_layers[layer_name]);
+      }
+
+      var features = new Array();
+      features.push(new Feature({ geometry: new Point(data) }));
+      var source = new VectorSource({
+        features: features,
+      });
+      var clusterSource = new Cluster({
+        distance: 0,
+        source: source,
+      });
+      var style = new Style({
+        image: new Circle({
+          radius: 7,
+          stroke: new Stroke({
+            color: "red",
+          }),
+          fill: new Fill({
+            color: "red",
+          }),
+        }),
+        text: new Text({
+          font: "13px Calibri,sans-serif",
+          fill: new Fill({ color: "#000" }),
+          stroke: new Stroke({
+            color: "#fff",
+            width: 2,
+          }),
+          text: "1",
+        }),
+      });
+
+      var vector_layer = new VectorLayer({
+        source: clusterSource,
+        style: style,
+        zIndex: 10,
+      });
+
+      self.map.addLayer(vector_layer);
+      self.point_layers[Object.keys(self.point_layers).length.toString()] =
+        vector_layer;
+    }, // showWayPoint() end
   },
 };
 </script>

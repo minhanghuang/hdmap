@@ -46,6 +46,17 @@ class GlobalMapApi : public cyclone::web::RequestHandler, public RequestBase {
   virtual void Get(cyclone::Server* server, cyclone::Connection* conn) override;
 };
 
+class HotUpdate : public cyclone::web::RequestHandler, public RequestBase {
+ public:
+  virtual void Post(cyclone::Server* server,
+                    cyclone::Connection* conn) override;
+
+ private:
+  RequiredKeys required_keys_{
+      std::make_pair("file", JsonValueType::string),
+  };
+};
+
 class NearestLane : public cyclone::web::RequestHandler, public RequestBase {
  public:
   virtual void Post(cyclone::Server* server,
@@ -53,8 +64,8 @@ class NearestLane : public cyclone::web::RequestHandler, public RequestBase {
 
  private:
   RequiredKeys required_keys_{
-      std::make_pair("x", nlohmann::json::value_t::number_float),
-      std::make_pair("y", nlohmann::json::value_t::number_float),
+      std::make_pair("x", JsonValueType::number_float),
+      std::make_pair("y", JsonValueType::number_float),
   };
 };
 
