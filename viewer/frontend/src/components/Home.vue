@@ -9,7 +9,10 @@
         </div>
         <div id="tool">
           <br />
-          <Button type="success">剩余距离</Button>
+          <Button type="success" @click="clickClear">Clear</Button>
+          <br />
+          <br />
+          <Button type="success" @click="clickPlanning">Planning</Button>
         </div>
       </Content>
     </Layout>
@@ -39,6 +42,7 @@ export default {
   data() {
     return {
       username: "xodr-engine",
+      base_map_layer_name: "global_map",
       map: {},
       styles: {},
       layers: {},
@@ -101,6 +105,7 @@ export default {
         self.singleclick_mouse[1] = parseFloat(mouseText[1]);
         self.showNearestLane(); // 显示最近车道
         self.showWayPoint("way_points", self.singleclick_mouse, 10, false); // 显示最近点
+        self.saveWayPoint(self.singleclick_mouse);
       });
       self.map.on("dblclick", function () {
         console.log("dblclick");
@@ -127,23 +132,43 @@ export default {
       self.styles["lineStringGlobalMapStyle"] = lineStringGlobalMapStyle;
       self.styles["lineStringNearestLaneStyle"] = lineStringNearestLaneStyle;
     },
+
+    clearLayers() {
+      console.log("clearLayers()");
+      var self = this;
+      // line layer
+      var keys = Object.keys(self.layers);
+      for (let i = 0; i < keys.length; i++) {
+        if (keys[i] != self.base_map_layer_name) {
+          self.map.removeLayer(self.layers[keys[i]]);
+          delete self.layers[keys[i]];
+        }
+      }
+      // point layer
+      var keys = Object.keys(self.point_layers);
+      for (let i = 0; i < keys.length; i++) {
+        self.map.removeLayer(self.point_layers[keys[i]]);
+        delete self.point_layers[keys[i]];
+      }
+    }, // clearLayers() end
+
+    /*   ----              -----  */
+    /*   ----  show layer  -----  */
+    /*   ----              -----  */
     showGlobalMap() {
       console.log("showGlobalMap()");
       var self = this;
       self.$api.api_all
         .get_global_map()
         .then((response) => {
-          console.log("GlobalMap Data: ", response);
           const data = response.data;
           if (data.code != 1000) {
             console.log("response exec: ", data.code);
             return;
           }
           self.view_center = data.results[0][0][0];
-          console.log(data.results[1]);
           self.showLines(
-            "global_map",
-            /* data.results[1], */
+            self.base_map_layer_name,
             data.results,
             "lineStringGlobalMapStyle",
             1,
@@ -152,6 +177,7 @@ export default {
         })
         .catch((error) => {});
     }, // showGlobalMap() end
+
     showNearestLane() {
       console.log("showNearestLane()");
       var self = this;
@@ -211,6 +237,7 @@ export default {
       self.map.addLayer(vectorLayer);
       self.layers[layer_name] = vectorLayer;
     }, // showLine() end
+
     showWayPoint(layer_name, data /*[2,4]*/, z, remove = true) {
       var self = this;
       if (remove || self.point_layers[layer_name]) {
@@ -243,7 +270,7 @@ export default {
             color: "#fff",
             width: 2,
           }),
-          text: "1",
+          text: Object.keys(self.point_layers).length.toString(),
         }),
       });
 
@@ -257,6 +284,35 @@ export default {
       self.point_layers[Object.keys(self.point_layers).length.toString()] =
         vector_layer;
     }, // showWayPoint() end
+
+    /*   ----                  -----  */
+    /*   ----     function     -----  */
+    /*   ----                  -----  */
+    saveWayPoint(point) {
+      var self = this;
+      self.way_points.push(Array.from(point));
+    }, // saveWayPoint() end
+    /*   ----                  -----  */
+    /*   ----  click callback  -----  */
+    /*   ----                  -----  */
+    clickClear() {
+      var self = this;
+      self.clearLayers();
+    }, // clickClear() end
+
+    clickPlanning() {
+      var self = this;
+      self.$api.api_all
+        .planning(self.way_points)
+        .then((response) => {
+          const data = response.data;
+          if (data.code != 1000) {
+            console.log("response exec: ", data.code);
+            return;
+          }
+        })
+        .catch((error) => {});
+    }, // clickPlanning() end
   },
 };
 </script>
