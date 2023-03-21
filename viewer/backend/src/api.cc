@@ -117,6 +117,33 @@ void NearestLane::Post(cyclone::Server* server, cyclone::Connection* conn) {
            SetResponse(response, HttpStatusCode::SUCCESS, "get nearest lane"));
 }
 
+void Planning::Post(cyclone::Server* server, cyclone::Connection* conn) {
+  ELOG_INFO("Http Request Planning Post");
+  Json response;
+  std::string req_data = GetRequestData(conn);
+  ELOG_INFO("Request Data: " << req_data);
+  nlohmann::json data_json;
+  if (!CheckRequestData(required_keys_, req_data, data_json)) {
+    Response(server, conn,
+             SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
+                         "Request数据异常"));
+    return;
+  }
+  auto points = data_json["points"];
+  for (const auto& point : points) {
+    if (2 != point.size()) {
+      Response(server, conn,
+               SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
+                           "Request数据异常"));
+      return;
+    }
+    std::cout << "[" << point.front() << "," << point.back() << "]"
+              << std::endl;
+  }
+  Response(server, conn,
+           SetResponse(response, HttpStatusCode::SUCCESS, "planning ok"));
+}
+
 }  // namespace server
 }  // namespace engine
 }  // namespace opendrive

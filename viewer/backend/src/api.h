@@ -69,6 +69,17 @@ class NearestLane : public cyclone::web::RequestHandler, public RequestBase {
   };
 };
 
+class Planning : public cyclone::web::RequestHandler, public RequestBase {
+ public:
+  virtual void Post(cyclone::Server* server,
+                    cyclone::Connection* conn) override;
+
+ private:
+  RequiredKeys required_keys_{
+      std::make_pair("points", JsonValueType::array),
+  };
+};
+
 }  // namespace server
 }  // namespace engine
 }  // namespace opendrive
