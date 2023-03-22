@@ -1,5 +1,6 @@
 #include "api.h"
 
+#include "cyclone/define.h"
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/common/status.h"
 
@@ -143,6 +144,41 @@ void Planning::Post(cyclone::Server* server, cyclone::Connection* conn) {
   Response(server, conn,
            SetResponse(response, HttpStatusCode::SUCCESS, "planning ok"));
 }
+
+void RealTimeData::Open(cyclone::Server* server,
+                        const cyclone::Connection* conn) {
+  ELOG_INFO("WebSocket Request Connection");
+}
+
+void RealTimeData::OnMessage(cyclone::Server* server, cyclone::Connection* conn,
+                             const std::string& msg, int op_code) {
+  ELOG_INFO("WebSocket OnMessage");
+  if (op_code != cyclone::WebSocketOpCode::TEXT) {
+    return;
+  }
+  Json response_json;
+  Json request_json;
+  if (!CheckRequestData(required_keys_, msg, request_json)) {
+    SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
+                               "WebSocket Data Execption."));
+    return;
+  }
+  double x = request_json["x"];
+  double y = request_json["y"];
+  auto search = engine_->GetNearestPoints<double>(x, y, 1);
+  if (search.empty()) {
+    SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
+                               "WebSocket Data Execption."));
+    return;
+  }
+}
+
+void RealTimeData::OnPong(cyclone::Server* server, cyclone::Connection* conn) {}
+
+void RealTimeData::OnPing(cyclone::Server* server, cyclone::Connection* conn) {}
+
+void RealTimeData::OnClose(cyclone::Server* server,
+                           const cyclone::Connection* conn) {}
 
 }  // namespace server
 }  // namespace engine

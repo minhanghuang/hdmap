@@ -28,6 +28,7 @@ class Server {
   std::shared_ptr<server::NearestLane> nearest_lane_;
   std::shared_ptr<server::HotUpdate> hot_update_;
   std::shared_ptr<server::Planning> planning_;
+  std::shared_ptr<server::RealTimeData> real_time_data_;
 };
 
 }  // namespace engine

@@ -15,6 +15,7 @@ int Server::Init() {
   nearest_lane_ = std::make_shared<server::NearestLane>();
   hot_update_ = std::make_shared<server::HotUpdate>();
   planning_ = std::make_shared<server::Planning>();
+  real_time_data_ = std::make_shared<server::RealTimeData>();
   return 0;
 }
 
@@ -26,6 +27,7 @@ int Server::Start() {
   app.AddHandler("/opendrive/engine/nearest_lane/", nearest_lane_);
   app.AddHandler("/opendrive/engine/hot_update/", hot_update_);
   app.AddHandler("/opendrive/engine/planning/", planning_);
+  app.AddHandler("/opendrive/engine/ws/real_time_data/", real_time_data_);
   app.Spin();
   return 0;
 }

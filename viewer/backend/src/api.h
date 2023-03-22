@@ -80,6 +80,27 @@ class Planning : public cyclone::web::RequestHandler, public RequestBase {
   };
 };
 
+class RealTimeData : public cyclone::websocket::WebSocketHandler,
+                     public RequestBase {
+ public:
+  virtual void Open(cyclone::Server* server,
+                    const cyclone::Connection* conn) override;
+  virtual void OnMessage(cyclone::Server* server, cyclone::Connection* conn,
+                         const std::string& msg, int op_code) override;
+  virtual void OnPong(cyclone::Server* server,
+                      cyclone::Connection* conn) override;
+  virtual void OnPing(cyclone::Server* server,
+                      cyclone::Connection* conn) override;
+  virtual void OnClose(cyclone::Server* server,
+                       const cyclone::Connection* conn) override;
+
+ private:
+  RequiredKeys required_keys_{
+      std::make_pair("x", JsonValueType::number_float),
+      std::make_pair("y", JsonValueType::number_float),
+  };
+};
+
 }  // namespace server
 }  // namespace engine
 }  // namespace opendrive
