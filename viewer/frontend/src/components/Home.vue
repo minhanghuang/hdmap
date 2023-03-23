@@ -10,9 +10,6 @@
         <div id="tool">
           <br />
           <Button type="success" @click="clickClear">Clear</Button>
-          <br />
-          <br />
-          <Button type="success" @click="clickPlanning">Planning</Button>
         </div>
       </Content>
     </Layout>
@@ -48,7 +45,8 @@ export default {
       layers: {},
       point_layers: {},
       view_center: [0, 0],
-      singleclick_mouse: [0, 0],
+      mouse: [0, 0], // 鼠标
+      singleclick_mouse: [0, 0], // 单击鼠标
       way_points: [], // 途经点
     };
   },
@@ -61,6 +59,7 @@ export default {
       var self = this;
       self.initOl();
       self.initOlStyle();
+      self.initWs();
       self.showGlobalMap();
     },
     initOl() {
@@ -94,7 +93,14 @@ export default {
           return interaction instanceof DoubleClickZoom;
         });
       self.map.removeInteraction(dblClickInteraction); // 双击禁止放大
-      self.map.on("pointermove", function () {});
+      self.map.on("pointermove", function () {
+        var mouseText = document
+          .getElementById("mouse-position")
+          .textContent.split(", ");
+        self.mouse[0] = parseFloat(mouseText[0]);
+        self.mouse[1] = parseFloat(mouseText[1]);
+        self.clickCursor();
+      });
       self.map.on("click", function () {});
       self.map.on("singleclick", function () {
         console.log("singleclick");
@@ -132,6 +138,24 @@ export default {
       self.styles["lineStringGlobalMapStyle"] = lineStringGlobalMapStyle;
       self.styles["lineStringNearestLaneStyle"] = lineStringNearestLaneStyle;
     },
+    initWs() {
+      var self = this;
+      const url =
+        "ws://" +
+        window.location.hostname +
+        ":9070/opendrive/engine/ws/real_time_data/";
+      console.log("ws url: ", url);
+      self.$websocket.createSocket(url);
+      const onMessage = (e) => {
+        // 创建接收消息函数
+        const data_str = e && e.detail.data;
+        if ("" == data_str) {
+          return;
+        }
+        let data = JSON.parse(data_str);
+      };
+      window.addEventListener("onmessageWS", onMessage);
+    },
 
     clearLayers() {
       console.log("clearLayers()");
@@ -151,6 +175,12 @@ export default {
         delete self.point_layers[keys[i]];
       }
     }, // clearLayers() end
+
+    clickCursor() {
+      var self = this;
+      console.log("clickCursor");
+      self.$websocket.sendWSPush({ x: self.mouse[0], y: self.mouse[1] });
+    }, // clickCursor() end
 
     /*   ----              -----  */
     /*   ----  show layer  -----  */
@@ -299,20 +329,6 @@ export default {
       var self = this;
       self.clearLayers();
     }, // clickClear() end
-
-    clickPlanning() {
-      var self = this;
-      self.$api.api_all
-        .planning(self.way_points)
-        .then((response) => {
-          const data = response.data;
-          if (data.code != 1000) {
-            console.log("response exec: ", data.code);
-            return;
-          }
-        })
-        .catch((error) => {});
-    }, // clickPlanning() end
   },
 };
 </script>

@@ -152,7 +152,7 @@ void RealTimeData::Open(cyclone::Server* server,
 
 void RealTimeData::OnMessage(cyclone::Server* server, cyclone::Connection* conn,
                              const std::string& msg, int op_code) {
-  ELOG_INFO("WebSocket OnMessage");
+  // ELOG_INFO("WebSocket OnMessage");
   if (op_code != cyclone::WebSocketOpCode::TEXT) {
     return;
   }

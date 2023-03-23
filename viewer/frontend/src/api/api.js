@@ -17,16 +17,6 @@ const api_all = {
       }
     })
   },
-  planning(points) {
-    return axios({
-      url: '/opendrive/engine/planning/',
-      method: 'POST',
-      data: {
-        "points": points,
-      }
-    })
-
-  }, // planning
 };
 
 export default api_all
