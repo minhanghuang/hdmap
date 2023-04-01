@@ -18,6 +18,7 @@
 
 <script>
 import "ol/ol.css";
+import GUI from "lil-gui";
 import Map from "ol/Map";
 import View from "ol/View";
 import { Vector as VectorLayer } from "ol/layer";
@@ -40,6 +41,7 @@ export default {
     return {
       username: "xodr-engine",
       base_map_layer_name: "global_map",
+      gui: {},
       map: {},
       styles: {},
       layers: {},
@@ -59,6 +61,7 @@ export default {
       var self = this;
       self.initOl();
       self.initOlStyle();
+      self.initGui();
       self.initWs();
       self.showGlobalMap();
     },
@@ -137,6 +140,12 @@ export default {
 
       self.styles["lineStringGlobalMapStyle"] = lineStringGlobalMapStyle;
       self.styles["lineStringNearestLaneStyle"] = lineStringNearestLaneStyle;
+    }, // initOlStyle() end
+    initGui() {
+      console.log("initGui()");
+      var self = this;
+      self.gui = new GUI();
+      self.gui.add(document, "title");
     },
     initWs() {
       var self = this;
