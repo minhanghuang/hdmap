@@ -9,6 +9,12 @@
 - [nanoflann](https://github.com/jlblancoc/nanoflann)
 - [http-server](https://github.com/minhanghuang/cyclone)
 
+## Install 
+
+```bash
+python3 setup.py
+```
+
 ## References
 
 [imap](https://github.com/daohu527/imap)
