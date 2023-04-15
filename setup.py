@@ -6,6 +6,9 @@ current_path = os.path.abspath(__file__)
 project_path = os.path.dirname(current_path)
 download_path = os.path.join(project_path, "third_party")
 install_path = os.path.join(project_path, "install")
+xodr_file_list = [
+    "https://github.com/minhanghuang/opendrive-files/blob/main/carla-simulator/Town07.xodr",
+]
 third_party_list = [
     {
         "addr": "https://github.com/leethomason/tinyxml2.git",
@@ -97,6 +100,11 @@ class Worker:
                      make install""".format(
                 install_path, path)
             self.command(cmd)
+        self.__install_xodr_file()
+
+    def command(self, msg):
+        print("###cmd: ", msg)
+        os.system(msg)
 
     def __parse_plugin(self):
         for item in third_party_list:
@@ -104,9 +112,11 @@ class Worker:
             plugin.parse(item)
             self.__plugins.append(plugin)
 
-    def command(self, msg):
-        print("###cmd: ", msg)
-        os.system(msg)
+    def __install_xodr_file(self):
+        for path in xodr_file_list:
+            cmd = "wget -nc {} -P {}".format(path,
+                                             os.path.join(install_path, "share/xodr/"))
+            self.command(cmd)
 
 
 def main():
