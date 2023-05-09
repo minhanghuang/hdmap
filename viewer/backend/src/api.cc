@@ -153,24 +153,39 @@ void RealTimeData::Open(cyclone::Server* server,
 void RealTimeData::OnMessage(cyclone::Server* server, cyclone::Connection* conn,
                              const std::string& msg, int op_code) {
   // ELOG_INFO("WebSocket OnMessage");
-  if (op_code != cyclone::WebSocketOpCode::TEXT) {
+  static std::mutex mutex_;
+  std::cout << "mutex: " << &mutex_ << std::endl;
+  if (!mutex_.try_lock()) {
+    ELOG_INFO("WebSocket Get Lock Fault");
+    std::cout << "111" << std::endl;
     return;
   }
-  Json response_json;
-  Json request_json;
-  if (!CheckRequestData(required_keys_, msg, request_json)) {
-    SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
-                               "WebSocket Data Execption."));
-    return;
-  }
-  double x = request_json["x"];
-  double y = request_json["y"];
-  auto search = engine_->GetNearestPoints<double>(x, y, 1);
-  if (search.empty()) {
-    SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
-                               "WebSocket Data Execption."));
-    return;
-  }
+  ELOG_INFO("WebSocket Get Lock Success");
+  sleep(1);
+  std::cout << "xxxx" << std::endl;
+  mutex_.unlock();
+  // if (op_code != cyclone::WebSocketOpCode::TEXT) {
+  //   return;
+  // }
+  // Json response_json;
+  // Json request_json;
+  // if (!CheckRequestData(required_keys_, msg, request_json)) {
+  //   SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
+  //                              "WebSocket Data Exception."));
+  //   mutex_.unlock();
+  //   return;
+  // }
+  // double x = request_json["x"];
+  // double y = request_json["y"];
+  // auto search = engine_->GetNearestPoints<double>(x, y, 1);
+  // if (search.empty()) {
+  //   SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
+  //                              "WebSocket Data Exception."));
+  //   mutex_.unlock();
+  //   return;
+  // }
+  // mutex_.unlock();
+  // return;
 }
 
 void RealTimeData::OnPong(cyclone::Server* server, cyclone::Connection* conn) {}

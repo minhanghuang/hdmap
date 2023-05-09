@@ -2,6 +2,7 @@
 #define OPENDRIVE_ENGINE_SERVER_API_H_
 #include <cyclone/cyclone.h>
 
+#include <mutex>
 #include <nlohmann/json.hpp>
 
 #include "cyclone/define.h"
@@ -99,6 +100,7 @@ class RealTimeData : public cyclone::websocket::WebSocketHandler,
       std::make_pair("x", JsonValueType::number_float),
       std::make_pair("y", JsonValueType::number_float),
   };
+  // std::mutex mutex_;
 };
 
 }  // namespace server
