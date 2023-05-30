@@ -1,0 +1,34 @@
+name: macos build
+run-name: build runner on macos 🚀
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+  push:
+    paths:
+      - 'cmake/**'
+      - 'include/**/*.h'
+      - 'src/**/*.cc'
+      - 'tests/**'
+      - 'CMakeLists.txt'
+      - 'scripts/**'
+      - 'setup.py'
+      - '.github/workflows/macos-build.yaml'
+
+jobs:
+  build-amd-macos:
+    strategy:
+      matrix:
+        os: ["macos-latest"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
+      - name: Build
+        run: |
+          bash -c "cd ${{ github.repository }} && python3 setup.py && source install/setup.bash && ./scripts/build.sh"
+      - name: Test
+        run: |
+          bash -c "cd ${{ github.repository }} && source install/setup.bash && ./scripts/run_tests.sh"

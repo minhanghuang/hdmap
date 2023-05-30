@@ -1,5 +1,8 @@
 # OpenDRIVE Engine
 
+[![Build Status](https://github.com/minhanghuang/opendrive-engine/actions/workflows/ubuntu-build.yaml/badge.svg?branch=dev)](https://github.com/minhanghuang/opendrive-engine/actions/workflows/ubuntu-build.yaml)
+[![Build Status](https://github.com/minhanghuang/opendrive-engine/actions/workflows/macos-build.yaml/badge.svg?branch=dev)](https://github.com/minhanghuang/opendrive-engine/actions/workflows/macos-build.yaml)
+
 ![opendrive-engine](./docs/images/opendrive-engine.png)
 
 ## Dependence
