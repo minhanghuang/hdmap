@@ -1,128 +1,116 @@
-import os
 import sys
+import os
+
+DEPENDENCES = {
+    # "": [link, branch, cmake options]
+    "setup": ["https://github.com/minhanghuang/setup.git", "", ""],
+    "googletest": ["https://github.com/google/googletest.git", "", ""],
+    "tinyxml2": ["https://github.com/leethomason/tinyxml2.git", "", ""],
+    "cactus": ["https://github.com/minhanghuang/cactus.git", "", ""],
+    "cyclone": ["https://github.com/minhanghuang/cyclone.git", "", ""],
+    "opendrive-cpp": ["https://github.com/minhanghuang/opendrive-cpp.git", "", ""],
+    "yaml-cpp": ["https://github.com/jbeder/yaml-cpp.git", "", ""],
+    "nanoflann": ["https://github.com/jlblancoc/nanoflann.git", "", ""],
+    "json": ["https://github.com/nlohmann/json.git", "", ""],
+}
 
 
-current_path = os.path.abspath(__file__)
-project_path = os.path.dirname(current_path)
-download_path = os.path.join(project_path, "third_party")
-install_path = os.path.join(project_path, "install")
-xodr_file_list = [
-    "https://github.com/minhanghuang/opendrive-files/blob/main/carla-simulator/Town07.xodr",
-]
-third_party_list = [
-    {
-        "addr": "https://github.com/leethomason/tinyxml2.git",
-        "commit": "master",  # tag branch commit
-    },
-    {
-        "addr": "https://github.com/minhanghuang/setup.git",
-    },
-    {
-        "addr": "https://github.com/minhanghuang/cactus.git",
-    },
-    {
-        "addr": "https://github.com/minhanghuang/cyclone.git",
-    },
-    {
-        "addr": "https://github.com/minhanghuang/opendrive-cpp.git",
-    },
-    {
-        "addr": "https://github.com/jbeder/yaml-cpp.git",
-    },
-    {
-        "addr": "https://github.com/jlblancoc/nanoflann.git",
-    },
-    {
-        "addr": "https://github.com/google/googletest.git",
-    },
-]
-
-
-class Plugin:
-
+class Repository:
     def __init__(self) -> None:
+        self.__link = ""
         self.__name = ""
-        self.__addr = ""
-        self.__b = ""
+        self.__branch = ""
+
+    def get_link(self):
+        return self.__link
 
     def get_name(self):
         return self.__name
 
-    def get_addr(self):
-        return self.__addr
+    def get_branch(self):
+        return self.__branch
 
-    def get_b(self):
-        return self.__b
+    def set_link(self, link):
+        self.__link = link
 
-    def parse(self, obj: dict):
-        if "addr" not in obj.keys():
-            return None
-        self.__addr = obj["addr"]
-        self.__name = self.__addr.rsplit("/")[-1].rsplit(".")[0]
-        if "commit" in obj.keys():
-            self.__b = obj["commit"]
-        return None
+    def set_name(self, name):
+        self.__name = name
+
+    def set_branch(self, branch):
+        self.__branch = branch
 
 
-class Worker:
-
+class Pipeline:
     def __init__(self) -> None:
-        self.__plugins = []
-        self.__parse_plugin()
+        self.__repos = []
+        self.__current_path = os.path.abspath(__file__)
+        self.__download_path = os.path.join(
+            os.path.dirname(self.__current_path), "third_party")
+        self.__install_path = os.path.join(
+            os.path.dirname(self.__current_path), "install")
+
+    def init(self):
+        print("current path: {}".format(self.__current_path))
+        print("download path: {}".format(self.__download_path))
+        print("install path: {}".format(self.__install_path))
+        os.system("mkdir -p {}".format(self.__download_path))
+        os.system("mkdir -p {}".format(self.__install_path))
+
+    def append_repository(self, link: str, branch: str = ""):
+        repo = Repository()
+        repo.set_link(link=link)
+        repo.set_name(name=link.rsplit(".", 1)[0].rsplit("/", 1)[-1])
+        repo.set_branch(branch=branch)
+        self.__repos.append(repo)
 
     def download(self):
-        print("download...")
-        for item in self.__plugins:
-            print("-----", item.get_name())
-            print("-----", item.get_addr())
-            print("-----", item.get_b())
-            dir = os.path.join(download_path, item.get_name())
-            if item.get_b():
-                cmd = "git clone {} {}".format(
-                    item.get_addr(), dir)
-                self.command(cmd)
-                os.chdir(dir)
-                cmd = "git checkout {}".format(item.get_b())
-                self.command(cmd)
-            else:
-                cmd = "git clone --depth 1 {} {}".format(
-                    item.get_addr(), dir)
-                self.command(cmd)
+        print("########### Download...")
+        for repo in self.__repos:
+            self.__clone(repo=repo)
 
-    def install(self):
-        print("install...")
-        for project in os.listdir(download_path):
-            path = os.path.join(download_path, project)
-            cmd = """export PKG_CONFIG_PATH={0}/lib/pkgconfig:{0}/share/pkgconfig:$PKG_CONFIG_PATH && cd {1} &&
-                     cmake -B build -DCMAKE_INSTALL_PREFIX={0} -DBUILD_SHARED_LIBS=ON &&
-                     cmake --build build -j4 &&
-                     cd build &&
-                     make install""".format(
-                install_path, path)
-            self.command(cmd)
-        self.__install_xodr_file()
+    def build(self):
+        print("########### Build...")
+        for name in os.listdir(self.__download_path):
+            print("name: ", name)
+            os.chdir(os.path.join(self.__download_path, name))
+            cmd = "cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX={} {}".format(
+                self.__install_path, DEPENDENCES[name][2])
+            print("cmake: {}".format(cmd))
+            os.system(cmd)
+            os.chdir("build")
+            cmd = "make install -j4"
+            print("make: {}".format(cmd))
+            os.system(cmd)
 
-    def command(self, msg):
-        print("###cmd: ", msg)
-        os.system(msg)
+    def __clone(self, repo: Repository):
+        cmd = ""
+        download_path = os.path.join(self.__download_path, repo.get_name())
+        if os.path.exists(download_path):
+            return
+            # os.system("rm -rf {}".format(download_path))
+        os.system("mkdir -p {}".format(download_path))
+        if "" == repo.get_branch():
+            cmd = "git clone --depth 1 {} {}".format(
+                repo.get_link(),
+                download_path)
+        else:
+            cmd = "git clone --depth 1 --single-branch --branch {} {} {}".format(
+                repo.get_branch(),
+                repo.get_link(),
+                download_path)
 
-    def __parse_plugin(self):
-        for item in third_party_list:
-            plugin = Plugin()
-            plugin.parse(item)
-            self.__plugins.append(plugin)
-
-    def __install_xodr_file(self):
-        for path in xodr_file_list:
-            cmd = "wget -nc {} -P {}".format(path,
-                                             os.path.join(install_path, "share/xodr/"))
-            self.command(cmd)
+        print("clone: {}".format(cmd))
+        os.system(cmd)
 
 
 def main():
-    worker = Worker()
-    worker.download()
-    worker.install()
+    pipe_line = Pipeline()
+    pipe_line.init()
+    for _, repo in DEPENDENCES.items():
+        print("parse: {} {}".format(repo[0], repo[1]))
+        pipe_line.append_repository(link=repo[0], branch=repo[1])
+    pipe_line.download()
+    pipe_line.build()
 
 
 if __name__ == "__main__":
