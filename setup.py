@@ -14,7 +14,6 @@ DEPENDENCES = {
     "json": ["https://github.com/nlohmann/json.git", "", ""],
 }
 
-
 class Repository:
     def __init__(self) -> None:
         self.__link = ""
@@ -73,7 +72,7 @@ class Pipeline:
         for name in os.listdir(self.__download_path):
             print("name: ", name)
             os.chdir(os.path.join(self.__download_path, name))
-            cmd = "cmake -B build -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX={} {}".format(
+            cmd = "mkdir -p build && cd build && cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX={} {}".format(
                 self.__install_path, DEPENDENCES[name][2])
             print("cmake: {}".format(cmd))
             os.system(cmd)

@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build
         run: |
-          bash -c "cd ${{ github.repository }} && python3 setup.py && source install/setup.bash && ./scripts/build.sh"
+          bash -c "cd ${{ github.workspace }} && python3 setup.py && source install/setup.bash && ./scripts/build.sh"
       - name: Test
         run: |
-          bash -c "cd ${{ github.repository }} && source install/setup.bash && ./scripts/run_tests.sh"
+          bash -c "cd ${{ github.workspace }} && source install/setup.bash && ./scripts/run_tests.sh"
