@@ -21,7 +21,7 @@ jobs:
   build-amd-ubuntu:
     strategy:
       matrix:
-        os: ["16.04", "18.04", "20.04", "22.04"]
+        os: ["16.04", "18.04", "20.04", "22.04", "latest"]
     runs-on: ubuntu-latest
     container:
       image: docker://ubuntu:${{ matrix.os }}

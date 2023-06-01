@@ -26,6 +26,9 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
+      - name: Install
+        run: |
+          brew install tinyxml2
       - name: Build
         run: |
           bash -c "cd ${{ github.workspace }} && python3 setup.py && source install/setup.bash && ./scripts/build.sh"
