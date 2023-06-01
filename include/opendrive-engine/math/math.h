@@ -67,10 +67,6 @@ double WrapAngle(double angle);
 
 double AngleDiff(double from, double to);
 
-int RandomInt(int s, int t, unsigned int rand_seed);
-
-double RandomDouble(double s, double t, unsigned int rand_seed);
-
 double Gaussian(double u, double stand, double x);
 
 std::pair<double, double> Cartesian2Polar(double x, double y);

@@ -1,6 +1,9 @@
 #ifndef OPENDRIVE_ENGINE_GEOMETRY_POLYGON2D_H_
 #define OPENDRIVE_ENGINE_GEOMETRY_POLYGON2D_H_
 
+#include <algorithm>
+#include <string>
+
 #include "opendrive-engine/geometry/box2d.h"
 #include "opendrive-engine/geometry/vec2d.h"
 #include "opendrive-engine/math/math.h"

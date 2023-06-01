@@ -1,6 +1,7 @@
 #ifndef OPENDRIVE_ENGINE_GEOMETRY_BOX2D_H_
 #define OPENDRIVE_ENGINE_GEOMETRY_BOX2D_H_
 
+#include <limits>
 #include <vector>
 
 #include "opendrive-engine/geometry/aabox2d.h"

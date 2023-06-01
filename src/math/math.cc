@@ -27,17 +27,6 @@ double WrapAngle(double angle) {
 
 double AngleDiff(double from, double to) { return NormalizeAngle(to - from); }
 
-int RandomInt(int s, int t, unsigned int rand_seed) {
-  if (s >= t) {
-    return s;
-  }
-  return s + rand_r(&rand_seed) % (t - s + 1);
-}
-
-double RandomDouble(double s, double t, unsigned int rand_seed) {
-  return s + (t - s) / 16383.0 * (rand_r(&rand_seed) & 16383);
-}
-
 double Gaussian(double u, double stand, double x) {
   return (1.0 / std::sqrt(2 * M_PI * stand * stand)) *
          std::exp(-(x - u) * (x - u) / (2 * stand * stand));
