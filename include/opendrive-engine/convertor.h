@@ -37,13 +37,13 @@ class Convertor {
                              core::Road::Ptr road);
   Convertor& BuildKDTree();
   void AppendKDTreeSample(const core::Curve::Point& point);
-  void CenterLaneSampling(const element::Geometry::ConstPtrs& geometrys,
+  void CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
                           const element::LaneOffsets& lane_offsets,
                           core::Section::Ptr section, double& road_ds);
   void LaneSampling(const element::Lane& ele_lane, core::Lane::Ptr lane,
                     const core::Curve::Line& refe_line);
   element::Geometry::ConstPtr GetGeometry(
-      const element::Geometry::ConstPtrs& geometrys, double road_ds);
+      const element::Geometry::Ptrs& geometrys, double road_ds);
   double GetLaneOffsetValue(const element::LaneOffsets& offsets,
                             double road_ds);
   float step_;

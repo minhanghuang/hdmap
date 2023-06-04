@@ -18,7 +18,7 @@ bool IsLineGeometry(core::Lane::ConstPtr lane) {
     return false;
   }
   for (const auto& geometry : lane->geometrys()) {
-    if (core::Geomotry::Type::LINE != geometry.type()) {
+    if (core::Geomotry::Type::kLine != geometry.type()) {
       return false;
     }
   }

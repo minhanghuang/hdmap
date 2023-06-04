@@ -63,8 +63,8 @@ class LaneBoundaryAttr {
  public:
   LaneBoundaryAttr()
       : start_position_(0),
-        boundary_type_(RoadMarkType::NONE),
-        boundary_color_(RoadMarkColor::STANDARD) {}
+        boundary_type_(RoadMarkType::kNone),
+        boundary_color_(RoadMarkColor::kStandard) {}
   void set_s(double d) { start_position_ = d; }
   void set_boundary_type(RoadMarkType t) { boundary_type_ = t; }
   void set_boundary_color(RoadMarkColor t) { boundary_color_ = t; }
@@ -115,7 +115,7 @@ typedef std::vector<SpeedLimit> SpeedLimits;
 class Geomotry {
  public:
   typedef opendrive::GeometryType Type;
-  Geomotry() : type_(Type::LINE) {}
+  Geomotry() : type_(Type::kLine) {}
   void set_type(Type i) { type_ = i; }
   void set_point(const Curve::Point& point) { point_ = point; }
   Type& mutable_type() { return type_; }

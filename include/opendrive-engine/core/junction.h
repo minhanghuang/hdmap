@@ -14,7 +14,7 @@ class Junction {
  public:
   typedef std::shared_ptr<Junction> Ptr;
   typedef std::shared_ptr<Junction const> ConstPtr;
-  Junction() : id_(""), name_(""), type_(JunctionType::DEFAULT) {}
+  Junction() : id_(""), name_(""), type_(JunctionType::kDefault) {}
   void set_id(const Id& s) { id_ = s; }
   void set_name(const std::string& s) { name_ = s; }
   void set_type(JunctionType t) { type_ = t; }
