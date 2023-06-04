@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-project(opendrive-engine VERSION 1.0.0)
+project(opendrive-engine VERSION 1.0.1)
 
 set(TARGET_NAME ${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 14)
@@ -26,7 +26,7 @@ include(GNUInstallDirs)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Tinyxml2 REQUIRED tinyxml2)
-pkg_check_modules(OpenDriveCpp REQUIRED opendrive-cpp)
+pkg_check_modules(OpenDriveCpp REQUIRED opendrive-cpp>=1.1.0)
 pkg_check_modules(NanoFlann REQUIRED nanoflann)
 pkg_check_modules(Cactus REQUIRED cactus)
 

@@ -226,10 +226,10 @@ void Convertor::AppendKDTreeSample(const core::Curve::Point& point) {
   center_line_pts_.emplace_back(point);
 }
 
-void Convertor::CenterLaneSampling(
-    const element::Geometry::ConstPtrs& geometrys,
-    const element::LaneOffsets& lane_offsets, core::Section::Ptr section,
-    double& road_ds) {
+void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
+                                   const element::LaneOffsets& lane_offsets,
+                                   core::Section::Ptr section,
+                                   double& road_ds) {
   double section_ds = 0;
   core::Curve::Point point;
   element::Point refe_point;
@@ -338,7 +338,7 @@ void Convertor::LaneSampling(const element::Lane& ele_lane,
 }
 
 element::Geometry::ConstPtr Convertor::GetGeometry(
-    const element::Geometry::ConstPtrs& geometrys, double road_ds) {
+    const element::Geometry::Ptrs& geometrys, double road_ds) {
   auto geometry_idx = opendrive::common::GetGtPtrPoloy3(geometrys, road_ds);
   if (geometry_idx < 0) {
     SetStatus(ErrorCode::CONVERTOR_CENTERLANE_ERROR,

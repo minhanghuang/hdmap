@@ -14,7 +14,7 @@ namespace core {
 
 class RoadInfo {
  public:
-  RoadInfo() : start_position_(0), type_(RoadType::TOWN), speed_limit_(0) {}
+  RoadInfo() : start_position_(0), type_(RoadType::kTown), speed_limit_(0) {}
   void set_s(double d) { start_position_ = d; }
   void set_type(RoadType i) { type_ = i; }
   void set_speed_limit(double d) { speed_limit_ = d; }
@@ -44,7 +44,7 @@ class Road {
         name_(""),
         junction_id_(""),
         length_(0),
-        rule_(RoadRule::RHT) {}
+        rule_(RoadRule::kRht) {}
   void set_id(const Id& s) { id_ = s; }
   void set_name(const std::string& s) { name_ = s; }
   void set_junction_id(const Id& s) { junction_id_ = "-1" == s ? "" : s; }
