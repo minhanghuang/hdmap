@@ -1,6 +1,7 @@
 #ifndef OPENDRIVE_ENGINE_CORE_LANE_H_
 #define OPENDRIVE_ENGINE_CORE_LANE_H_
 
+#include <cactus/macros.h>
 #include <opendrive-cpp/geometry/element.h>
 #include <opendrive-cpp/geometry/enums.h>
 
@@ -17,6 +18,9 @@ namespace core {
 class Curve {
  public:
   class Point : public geometry::Point4D {
+    CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Id, id);
+    CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, start_position, 0);
+
    public:
     Point() : start_position_(0), id_("") {}
     Point(double x, double y)
@@ -34,156 +38,72 @@ class Curve {
         : geometry::Point4D(x, y, z, heading),
           start_position_(start_position),
           id_(id) {}
-    void set_start_position(double d) { start_position_ = d; }
-    void set_id(const Id& s) { id_ = s; }
-    double& mutable_start_position() { return start_position_; }
-    Id& mutable_id() { return id_; }
-    double start_position() const { return start_position_; }
-    const Id& id() const { return id_; }
-
-   protected:
-    double start_position_;
-    Id id_;
   };
-  typedef std::vector<Point> Points;
-  typedef std::vector<Point> Line;
-  void set_pts(const Line& v) { pts_ = v; }
-  void set_length(double d) { length_ = d; }
-  Line& mutable_pts() { return pts_; }
-  double& mutable_length() { return length_; }
-  const Line& pts() const { return pts_; }
-  double length() const { return length_; }
-
- private:
-  Line pts_;
-  double length_ = 0;
+  using Points = std::vector<Point>;
+  using Line = std::vector<Point>;
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Line, pts);
+  CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, length, 0);
 };
 
 class LaneBoundaryAttr {
+  CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, start_position, 0);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(RoadMarkType, boundary_type);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(RoadMarkColor, boundary_color);
+
  public:
   LaneBoundaryAttr()
       : start_position_(0),
         boundary_type_(RoadMarkType::kNone),
         boundary_color_(RoadMarkColor::kStandard) {}
-  void set_s(double d) { start_position_ = d; }
-  void set_boundary_type(RoadMarkType t) { boundary_type_ = t; }
-  void set_boundary_color(RoadMarkColor t) { boundary_color_ = t; }
-  double& mutable_start_position() { return start_position_; }
-  RoadMarkType& mutable_boundary_type() { return boundary_type_; }
-  RoadMarkColor& mutable_boundary_color() { return boundary_color_; }
-  double s() const { return start_position_; }
-  RoadMarkType boundary_type() const { return boundary_type_; }
-  RoadMarkColor boundary_color() const { return boundary_color_; }
-
- private:
-  double start_position_;
-  RoadMarkType boundary_type_;
-  RoadMarkColor boundary_color_;
 };
-typedef std::vector<LaneBoundaryAttr> LaneBoundaryAttrs;
+using LaneBoundaryAttrs = std::vector<LaneBoundaryAttr>;
 
 class LaneBoundary {
- public:
-  void set_curve(const Curve& v) { curve_ = v; }
-  void set_attrs(const LaneBoundaryAttrs& v) { attrs_ = v; }
-  Curve& mutable_curve() { return curve_; }
-  LaneBoundaryAttrs& mutable_attrs() { return attrs_; }
-  const Curve& curve() const { return curve_; }
-  const LaneBoundaryAttrs& attrs() const { return attrs_; }
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Curve, curve);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(LaneBoundaryAttrs, attributes);
 
- private:
-  Curve curve_;
-  LaneBoundaryAttrs attrs_;
+ public:
+  LaneBoundary() {}
 };
 
 class SpeedLimit {
- public:
-  SpeedLimit() : start_position_(0), value_(0) {}
-  void set_start_position(double d) { start_position_ = d; }
-  void set_value(double d) { value_ = d; }
-  double& mutable_start_position() { return start_position_; }
-  double& mutable_value() { return value_; }
-  double start_position() const { return start_position_; }
-  double value() const { return value_; }
+  CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, start_position, 0);
+  // meters per second
+  CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, value, 0);
 
- private:
-  double start_position_;
-  double value_;  // meters per second
+ public:
+  SpeedLimit() {}
 };
-typedef std::vector<SpeedLimit> SpeedLimits;
+using SpeedLimits = std::vector<SpeedLimit>;
 
 class Geomotry {
- public:
-  typedef opendrive::GeometryType Type;
-  Geomotry() : type_(Type::kLine) {}
-  void set_type(Type i) { type_ = i; }
-  void set_point(const Curve::Point& point) { point_ = point; }
-  Type& mutable_type() { return type_; }
-  Curve::Point& mutable_point() { return point_; }
-  Type type() const { return type_; }
-  Curve::Point point() const { return point_; }
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(opendrive::GeometryType, type);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Curve::Point, point);
 
- private:
-  Type type_;
-  Curve::Point point_;
+ public:
+  using Type = opendrive::GeometryType;
+  Geomotry() : type_(Type::kLine) {}
 };
-typedef std::vector<Geomotry> Geomotrys;
+using Geomotrys = std::vector<Geomotry>;
 
 class Lane {
- public:
-  typedef std::shared_ptr<Lane> Ptr;
-  typedef std::shared_ptr<Lane const> ConstPtr;
-  typedef std::vector<Ptr> Ptrs;
-  typedef std::vector<ConstPtr> ConstPtrs;
-  Lane() : id_(""), parent_id_("") {}
-  void set_id(const Id& s) { id_ = s; }
-  void set_parent_id(const Id& s) { parent_id_ = s; }
-  void set_predecessor_ids(const Ids& v) { predecessor_ids_ = v; }
-  void set_successor_ids(const Ids& v) { successor_ids_ = v; }
-  void set_left_neighbor_lane_ids(const Ids& v) { left_neighbor_lane_ids_ = v; }
-  void set_right_neighbor_lane_ids(const Ids& v) {
-    right_neighbor_lane_ids_ = v;
-  }
-  void set_central_curve(const Curve& v) { central_curve_ = v; }
-  void set_left_boundary(const LaneBoundary& v) { left_boundary_ = v; }
-  void set_right_boundary(const LaneBoundary& v) { right_boundary_ = v; }
-  void set_speed_limits(const SpeedLimits& v) { speed_limits_ = v; }
-  void set_geometrys(const Geomotrys& v) { geometrys_ = v; }
-  Id& mutable_id() { return id_; }
-  Id& mutable_parent_id() { return parent_id_; }
-  Ids& mutable_predecessor_ids() { return predecessor_ids_; }
-  Ids& mutable_successor_ids() { return successor_ids_; }
-  Curve& mutable_central_curve() { return central_curve_; }
-  LaneBoundary& mutable_left_boundary() { return left_boundary_; }
-  LaneBoundary& mutable_right_boundary() { return right_boundary_; }
-  SpeedLimits& mutable_speed_limits() { return speed_limits_; }
-  Geomotrys& mutable_geometrys() { return geometrys_; }
-  const Id& id() const { return id_; }
-  const Id& parent_id() const { return parent_id_; }
-  const Ids& predecessor_ids() const { return predecessor_ids_; }
-  const Ids& successor_ids() const { return successor_ids_; }
-  const Ids& left_neighbor_lane_ids() const { return left_neighbor_lane_ids_; }
-  const Ids& right_neighbor_lane_ids() const {
-    return right_neighbor_lane_ids_;
-  }
-  const Curve& central_curve() const { return central_curve_; }
-  const LaneBoundary& left_boundary() const { return left_boundary_; }
-  const LaneBoundary& right_boundary() const { return right_boundary_; }
-  const SpeedLimits& speed_limits() const { return speed_limits_; }
-  const Geomotrys& geometrys() const { return geometrys_; }
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Id, id);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Id, parent_id);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Ids, predecessor_ids);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Ids, successor_ids);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Ids, left_neighbor_lane_ids);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Ids, right_neighbor_lane_ids);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Curve, central_curve);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(LaneBoundary, left_boundary);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(LaneBoundary, right_boundary);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Geomotrys, geometrys);
 
- private:
-  Id id_;
-  Id parent_id_;  // section id
-  Ids predecessor_ids_;
-  Ids successor_ids_;
-  Ids left_neighbor_lane_ids_;
-  Ids right_neighbor_lane_ids_;
-  Curve central_curve_;
-  LaneBoundary left_boundary_;
-  LaneBoundary right_boundary_;
-  SpeedLimits speed_limits_;
-  Geomotrys geometrys_;
+ public:
+  using Ptr = std::shared_ptr<Lane>;
+  using ConstPtr = std::shared_ptr<Lane const>;
+  using Ptrs = std::vector<Ptr>;
+  using ConstPtrs = std::vector<ConstPtr>;
+  Lane() {}
 };
 
 }  // namespace core

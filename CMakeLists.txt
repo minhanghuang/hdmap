@@ -28,7 +28,7 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(Tinyxml2 REQUIRED tinyxml2)
 pkg_check_modules(OpenDriveCpp REQUIRED opendrive-cpp>=1.1.0)
 pkg_check_modules(NanoFlann REQUIRED nanoflann)
-pkg_check_modules(Cactus REQUIRED cactus)
+pkg_check_modules(Cactus REQUIRED cactus>=1.1.0)
 
 include_directories(
   include

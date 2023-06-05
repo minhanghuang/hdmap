@@ -4,15 +4,13 @@
 #include <string>
 #include <unordered_set>
 
-#include "opendrive-cpp/opendrive.h"
-
 namespace opendrive {
 namespace engine {
 namespace core {
 
-typedef std::string Id;
-typedef std::unordered_set<Id> Ids;
-typedef std::vector<Id> Path;
+using Id = std::string;
+using Ids = std::unordered_set<Id>;
+using Path = std::vector<Id>;
 
 }  // namespace core
 }  // namespace engine

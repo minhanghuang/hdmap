@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "cactus/factory.h"
 #include "opendrive-cpp/common/common.hpp"
@@ -24,7 +25,7 @@ inline bool Convertor::Continue() const {
 Status Convertor::Start() {
   auto factory = cactus::Factory::Instance();
   param_ = factory->GetObject<common::Param>("engine_param");
-  data_ = factory->GetObject<core::Data>("core_data");
+  data_ = factory->GetObject<core::Map>("core_data");
   center_line_pts_.clear();
   if (!param_ || !data_) {
     SetStatus(ErrorCode::INIT_FACTORY_ERROR, "factory error.");
@@ -88,7 +89,8 @@ Convertor& Convertor::ConvertJunction(opendrive::element::Map::Ptr ele_map) {
     if (ele_junction.attribute().id() < 0) continue;
     auto junction = std::make_shared<core::Junction>();
     ConvertJunctionAttr(ele_junction, junction);
-    data_->mutable_junction()[junction->id()] = junction;
+    data_->mutable_junctions()->emplace(
+        std::make_pair(junction->id(), junction));
   }
   ENGINE_INFO("Convert Junction End")
   return *this;
@@ -110,7 +112,7 @@ Convertor& Convertor::ConvertRoad(opendrive::element::Map::Ptr ele_map) {
     if (ele_road.attribute().id() < 0) continue;
     auto road = std::make_shared<core::Road>();
     ConvertRoadAttr(ele_road, road).ConvertSections(ele_road, road);
-    data_->mutable_roads()[road->id()] = road;
+    data_->mutable_roads()->emplace(std::make_pair(road->id(), road));
   }
   ENGINE_INFO("Convert Road End")
   return *this;
@@ -126,18 +128,18 @@ Convertor& Convertor::ConvertRoadAttr(const element::Road& ele_road,
   road->set_rule(ele_road.attribute().rule());
   if (-1 != ele_road.link().predecessor().id()) {
     // road predecessor/successor range 0~1 in opendrive.
-    road->mutable_predecessor_ids().emplace(
+    road->mutable_predecessor_ids()->emplace(
         std::to_string(ele_road.link().predecessor().id()));
   }
   if (-1 != ele_road.link().successor().id()) {
-    road->mutable_successor_ids().emplace(
+    road->mutable_successor_ids()->emplace(
         std::to_string(ele_road.link().successor().id()));
   }
   for (const auto& ele_info : ele_road.type_info()) {
     core::RoadInfo road_info;
-    road_info.set_s(ele_info.start_position());
+    road_info.set_start_position(ele_info.start_position());
     road_info.set_type(ele_info.type());
-    road->mutable_info().emplace_back(road_info);
+    road->mutable_info()->emplace_back(road_info);
   }
   return *this;
 }
@@ -151,14 +153,14 @@ Convertor& Convertor::ConvertSections(const element::Road& ele_road,
   int section_idx = 0;
   for (const auto& ele_section : ele_road.lanes().lane_sections()) {
     auto section = std::make_shared<core::Section>();
-    road->mutable_sections().emplace_back(section);
+    road->mutable_sections()->emplace_back(section);
     section->set_id(road_id + "_" + std::to_string(section_idx++));
     section->set_parent_id(road_id);
     section->set_start_position(ele_section.start_position());
     section->set_end_position(ele_section.end_position());
     section->set_length(ele_section.end_position() -
                         ele_section.start_position());
-    data_->mutable_sections()[section->id()] = section;
+    data_->mutable_sections()->emplace(std::make_pair(section->id(), section));
 
     /// center lane
     if (1 != ele_section.center().lanes().size()) {
@@ -173,41 +175,43 @@ Convertor& Convertor::ConvertSections(const element::Road& ele_road,
       lane->set_parent_id(section->id());
       CenterLaneSampling(ele_road.plan_view().geometrys(),
                          ele_road.lanes().lane_offsets(), section, road_ds);
-      data_->mutable_lanes()[lane->id()] = lane;
+      data_->mutable_lanes()->emplace(std::make_pair(lane->id(), lane));
     }
     // 参考线: 中心车道的左边界
-    core::Curve::Line& refe_line = section->mutable_center_lane()
+    core::Curve::Line* refe_line = section->mutable_center_lane()
                                        ->mutable_left_boundary()
-                                       .mutable_curve()
-                                       .mutable_pts();
+                                       ->mutable_curve()
+                                       ->mutable_pts();
 
     /// left lanes
     for (const auto& ele_lane : ele_section.left().lanes()) {
       auto lane = std::make_shared<core::Lane>();
-      section->mutable_left_lanes().emplace_back(lane);
+      section->mutable_left_lanes()->emplace_back(lane);
       lane->set_id(section->id() + "_" +
                    std::to_string(ele_lane.attribute().id()));
       lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
-      data_->mutable_lanes()[lane->id()] = lane;
-      refe_line = lane->mutable_right_boundary().mutable_curve().mutable_pts();
+      data_->mutable_lanes()->emplace(std::make_pair(lane->id(), lane));
+      refe_line =
+          lane->mutable_right_boundary()->mutable_curve()->mutable_pts();
     }
     // 参考线: 中心车道的右边界
     refe_line = section->mutable_center_lane()
                     ->mutable_right_boundary()
-                    .mutable_curve()
-                    .mutable_pts();
+                    ->mutable_curve()
+                    ->mutable_pts();
 
     /// right lanes
     for (const auto& ele_lane : ele_section.right().lanes()) {
       auto lane = std::make_shared<core::Lane>();
-      section->mutable_right_lanes().emplace_back(lane);
+      section->mutable_right_lanes()->emplace_back(lane);
       lane->set_id(section->id() + "_" +
                    std::to_string(ele_lane.attribute().id()));
       lane->set_parent_id(section->id());
       LaneSampling(ele_lane, lane, refe_line);
-      data_->mutable_lanes()[lane->id()] = lane;
-      refe_line = lane->mutable_right_boundary().mutable_curve().mutable_pts();
+      data_->mutable_lanes()->emplace(std::make_pair(lane->id(), lane));
+      refe_line =
+          lane->mutable_right_boundary()->mutable_curve()->mutable_pts();
     }
   }
 
@@ -238,7 +242,10 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
   int geometry_type = -1;
   size_t point_idx = 0;
   bool last_point = false;
-  section->mutable_center_lane()->mutable_central_curve().mutable_pts().clear();
+  section->mutable_center_lane()
+      ->mutable_central_curve()
+      ->mutable_pts()
+      ->clear();
 
   while (true) {
     geometry = GetGeometry(geometrys, road_ds);
@@ -253,40 +260,40 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
       point.mutable_x() = offset_point.x();
       point.mutable_y() = offset_point.y();
       point.mutable_heading() = offset_point.heading();
-      point.mutable_start_position() = section_ds;
-      point.mutable_id() =
-          section->center_lane()->id() + "_" + std::to_string(point_idx++);
+      point.set_start_position(section_ds);
+      point.set_id(section->center_lane()->id() + "_" +
+                   std::to_string(point_idx++));
     } else {
       point.mutable_x() = refe_point.x();
       point.mutable_y() = refe_point.y();
       point.mutable_heading() = refe_point.heading();
-      point.mutable_start_position() = section_ds;
-      point.mutable_id() =
-          section->center_lane()->id() + "_" + std::to_string(point_idx++);
+      point.set_start_position(section_ds);
+      point.set_id(section->center_lane()->id() + "_" +
+                   std::to_string(point_idx++));
     }
     if (geometry_type != static_cast<int>(geometry->type())) {
       // new geometry
       core::Geomotry core_geo;
       core_geo.set_type(geometry->type());
       core_geo.set_point(point);
-      section->mutable_center_lane()->mutable_geometrys().emplace_back(
+      section->mutable_center_lane()->mutable_geometrys()->emplace_back(
           core_geo);
       geometry_type = static_cast<int>(geometry->type());
     }
     section->mutable_center_lane()
         ->mutable_central_curve()
-        .mutable_pts()
-        .emplace_back(point);
+        ->mutable_pts()
+        ->emplace_back(point);
     section->mutable_center_lane()
         ->mutable_left_boundary()
-        .mutable_curve()
-        .mutable_pts()
-        .emplace_back(point);
+        ->mutable_curve()
+        ->mutable_pts()
+        ->emplace_back(point);
     section->mutable_center_lane()
         ->mutable_right_boundary()
-        .mutable_curve()
-        .mutable_pts()
-        .emplace_back(point);
+        ->mutable_curve()
+        ->mutable_pts()
+        ->emplace_back(point);
 
     if (last_point) {
       break;
@@ -304,36 +311,38 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
 
 void Convertor::LaneSampling(const element::Lane& ele_lane,
                              core::Lane::Ptr lane,
-                             const core::Curve::Line& refe_line) {
+                             const core::Curve::Line* refe_line) {
   core::Curve::Point point;
   int point_idx = 0;
   auto lane_idx = opendrive::common::Split(lane->id(), "_");
   const int lane_dir = lane_idx.at(2) > "0" ? 1 : -1;
   double lane_width = 0;
   core::Id point_id = "";
-  for (const auto& refe_point : refe_line) {
+  for (const auto& refe_point : *refe_line) {
     lane_width = ele_lane.GetLaneWidth(refe_point.start_position()) * lane_dir;
     point_id = lane->id() + "_" + std::to_string(point_idx++);
 
     // left boundary point
     point = refe_point;
-    point.mutable_id() = point_id + "_1";
-    lane->mutable_left_boundary().mutable_curve().mutable_pts().emplace_back(
+    point.set_id(point_id + "_1");
+    lane->mutable_left_boundary()->mutable_curve()->mutable_pts()->emplace_back(
         point);
 
     // center line point
     point = opendrive::common::GetOffsetPoint<core::Curve::Point>(
         refe_point, lane_width / 2.0);
-    point.mutable_id() = point_id + "_2";
-    lane->mutable_central_curve().mutable_pts().emplace_back(point);
+    point.set_id(point_id + "_2");
+    lane->mutable_central_curve()->mutable_pts()->emplace_back(point);
     AppendKDTreeSample(point);
 
     // right boundary point
     point = opendrive::common::GetOffsetPoint<core::Curve::Point>(refe_point,
                                                                   lane_width);
-    point.mutable_id() = point_id + "_3";
-    lane->mutable_right_boundary().mutable_curve().mutable_pts().emplace_back(
-        point);
+    point.set_id(point_id + "_3");
+    lane->mutable_right_boundary()
+        ->mutable_curve()
+        ->mutable_pts()
+        ->emplace_back(point);
   }
 }
 

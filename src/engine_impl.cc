@@ -9,10 +9,10 @@ Status EngineImpl::Init(const common::Param& param) {
   // factory load
   auto factory = cactus::Factory::Instance();
   factory->Register<common::Param>(&param, "engine_param", true);
-  factory->Register<core::Data>("core_data", true);
+  factory->Register<core::Map>("core_data", true);
   factory->Register<kdtree::KDTree>("kdtree", true);
   param_ = factory->GetObject<common::Param>("engine_param");
-  data_ = factory->GetObject<core::Data>("core_data");
+  data_ = factory->GetObject<core::Map>("core_data");
   kdtree_ = factory->GetObject<kdtree::KDTree>("kdtree");
   ENGINE_INFO("Factory Load End.");
 

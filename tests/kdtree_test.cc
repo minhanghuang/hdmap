@@ -53,7 +53,7 @@ TEST_F(TestKDTree, TestKDTreeAll) {
     opendrive::engine::kdtree::SamplePoint point;
     point.mutable_x() = i;
     point.mutable_y() = i + 1;
-    point.mutable_id() = std::to_string(i);
+    point.set_id(std::to_string(i));
     samples.emplace_back(point);
   }
   kdtree.Init(samples);

@@ -12,16 +12,16 @@
 #include "opendrive-engine/common/common.h"
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/convertor.h"
-#include "opendrive-engine/core/define.h"
 #include "opendrive-engine/core/header.h"
 #include "opendrive-engine/core/lane.h"
+#include "opendrive-engine/core/map.h"
 
 namespace opendrive {
 namespace engine {
 
 class EngineImpl {
  public:
-  typedef std::shared_ptr<EngineImpl> Ptr;
+  using Ptr = std::shared_ptr<EngineImpl>;
   EngineImpl();
   Status Init(const common::Param& param);
   std::string GetXodrVersion() const;
@@ -38,7 +38,7 @@ class EngineImpl {
   core::Lane::ConstPtrs GetNearestLanes(double x, double y, size_t num_closest);
 
  private:
-  core::Data::Ptr data_;
+  core::Map::Ptr data_;
   common::Param::ConstPtr param_;
   kdtree::KDTree::Ptr kdtree_;
 };

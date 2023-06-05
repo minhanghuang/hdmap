@@ -17,9 +17,9 @@ namespace engine {
 
 class Engine {
  public:
-  typedef std::shared_ptr<Engine> Ptr;
-  typedef std::unique_ptr<Engine> UPtr;
-  typedef std::shared_ptr<Engine const> ConstPtr;
+  using Ptr = std::shared_ptr<Engine>;
+  using UPtr = std::unique_ptr<Engine>;
+  using ConstPtr = std::shared_ptr<Engine const>;
   ~Engine() = default;
   Engine();
   Status Init(const common::Param& param);
