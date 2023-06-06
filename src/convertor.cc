@@ -7,6 +7,7 @@
 
 #include "cactus/factory.h"
 #include "opendrive-cpp/common/common.hpp"
+#include "opendrive-engine/common/g.h"
 #include "opendrive-engine/common/log.h"
 #include "opendrive-engine/core/lane.h"
 
@@ -24,8 +25,8 @@ inline bool Convertor::Continue() const {
 
 Status Convertor::Start() {
   auto factory = cactus::Factory::Instance();
-  param_ = factory->GetObject<common::Param>("engine_param");
-  data_ = factory->GetObject<core::Map>("core_data");
+  param_ = factory->GetObject<common::Param>(kGlobalParamObjectKey);
+  data_ = factory->GetObject<core::Map>(kGlobalCoreMapObjectKey);
   center_line_pts_.clear();
   if (!param_ || !data_) {
     SetStatus(ErrorCode::INIT_FACTORY_ERROR, "factory error.");
@@ -220,8 +221,8 @@ Convertor& Convertor::ConvertSections(const element::Road& ele_road,
 
 Convertor& Convertor::BuildKDTree() {
   if (!Continue()) return *this;
-  auto factory = cactus::Factory::Instance();
-  auto kdtree = factory->GetObject<kdtree::KDTree>("kdtree");
+  auto kdtree = cactus::Factory::Instance()->GetObject<kdtree::KDTree>(
+      kGlobalKdtreeObjectKey);
   kdtree->Init(center_line_pts_);
   return *this;
 }

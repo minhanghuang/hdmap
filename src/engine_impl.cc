@@ -8,12 +8,12 @@ EngineImpl::EngineImpl() : param_(nullptr), data_(nullptr), kdtree_(nullptr) {}
 Status EngineImpl::Init(const common::Param& param) {
   // factory load
   auto factory = cactus::Factory::Instance();
-  factory->Register<common::Param>(&param, "engine_param", true);
-  factory->Register<core::Map>("core_data", true);
-  factory->Register<kdtree::KDTree>("kdtree", true);
-  param_ = factory->GetObject<common::Param>("engine_param");
-  data_ = factory->GetObject<core::Map>("core_data");
-  kdtree_ = factory->GetObject<kdtree::KDTree>("kdtree");
+  factory->Register<common::Param>(&param, kGlobalParamObjectKey, true);
+  factory->Register<core::Map>(kGlobalCoreMapObjectKey, true);
+  factory->Register<kdtree::KDTree>(kGlobalKdtreeObjectKey, true);
+  param_ = factory->GetObject<common::Param>(kGlobalParamObjectKey);
+  data_ = factory->GetObject<core::Map>(kGlobalCoreMapObjectKey);
+  kdtree_ = factory->GetObject<kdtree::KDTree>(kGlobalKdtreeObjectKey);
   ENGINE_INFO("Factory Load End.");
 
   // convert data

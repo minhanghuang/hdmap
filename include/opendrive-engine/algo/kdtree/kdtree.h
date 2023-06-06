@@ -17,13 +17,13 @@ namespace opendrive {
 namespace engine {
 namespace kdtree {
 
-typedef core::Curve::Point SamplePoint;
-typedef std::vector<SamplePoint> SamplePoints;
-typedef std::vector<double> KDTreeNode;
-typedef std::vector<KDTreeNode> KDTreeNodes;
-typedef std::vector<core::Id> KDTreeIds;
-typedef std::vector<size_t> KDTreeIndices;
-typedef std::vector<double> KDTreeDists;
+using SamplePoint = core::Curve::Point;
+using SamplePoints = std::vector<SamplePoint>;
+using KDTreeNode = std::vector<double>;
+using KDTreeNodes = std::vector<KDTreeNode>;
+using KDTreeIds = std::vector<core::Id>;
+using KDTreeIndices = std::vector<size_t>;
+using KDTreeDists = std::vector<double>;
 
 struct KDTreeParam {
   KDTreeParam()
@@ -40,7 +40,7 @@ struct SearchResult {
   double dist;  // not sqr
   core::Id id;
 };
-typedef std::vector<SearchResult> SearchResults;
+using SearchResults = std::vector<SearchResult>;
 
 class KDTreeAdaptor {
  public:
@@ -64,11 +64,10 @@ class KDTreeAdaptor {
 
 class KDTree {
  public:
-  typedef std::shared_ptr<KDTree> Ptr;
-  typedef nanoflann::KDTreeSingleIndexAdaptor<
+  using Ptr = std::shared_ptr<KDTree>;
+  using KDTreeIndex = nanoflann::KDTreeSingleIndexAdaptor<
       nanoflann::metric_L2::template traits<double, KDTreeAdaptor>::distance_t,
-      KDTreeAdaptor, 2 /* dimensionality */, size_t /* index type */>
-      KDTreeIndex;
+      KDTreeAdaptor, 2 /* dimensionality */, size_t /* index type */>;
   ~KDTree();
   KDTree();
   void Init(const SamplePoints& samples,

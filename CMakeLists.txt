@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.1)
 
-project(opendrive-engine VERSION 1.0.1)
+project(opendrive-engine VERSION 1.0.2)
 
 set(TARGET_NAME ${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 14)

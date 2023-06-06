@@ -9,8 +9,8 @@ namespace engine {
 namespace common {
 
 struct Param {
-  typedef std::shared_ptr<Param> Ptr;
-  typedef std::shared_ptr<Param const> ConstPtr;
+  using Ptr = std::shared_ptr<Param>;
+  using ConstPtr = std::shared_ptr<Param const>;
   Param() : map_file(""), step(0.5) {}
   std::string map_file;
   float step;
