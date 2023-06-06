@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 CURRENT_PATH=$(cd $(dirname $0) && pwd)
 PEOJECT_PATH="$CURRENT_PATH/.."
 

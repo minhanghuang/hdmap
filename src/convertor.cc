@@ -169,7 +169,7 @@ Convertor& Convertor::ConvertSections(const element::Road& ele_road,
       return *this;
     } else {
       auto lane = std::make_shared<core::Lane>();
-      section->mutable_center_lane() = lane;
+      section->set_center_lane(lane);
       // lane attr
       lane->set_id(section->id() + "_0");
       lane->set_parent_id(section->id());
