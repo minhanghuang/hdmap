@@ -2,6 +2,7 @@
 #define OPENDRIVE_ENGINE_CORE_ID_H_
 
 #include <string>
+#include <vector>
 #include <unordered_set>
 
 namespace opendrive {
