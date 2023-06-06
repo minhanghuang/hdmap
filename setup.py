@@ -12,7 +12,9 @@ DEPENDENCES = {
     "yaml-cpp": ["https://github.com/jbeder/yaml-cpp.git", "", ""],
     "nanoflann": ["https://github.com/jlblancoc/nanoflann.git", "", ""],
     "json": ["https://github.com/nlohmann/json.git", "", ""],
+    "opendrive-files": ["https://github.com/minhanghuang/opendrive-files.git", "", ""],
 }
+
 
 class Repository:
     def __init__(self) -> None:
@@ -81,6 +83,13 @@ class Pipeline:
             print("make: {}".format(cmd))
             os.system(cmd)
 
+    def upload(self):
+        print("########### Upload...")
+        cmd = "mkdir -p {} && cp -r {} {}".format("/opt/xodr", os.path.join(self.__install_path,
+                                                                            "share/"), "/opt/xodr/")
+        print("{}".format(cmd))
+        os.system(cmd)
+
     def __clone(self, repo: Repository):
         cmd = ""
         download_path = os.path.join(self.__download_path, repo.get_name())
@@ -110,6 +119,7 @@ def main():
         pipe_line.append_repository(link=repo[0], branch=repo[1])
     pipe_line.download()
     pipe_line.build()
+    pipe_line.upload()
 
 
 if __name__ == "__main__":
