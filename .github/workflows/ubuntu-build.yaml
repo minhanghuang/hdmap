@@ -8,12 +8,12 @@ on:
       - dev
   push:
     paths:
-      - 'cmake/*'
-      - 'include/*'
-      - 'src/*'
-      - 'tests/*'
+      - 'cmake/**'
+      - 'include/**/*.h'
+      - 'src/**/*.cc'
+      - 'tests/**'
       - 'CMakeLists.txt'
-      - 'scripts/*'
+      - 'scripts/**'
       - 'setup.py'
       - '.github/workflows/ubuntu-build.yaml'
 
