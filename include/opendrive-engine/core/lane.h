@@ -18,6 +18,15 @@ namespace core {
 class Curve {
  public:
   class Point : public geometry::Point4D {
+    /*
+     * e.g. 207_2_-2_9_1 (size: 5)
+     * road id: 270
+     * section id: 270_2
+     * lane id: 207_2_-2 (0: reference line; minus: left lanes; plus: right
+     * lanes)
+     * point: left boundary point id: 9_1 center curve point id: 9_2
+     *  right boundary point id: 9_3
+     */
     CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Id, id);
     CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, start_position, 0);
 
@@ -76,15 +85,18 @@ class SpeedLimit {
 };
 using SpeedLimits = std::vector<SpeedLimit>;
 
-class Geomotry {
+class Geometry {
   CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(opendrive::GeometryType, type);
+  /*
+   * 参考线车道 中线
+   */
   CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Curve::Point, point);
 
  public:
   using Type = opendrive::GeometryType;
-  Geomotry() : type_(Type::kLine) {}
+  Geometry() : type_(Type::kLine) {}
 };
-using Geomotrys = std::vector<Geomotry>;
+using Geometrys = std::vector<Geometry>;
 
 class Lane {
   CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Id, id);
@@ -96,7 +108,7 @@ class Lane {
   CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Curve, central_curve);
   CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(LaneBoundary, left_boundary);
   CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(LaneBoundary, right_boundary);
-  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Geomotrys, geometrys);
+  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Geometrys, geometrys);
 
  public:
   using Ptr = std::shared_ptr<Lane>;

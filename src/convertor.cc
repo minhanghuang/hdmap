@@ -1,6 +1,7 @@
 #include "opendrive-engine/convertor.h"
 
 #include <algorithm>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>
@@ -274,27 +275,44 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
     }
     if (geometry_type != static_cast<int>(geometry->type())) {
       // new geometry
-      core::Geomotry core_geo;
+      core::Geometry core_geo;
+      core::Curve::Point geometry_point(point);
+      geometry_point.set_id(geometry_point.id() + "_2");
       core_geo.set_type(geometry->type());
-      core_geo.set_point(point);
+      core_geo.set_point(geometry_point);
       section->mutable_center_lane()->mutable_geometrys()->emplace_back(
           core_geo);
       geometry_type = static_cast<int>(geometry->type());
     }
-    section->mutable_center_lane()
-        ->mutable_central_curve()
-        ->mutable_pts()
-        ->emplace_back(point);
-    section->mutable_center_lane()
-        ->mutable_left_boundary()
-        ->mutable_curve()
-        ->mutable_pts()
-        ->emplace_back(point);
-    section->mutable_center_lane()
-        ->mutable_right_boundary()
-        ->mutable_curve()
-        ->mutable_pts()
-        ->emplace_back(point);
+    {
+      /// 参考线车道 左边界
+      core::Curve::Point reference_point(point);
+      reference_point.set_id(reference_point.id() + "_1");
+      section->mutable_center_lane()
+          ->mutable_left_boundary()
+          ->mutable_curve()
+          ->mutable_pts()
+          ->emplace_back(reference_point);
+    }
+    {
+      /// 参考线车道 中线
+      core::Curve::Point reference_point(point);
+      reference_point.set_id(reference_point.id() + "_2");
+      section->mutable_center_lane()
+          ->mutable_central_curve()
+          ->mutable_pts()
+          ->emplace_back(reference_point);
+    }
+    {
+      /// 参考线车道 右边界
+      core::Curve::Point reference_point(point);
+      reference_point.set_id(reference_point.id() + "_3");
+      section->mutable_center_lane()
+          ->mutable_right_boundary()
+          ->mutable_curve()
+          ->mutable_pts()
+          ->emplace_back(reference_point);
+    }
 
     if (last_point) {
       break;

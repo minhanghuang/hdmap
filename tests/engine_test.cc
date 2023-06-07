@@ -51,23 +51,34 @@ TEST_F(TestEmpty, TestInit) {
 TEST_F(TestEmpty, TestPointId) {
   auto engine = TestEmpty::GetEngine();
   ASSERT_TRUE(engine->GetLanes().size() > 0);
-  auto lane = engine->GetLanes().front();
-  int point_size = lane->central_curve().pts().size();
-  ASSERT_EQ(lane->central_curve().pts().size(),
-            lane->left_boundary().curve().pts().size());
-  ASSERT_EQ(lane->central_curve().pts().size(),
-            lane->right_boundary().curve().pts().size());
+  for (const auto& lane : engine->GetLanes()) {
+    for (const auto& point : lane->central_curve().pts()) {
+      ASSERT_EQ(5, opendrive::common::Split(point.id(), "_").size());
+    }
+    for (const auto& point : lane->left_boundary().curve().pts()) {
+      ASSERT_EQ(5, opendrive::common::Split(point.id(), "_").size());
+    }
+    for (const auto& point : lane->right_boundary().curve().pts()) {
+      ASSERT_EQ(5, opendrive::common::Split(point.id(), "_").size());
+    }
+  }
+  auto first_lane = engine->GetLanes().front();
+  int point_size = first_lane->central_curve().pts().size();
+  ASSERT_EQ(first_lane->central_curve().pts().size(),
+            first_lane->left_boundary().curve().pts().size());
+  ASSERT_EQ(first_lane->central_curve().pts().size(),
+            first_lane->right_boundary().curve().pts().size());
   for (int i = 0; i < point_size; i++) {
-    auto split =
-        opendrive::common::Split(lane->central_curve().pts().at(i).id(), "_");
+    auto split = opendrive::common::Split(
+        first_lane->central_curve().pts().at(i).id(), "_");
     ASSERT_EQ(5, split.size());
     ASSERT_EQ(i, std::atoi(split.at(3).c_str()));
     auto left_split = opendrive::common::Split(
-        lane->left_boundary().curve().pts().at(i).id(), "_");
+        first_lane->left_boundary().curve().pts().at(i).id(), "_");
     ASSERT_EQ(5, left_split.size());
     ASSERT_EQ(i, std::atoi(left_split.at(3).c_str()));
     auto right_split = opendrive::common::Split(
-        lane->right_boundary().curve().pts().at(i).id(), "_");
+        first_lane->right_boundary().curve().pts().at(i).id(), "_");
     ASSERT_EQ(5, right_split.size());
     ASSERT_EQ(i, std::atoi(right_split.at(3).c_str()));
     ASSERT_EQ(split.at(0), left_split.at(0));

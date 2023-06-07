@@ -86,7 +86,7 @@ class Pipeline:
     def upload(self):
         print("########### Upload...")
         cmd = "mkdir -p {} && cp -r {} {}".format("/opt/xodr", os.path.join(self.__install_path,
-                                                                            "share/"), "/opt/xodr/")
+                                                                            "share"), "/opt/xodr/share")
         print("{}".format(cmd))
         os.system(cmd)
 
