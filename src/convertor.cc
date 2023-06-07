@@ -30,7 +30,7 @@ Status Convertor::Start() {
   data_ = factory->GetObject<core::Map>(kGlobalCoreMapObjectKey);
   center_line_pts_.clear();
   if (!param_ || !data_) {
-    SetStatus(ErrorCode::INIT_FACTORY_ERROR, "factory error.");
+    SetStatus(ErrorCode::kInitFactoryError, "factory error.");
     return status_;
   }
   step_ = std::max<float>(0.1, param_->step);
@@ -38,7 +38,7 @@ Status Convertor::Start() {
   status_.msg = "ok";
   std::string map_file = param_->map_file;
   if (map_file.empty() || !cactus::FileExists(map_file) || !data_) {
-    SetStatus(ErrorCode::INIT_MAPFILE_ERROR, "input file error: " + map_file);
+    SetStatus(ErrorCode::kInitMapfileError, "input file error: " + map_file);
     return status_;
   }
   std::unique_ptr<opendrive::Parser> perser =
@@ -47,7 +47,7 @@ Status Convertor::Start() {
       std::make_shared<opendrive::element::Map>();
   auto parse_ret = perser->ParseMap(map_file, ele_map);
   if (opendrive::ErrorCode::OK != parse_ret.error_code) {
-    SetStatus(ErrorCode::INIT_MAPFILE_ERROR, "input file error: " + map_file);
+    SetStatus(ErrorCode::kInitMapfileError, "input file error: " + map_file);
     return status_;
   }
 
@@ -166,7 +166,7 @@ Convertor& Convertor::ConvertSections(const element::Road& ele_road,
 
     /// center lane
     if (1 != ele_section.center().lanes().size()) {
-      SetStatus(ErrorCode::CONVERTOR_CENTERLANE_ERROR,
+      SetStatus(ErrorCode::kConvertorCenterlaneError,
                 section->id() + " center lane size not equal 1.");
       return *this;
     } else {
@@ -369,7 +369,7 @@ element::Geometry::ConstPtr Convertor::GetGeometry(
     const element::Geometry::Ptrs& geometrys, double road_ds) {
   auto geometry_idx = opendrive::common::GetGtPtrPoloy3(geometrys, road_ds);
   if (geometry_idx < 0) {
-    SetStatus(ErrorCode::CONVERTOR_CENTERLANE_ERROR,
+    SetStatus(ErrorCode::kConvertorCenterlaneError,
               "get geometry index execption.");
     return nullptr;
   }

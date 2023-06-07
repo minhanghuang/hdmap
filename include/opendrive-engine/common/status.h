@@ -10,14 +10,17 @@ enum class ErrorCode {
   OK = 0,
 
   // init
-  INIT_ERROR = 1000,
-  INIT_FACTORY_ERROR,
-  INIT_MAPFILE_ERROR,
+  kInitError = 1000,
+  kInitFactoryError,
+  kInitMapfileError,
 
   // convert
-  CONVERTOR_ERROR = 2000,
-  CONVERTOR_XMLPARSE_ERROR,
-  CONVERTOR_CENTERLANE_ERROR,
+  kConvertorError = 2000,
+  kConvertorXmlParserError,
+  kConvertorCenterlaneError,
+
+  // routing
+  kRoutingError = 3000,
 };
 
 struct Status {
