@@ -4,7 +4,10 @@ namespace opendrive {
 namespace engine {
 namespace routing {
 
-Strategy::Strategy() {}
+Strategy::Strategy() {
+  map_ = cactus::Factory::Instance()->GetObject<core::Map>(
+      kGlobalCoreMapObjectKey);
+}
 
 }  // namespace routing
 }  // namespace engine

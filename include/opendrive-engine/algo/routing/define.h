@@ -1,5 +1,5 @@
-#ifndef OPENDRIVE_ENGINE_ALGO_ROUTING_GRAPH_H_
-#define OPENDRIVE_ENGINE_ALGO_ROUTING_GRAPH_H_
+#ifndef OPENDRIVE_ENGINE_ALGO_ROUTING_DEFINE_H_
+#define OPENDRIVE_ENGINE_ALGO_ROUTING_DEFINE_H_
 
 #include <limits>
 #include <string>
@@ -8,18 +8,21 @@
 #include "opendrive-engine/common/status.h"
 #include "opendrive-engine/core/id.h"
 #include "opendrive-engine/core/lane.h"
+#include "opendrive-engine/geometry/geometry.h"
 
 namespace opendrive {
 namespace engine {
 namespace routing {
 
+using Point = geometry::Point4D;
+
 struct Node {
-  /// node id
-  core::Id id;
+  /// point
+  core::Curve::Point point;
 };
 
-struct Path {
-  Path()
+struct Result {
+  Result()
       : status(ErrorCode::kRoutingError),
         cost(std::numeric_limits<double>::max()) {}
 
@@ -37,4 +40,4 @@ struct Path {
 }  // namespace engine
 }  // namespace opendrive
 
-#endif  // OPENDRIVE_ENGINE_ALGO_ROUTING_GRAPH_H_
+#endif  // OPENDRIVE_ENGINE_ALGO_ROUTING_DEFINE_H_

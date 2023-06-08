@@ -76,24 +76,50 @@ class KDTree {
   template <typename PointType>
   SearchResults Query(const PointType& query_point, size_t num_closest) {
     cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
-    SearchResults result;
-    Search(query_point.x(), query_point.y(), num_closest, result);
-    return result;
+    SearchResults results;
+    Search(query_point.x(), query_point.y(), num_closest, results);
+    return results;
   }
 
   template <typename T>
   SearchResults Query(T x, T y, size_t num_closest) {
     cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
-    SearchResults result;
-    Search(static_cast<double>(x), static_cast<double>(y), num_closest, result);
-    return result;
+    SearchResults results;
+    Search(static_cast<double>(x), static_cast<double>(y), num_closest,
+           results);
+    return results;
+  }
+
+  template <typename PointType>
+  SearchResults QueryByRadius(const PointType& query_point, float radius) {
+    cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+    SearchResults results;
+    RadiusSearch(query_point.x(), query_point.y(), radius, results);
+    return results;
+  }
+
+  template <typename T>
+  SearchResults QueryByRadius(T x, T y, float radius) {
+    cactus::ReadLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
+    SearchResults results;
+    RadiusSearch(static_cast<double>(x), static_cast<double>(y), radius,
+                 results);
+    return results;
   }
 
  private:
-  int Search(double x, double y, size_t num_closest, SearchResults& result);
+  /// Search closest points
+  int Search(double x, double y, size_t num_closest, SearchResults& results);
+
+  /// Search points by radius
+  int RadiusSearch(double x, double y, float radius, SearchResults& results);
+
   cactus::AtomicRWLock rw_lock_;  // read and write lock
+
   KDTreeParam param_;
+
   KDTreeAdaptor adaptor_;
+
   std::shared_ptr<KDTreeIndex> index_;
 };
 

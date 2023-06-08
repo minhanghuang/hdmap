@@ -9,6 +9,7 @@
 
 #include "opendrive-cpp/common/status.h"
 #include "opendrive-engine/algo/kdtree/kdtree.h"
+#include "opendrive-engine/algo/routing/routing.h"
 #include "opendrive-engine/common/common.h"
 #include "opendrive-engine/common/g.h"
 #include "opendrive-engine/common/param.h"
