@@ -66,6 +66,22 @@ TEST_F(TestKDTree, TestKDTreeAll) {
   ASSERT_DOUBLE_EQ(0, knn_ret.front().dist);
 }
 
+TEST_F(TestKDTree, TestRadius) {
+  opendrive::engine::kdtree::KDTree kdtree;
+  opendrive::engine::kdtree::SamplePoints samples;
+  for (int i = 0; i < 1000; i++) {
+    opendrive::engine::kdtree::SamplePoint point;
+    point.mutable_x() = i;
+    point.mutable_y() = i + 1;
+    point.set_id(std::to_string(i));
+    samples.emplace_back(point);
+  }
+  kdtree.Init(samples);
+  opendrive::engine::kdtree::SamplePoint target_node(1.2, 2.3);
+  auto knn_ret = kdtree.QueryByRadius(target_node, 0.1);
+  ASSERT_EQ(0, knn_ret.size());
+}
+
 int main(int argc, char* argv[]) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

@@ -1,5 +1,8 @@
 #include "opendrive-engine/algo/kdtree/kdtree.h"
 
+#include <cstddef>
+#include <vector>
+
 namespace opendrive {
 namespace engine {
 namespace kdtree {
@@ -53,6 +56,23 @@ int KDTree::Search(double x, double y, size_t num_closest,
     result.y = adaptor_.matrix().at(indices.at(i))[1];
     result.id = adaptor_.ids().at(indices.at(i));
     result.dist = std::sqrt(dists.at(i));
+    results.emplace_back(result);
+  }
+  return 0;
+}
+
+int KDTree::RadiusSearch(double x, double y, float radius,
+                         SearchResults& results) {
+  results.clear();
+  std::vector<nanoflann::ResultItem<size_t, double>> search_results;
+  KDTreeNode query_node{x, y};
+  index_->radiusSearch(&query_node[0], radius, search_results);
+  SearchResult result;
+  for (const auto& search_result : search_results) {
+    result.x = adaptor_.matrix().at(search_result.first)[0];
+    result.y = adaptor_.matrix().at(search_result.first)[1];
+    result.id = adaptor_.ids().at(search_result.first);
+    result.dist = std::sqrt(search_result.second);
     results.emplace_back(result);
   }
   return 0;
