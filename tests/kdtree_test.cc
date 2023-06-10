@@ -52,8 +52,8 @@ TEST_F(TestKDTree, TestKDTreeAll) {
   opendrive::engine::kdtree::SamplePoints samples;
   for (int i = 0; i < 1000; i++) {
     opendrive::engine::kdtree::SamplePoint point;
-    point.mutable_x() = i;
-    point.mutable_y() = i + 1;
+    point.set_x(i);
+    point.set_y(i + 1);
     point.set_id(std::to_string(i));
     samples.emplace_back(point);
   }
@@ -72,8 +72,8 @@ TEST_F(TestKDTree, TestRadius) {
   opendrive::engine::kdtree::SamplePoints samples;
   for (int i = 0; i < 1000; i++) {
     opendrive::engine::kdtree::SamplePoint point;
-    point.mutable_x() = i;
-    point.mutable_y() = i + 1;
+    point.set_x(i);
+    point.set_y(i + 1);
     point.set_id(std::to_string(i));
     samples.emplace_back(point);
   }

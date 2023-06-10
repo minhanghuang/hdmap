@@ -96,8 +96,8 @@ TEST_F(TestEmpty, TestGetNearestPoint) {
   auto engine = TestEmpty::GetEngine();
   ASSERT_TRUE(nullptr != engine);
   opendrive::engine::geometry::Point2D point2d;  // id 207_1_-1_18_2
-  point2d.mutable_x() = 88.6349;
-  point2d.mutable_y() = -330.582;
+  point2d.set_x(88.6349);
+  point2d.set_y(-330.582);
   auto search_ret = engine->GetNearestPoints(point2d, 1);
   ASSERT_EQ(1, search_ret.size());
   ASSERT_FLOAT_EQ(88.6349, search_ret.front().x);

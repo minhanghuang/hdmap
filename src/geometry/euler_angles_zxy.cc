@@ -21,7 +21,7 @@ EulerAnglesZXY::EulerAnglesZXY(double qw, double qx, double qy, double qz)
           2.0 * (math::Square<double>(qw) + math::Square<double>(qy)) - 1.0)) {}
 
 EulerAnglesZXY::EulerAnglesZXY(const geometry::Quaternion& q)
-    : EulerAnglesZXY(q.w(), q.x(), q.y(), q.z()) {}
+    : EulerAnglesZXY(q.qw(), q.qx(), q.qy(), q.qz()) {}
 
 void EulerAnglesZXY::Normalize() {
   roll_ = math::NormalizeAngle(roll_);

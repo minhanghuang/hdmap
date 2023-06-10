@@ -259,16 +259,16 @@ void Convertor::CenterLaneSampling(const element::Geometry::Ptrs& geometrys,
     if (0 != offset) {
       offset_point =
           opendrive::common::GetOffsetPoint<element::Point>(refe_point, offset);
-      point.mutable_x() = offset_point.x();
-      point.mutable_y() = offset_point.y();
-      point.mutable_heading() = offset_point.heading();
+      point.set_x(offset_point.x());
+      point.set_y(offset_point.y());
+      point.set_heading(offset_point.heading());
       point.set_start_position(section_ds);
       point.set_id(section->center_lane()->id() + "_" +
                    std::to_string(point_idx++));
     } else {
-      point.mutable_x() = refe_point.x();
-      point.mutable_y() = refe_point.y();
-      point.mutable_heading() = refe_point.heading();
+      point.set_x(refe_point.x());
+      point.set_y(refe_point.y());
+      point.set_heading(refe_point.heading());
       point.set_start_position(section_ds);
       point.set_id(section->center_lane()->id() + "_" +
                    std::to_string(point_idx++));
