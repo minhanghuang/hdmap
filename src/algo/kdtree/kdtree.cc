@@ -66,7 +66,8 @@ int KDTree::RadiusSearch(double x, double y, float radius,
   results.clear();
   std::vector<nanoflann::ResultItem<size_t, double>> search_results;
   KDTreeNode query_node{x, y};
-  index_->radiusSearch(&query_node[0], radius, search_results);
+  // If L2 norms are used, radius distances are actually squared distances.
+  index_->radiusSearch(&query_node[0], std::pow(radius, 2), search_results);
   SearchResult result;
   for (const auto& search_result : search_results) {
     result.x = adaptor_.matrix().at(search_result.first)[0];

@@ -6,6 +6,7 @@
 #include <tinyxml2.h>
 
 #include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <map>
 #include <memory>
@@ -80,6 +81,18 @@ TEST_F(TestKDTree, TestRadius) {
   opendrive::engine::kdtree::SamplePoint target_node(1.2, 2.3);
   auto knn_ret = kdtree.QueryByRadius(target_node, 0.1);
   ASSERT_EQ(0, knn_ret.size());
+  ASSERT_EQ(1, kdtree.QueryByRadius(0, 1, 0.1).size());
+  ASSERT_EQ(1, kdtree.QueryByRadius(0, 1, 1).size());
+  knn_ret = kdtree.QueryByRadius(0, 1, 2);
+  ASSERT_EQ(2, knn_ret.size());
+  ASSERT_EQ(0, knn_ret.front().x);
+  ASSERT_EQ(1, knn_ret.front().y);
+  ASSERT_EQ(0, knn_ret.front().dist);
+  ASSERT_EQ(1, knn_ret.back().x);
+  ASSERT_EQ(2, knn_ret.back().y);
+  ASSERT_EQ(std::sqrt(std::pow(knn_ret.back().x - knn_ret.front().x, 2) +
+                      std::pow(knn_ret.back().y - knn_ret.front().y, 2)),
+            knn_ret.back().dist);
 }
 
 int main(int argc, char* argv[]) {

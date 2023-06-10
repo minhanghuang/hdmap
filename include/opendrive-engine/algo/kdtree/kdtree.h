@@ -2,6 +2,7 @@
 #define OPENDRIVE_ENGINE_ALGO_KDTREE_H_
 
 #include <array>
+#include <cmath>
 #include <cstddef>
 #include <memory>
 #include <mutex>
