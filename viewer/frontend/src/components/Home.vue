@@ -48,6 +48,7 @@ export default {
       point_layers: {},
       view_center: [0, 0],
       mouse: [0, 0], // 鼠标
+      debounce_timer: null, // 鼠标防抖
       singleclick_mouse: [0, 0], // 单击鼠标
       way_points: [], // 途经点
     };
@@ -187,8 +188,14 @@ export default {
 
     clickCursor() {
       var self = this;
-      console.log("clickCursor");
-      self.$websocket.sendWSPush({ x: self.mouse[0], y: self.mouse[1] });
+      if (self.debounce_timer) {
+        clearTimeout(self.debounce_timer);
+      }
+      self.debounce_timer = setTimeout(() => {
+        // 这里写入需要执行的代码
+        self.$websocket.sendWSPush({ x: self.mouse[0], y: self.mouse[1] });
+        console.log("Mouse move debounced");
+      }, 500); // 防抖间隔为500毫秒
     }, // clickCursor() end
 
     /*   ----              -----  */
