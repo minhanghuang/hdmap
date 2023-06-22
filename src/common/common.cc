@@ -14,7 +14,7 @@ core::Id GetLaneIdById(const core::Id& point_id) {
 }
 
 bool IsLineGeometry(core::Lane::ConstPtr lane) {
-  if (0 == lane->geometrys().size()) {
+  if (lane->geometrys().empty()) {
     return false;
   }
   for (const auto& geometry : lane->geometrys()) {

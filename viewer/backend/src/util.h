@@ -5,24 +5,22 @@
 #include <opendrive-engine/core/lane.h>
 #include <opendrive-engine/core/section.h>
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <nlohmann/json.hpp>
+
+#include "msgs.h"
 
 namespace opendrive {
 namespace engine {
 namespace server {
 
-typedef nlohmann::json Json;
-typedef nlohmann::json::value_t JsonValueType;
-typedef std::string Data;
-typedef std::unordered_map<std::string, JsonValueType> RequiredKeys;
+bool ConvertLaneToLaneMsg(const core::Lane::ConstPtr& lane,
+                          msgs::Lane& lane_msg);
 
-bool ConvertLineToPts(const core::Curve& line, Json& line_json);
-
-bool ConvertLaneToPts(core::Lane::ConstPtr lane, Json& data);
-
-bool ConvertLaneToSimplePts(core::Lane::ConstPtr lane, Json& data);
+bool ConvertLaneToLanesMsg(const core::Lane::ConstPtrs& lanes,
+                           msgs::Lanes& lanes_msg);
 
 }  // namespace server
 }  // namespace engine

@@ -1,13 +1,14 @@
 #ifndef OPENDRIVE_ENGINE_SERVER_API_H_
 #define OPENDRIVE_ENGINE_SERVER_API_H_
 #include <cyclone/cyclone.h>
+#include <cyclone/define.h>
 
 #include <mutex>
 #include <nlohmann/json.hpp>
 
-#include "cyclone/define.h"
 #include "global_data.h"
 #include "log.h"
+#include "msgs.h"
 #include "util.h"
 
 namespace opendrive {
@@ -15,9 +16,9 @@ namespace engine {
 namespace server {
 
 enum class HttpStatusCode {
-  SUCCESS = 1000,
-  FAILED,
-  PARAM,
+  kSuccess = 1000,
+  kFailed,
+  kParam,
 };
 
 class RequestBase {
@@ -29,17 +30,15 @@ class RequestBase {
   virtual bool CheckRequestData(const RequiredKeys& keys,
                                 const std::string& data, Json& data_out) final;
   virtual bool IsNumberType(const Json& value) const final;
-  virtual std::string SetResponse(const Json& data,
-                                  HttpStatusCode code = HttpStatusCode::SUCCESS,
-                                  const std::string& msg = "ok") final;
+  virtual std::string SetResponse(
+      const Json& data, HttpStatusCode code = HttpStatusCode::kSuccess,
+      const std::string& msg = "ok") final;
   engine::Engine::Ptr engine_;
 };
 
 class OkApi : public cyclone::web::RequestHandler, public RequestBase {
  public:
   virtual void Get(cyclone::Server* server, cyclone::Connection* conn) override;
-  virtual void Post(cyclone::Server* server,
-                    cyclone::Connection* conn) override;
 };
 
 class GlobalMapApi : public cyclone::web::RequestHandler, public RequestBase {

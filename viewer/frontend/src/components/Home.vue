@@ -159,6 +159,7 @@ export default {
       const onMessage = (e) => {
         // 创建接收消息函数
         const data_str = e && e.detail.data;
+        console.log(data_str);
         if ("" == data_str) {
           return;
         }
@@ -207,15 +208,33 @@ export default {
       self.$api.api_all
         .get_global_map()
         .then((response) => {
-          const data = response.data;
-          if (data.code != 1000) {
-            console.log("response exec: ", data.code);
+          const code = response.data.code;
+          const data = response.data.results;
+          if (code != 1000) {
+            console.log("response exec: ", code);
             return;
           }
-          self.view_center = data.results[0][0][0];
+          var lines = [];
+          for (var i = 0; i < data.length; i++) {
+            var left_boundary = [];
+            var right_boundary = [];
+            for (var j = 0; j < data[i].left_boundary.length; j++) {
+              left_boundary.push([
+                data[i].left_boundary[j].x,
+                data[i].left_boundary[j].y,
+              ]);
+              right_boundary.push([
+                data[i].right_boundary[j].x,
+                data[i].right_boundary[j].y,
+              ]);
+            }
+            lines.push(left_boundary);
+            lines.push(right_boundary);
+          }
+          self.view_center = lines[0][0][0];
           self.showLines(
             self.base_map_layer_name,
-            data.results,
+            lines,
             "lineStringGlobalMapStyle",
             1,
             true
@@ -249,7 +268,7 @@ export default {
 
     showLines(
       layer_name,
-      data /*[[[1,2], [3,4]], [[2,4], [5,8]]]*/,
+      data /* lines [[[1,2], [3,4]], [[2,4], [5,8]]]*/,
       style,
       z,
       remove = true

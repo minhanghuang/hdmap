@@ -1,6 +1,7 @@
 #include "api.h"
 
 #include "cyclone/define.h"
+#include "msgs.h"
 #include "opendrive-engine/common/param.h"
 #include "opendrive-engine/common/status.h"
 
@@ -57,18 +58,12 @@ void OkApi::Get(cyclone::Server* server, cyclone::Connection* conn) {
   Response(server, conn, "ok get");
 }
 
-void OkApi::Post(cyclone::Server* server, cyclone::Connection* conn) {
-  Response(server, conn, "ok post");
-}
-
 void GlobalMapApi::Get(cyclone::Server* server, cyclone::Connection* conn) {
   ELOG_INFO("Http Request GlobalMapApi Get");
-  Json response;
-  Json line_json;
-  for (const auto& lane : engine_->GetLanes()) {
-    ConvertLaneToSimplePts(lane, response);
-  }
-  Response(server, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
+  msgs::Lanes lanes_msg;
+  ConvertLaneToLanesMsg(engine_->GetLanes(), lanes_msg);
+  Response(server, conn,
+           SetResponse(lanes_msg.ToJson(), HttpStatusCode::kSuccess, "ok"));
 }
 
 void HotUpdate::Post(cyclone::Server* server, cyclone::Connection* conn) {
@@ -79,7 +74,7 @@ void HotUpdate::Post(cyclone::Server* server, cyclone::Connection* conn) {
   nlohmann::json data_json;
   if (!CheckRequestData(required_keys_, req_data, data_json)) {
     Response(server, conn,
-             SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
+             SetResponse(nlohmann::json(), HttpStatusCode::kParam,
                          "Request数据异常"));
     return;
   }
@@ -88,34 +83,34 @@ void HotUpdate::Post(cyclone::Server* server, cyclone::Connection* conn) {
   auto status = engine_->HotUpdate(param);
   if (ErrorCode::OK != status.error_code) {
     Response(server, conn,
-             SetResponse(response, HttpStatusCode::FAILED, status.msg));
+             SetResponse(response, HttpStatusCode::kFailed, status.msg));
   }
-  Response(server, conn, SetResponse(response, HttpStatusCode::SUCCESS, "ok"));
+  Response(server, conn, SetResponse(response, HttpStatusCode::kSuccess, "ok"));
 }
 
 void NearestLane::Post(cyclone::Server* server, cyclone::Connection* conn) {
   ELOG_INFO("Http Request NearestLane Post");
-  Json response;
   std::string req_data = GetRequestData(conn);
   ELOG_INFO("Request Data: " << req_data);
-  nlohmann::json data_json;
+  Json data_json;
   if (!CheckRequestData(required_keys_, req_data, data_json)) {
     Response(server, conn,
-             SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
-                         "Request数据异常"));
+             SetResponse(Json(), HttpStatusCode::kParam, "Request数据异常"));
     return;
   }
   auto lanes = engine_->GetNearestLanes(data_json["x"], data_json["y"], 1);
   if (1 != lanes.size()) {
     Response(server, conn,
-             SetResponse(nlohmann::json(), HttpStatusCode::FAILED,
+             SetResponse(Json(), HttpStatusCode::kFailed,
                          "Query Nearest Lanes Fault."));
   }
   auto lane = lanes.front();
+  msgs::Lane lane_msg;
   ELOG_INFO("Nearest Lane Id: " << lane->id());
-  ConvertLaneToSimplePts(lane, response);
+  ConvertLaneToLaneMsg(lane, lane_msg);
   Response(server, conn,
-           SetResponse(response, HttpStatusCode::SUCCESS, "get nearest lane"));
+           SetResponse(lane_msg.ToJson(), HttpStatusCode::kSuccess,
+                       "get nearest lane"));
 }
 
 void Planning::Post(cyclone::Server* server, cyclone::Connection* conn) {
@@ -123,26 +118,24 @@ void Planning::Post(cyclone::Server* server, cyclone::Connection* conn) {
   Json response;
   std::string req_data = GetRequestData(conn);
   ELOG_INFO("Request Data: " << req_data);
-  nlohmann::json data_json;
+  Json data_json;
   if (!CheckRequestData(required_keys_, req_data, data_json)) {
     Response(server, conn,
-             SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
-                         "Request数据异常"));
+             SetResponse(Json(), HttpStatusCode::kParam, "Request数据异常"));
     return;
   }
   auto points = data_json["points"];
   for (const auto& point : points) {
     if (2 != point.size()) {
       Response(server, conn,
-               SetResponse(nlohmann::json(), HttpStatusCode::PARAM,
-                           "Request数据异常"));
+               SetResponse(Json(), HttpStatusCode::kParam, "Request数据异常"));
       return;
     }
     std::cout << "[" << point.front() << "," << point.back() << "]"
               << std::endl;
   }
   Response(server, conn,
-           SetResponse(response, HttpStatusCode::SUCCESS, "planning ok"));
+           SetResponse(response, HttpStatusCode::kSuccess, "planning ok"));
 }
 
 void RealTimeData::Open(cyclone::Server* server,
@@ -152,40 +145,33 @@ void RealTimeData::Open(cyclone::Server* server,
 
 void RealTimeData::OnMessage(cyclone::Server* server, cyclone::Connection* conn,
                              const std::string& msg, int op_code) {
-  // ELOG_INFO("WebSocket OnMessage");
   static std::mutex mutex_;
-  std::cout << "mutex: " << &mutex_ << std::endl;
   if (!mutex_.try_lock()) {
     ELOG_INFO("WebSocket Get Lock Fault");
-    std::cout << "111" << std::endl;
     return;
   }
-  ELOG_INFO("WebSocket Get Lock Success");
-  sleep(1);
-  std::cout << "xxxx" << std::endl;
+  if (op_code != cyclone::WebSocketOpCode::TEXT) {
+    return;
+  }
+  Json response_json;
+  Json request_json;
+  if (!CheckRequestData(required_keys_, msg, request_json)) {
+    SendData(conn, SetResponse(response_json, HttpStatusCode::kParam,
+                               "WebSocket Data Exception."));
+    mutex_.unlock();
+    return;
+  }
+  double x = request_json["x"];
+  double y = request_json["y"];
+  auto search = engine_->GetNearestPoints<double>(x, y, 1);
+  if (search.empty()) {
+    SendData(conn, SetResponse(response_json, HttpStatusCode::kParam,
+                               "WebSocket Data Exception."));
+    mutex_.unlock();
+    return;
+  }
   mutex_.unlock();
-  // if (op_code != cyclone::WebSocketOpCode::TEXT) {
-  //   return;
-  // }
-  // Json response_json;
-  // Json request_json;
-  // if (!CheckRequestData(required_keys_, msg, request_json)) {
-  //   SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
-  //                              "WebSocket Data Exception."));
-  //   mutex_.unlock();
-  //   return;
-  // }
-  // double x = request_json["x"];
-  // double y = request_json["y"];
-  // auto search = engine_->GetNearestPoints<double>(x, y, 1);
-  // if (search.empty()) {
-  //   SendData(conn, SetResponse(response_json, HttpStatusCode::PARAM,
-  //                              "WebSocket Data Exception."));
-  //   mutex_.unlock();
-  //   return;
-  // }
-  // mutex_.unlock();
-  // return;
+  return;
 }
 
 void RealTimeData::OnPong(cyclone::Server* server, cyclone::Connection* conn) {}

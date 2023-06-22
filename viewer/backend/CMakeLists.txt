@@ -51,7 +51,7 @@ target_link_libraries(${PROJECT_NAME}_runner
 )
 
 file(COPY conf/engine_server.yaml
-  DESTINATION 
+  DESTINATION
   ${CMAKE_BINARY_DIR}/conf
 )
 
