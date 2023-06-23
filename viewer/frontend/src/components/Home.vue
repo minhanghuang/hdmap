@@ -216,20 +216,9 @@ export default {
           }
           var lines = [];
           for (var i = 0; i < data.length; i++) {
-            var left_boundary = [];
-            var right_boundary = [];
-            for (var j = 0; j < data[i].left_boundary.length; j++) {
-              left_boundary.push([
-                data[i].left_boundary[j].x,
-                data[i].left_boundary[j].y,
-              ]);
-              right_boundary.push([
-                data[i].right_boundary[j].x,
-                data[i].right_boundary[j].y,
-              ]);
-            }
-            lines.push(left_boundary);
-            lines.push(right_boundary);
+            var parse_lane = self.parseLane(data[i]);
+            lines.push(parse_lane["left_boundary"]);
+            lines.push(parse_lane["right_boundary"]);
           }
           self.view_center = lines[0][0][0];
           self.showLines(
@@ -255,9 +244,13 @@ export default {
             console.log("response exec: ", data.code);
             return;
           }
+          var lines = [];
+          var parse_lane = self.parseLane(data.results);
+          lines.push(parse_lane["left_boundary"]);
+          lines.push(parse_lane["right_boundary"]);
           self.showLines(
             "nearest_lane",
-            data.results,
+            lines,
             "lineStringNearestLaneStyle",
             1,
             true
@@ -357,6 +350,24 @@ export default {
       var self = this;
       self.way_points.push(Array.from(point));
     }, // saveWayPoint() end
+    // 解析车道
+    parseLane(lane) {
+      var left_boundary = [];
+      var right_boundary = [];
+      if (lane.left_boundary.length == lane.right_boundary.length) {
+        for (var i = 0; i < lane.left_boundary.length; i++) {
+          left_boundary.push([
+            lane.left_boundary[i].x,
+            lane.left_boundary[i].y,
+          ]);
+          right_boundary.push([
+            lane.right_boundary[i].x,
+            lane.right_boundary[i].y,
+          ]);
+        }
+      }
+      return { left_boundary: left_boundary, right_boundary: right_boundary };
+    }, // parseLane() end
     /*   ----                  -----  */
     /*   ----  click callback  -----  */
     /*   ----                  -----  */

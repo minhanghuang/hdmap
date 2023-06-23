@@ -151,21 +151,22 @@ void RealTimeData::OnMessage(cyclone::Server* server, cyclone::Connection* conn,
     return;
   }
   if (op_code != cyclone::WebSocketOpCode::TEXT) {
+    mutex_.unlock();
     return;
   }
-  Json response_json;
-  Json request_json;
-  if (!CheckRequestData(required_keys_, msg, request_json)) {
-    SendData(conn, SetResponse(response_json, HttpStatusCode::kParam,
+  Json response;
+  Json request;
+  if (!CheckRequestData(required_keys_, msg, request)) {
+    SendData(conn, SetResponse(response, HttpStatusCode::kParam,
                                "WebSocket Data Exception."));
     mutex_.unlock();
     return;
   }
-  double x = request_json["x"];
-  double y = request_json["y"];
+  double x = request["x"];
+  double y = request["y"];
   auto search = engine_->GetNearestPoints<double>(x, y, 1);
   if (search.empty()) {
-    SendData(conn, SetResponse(response_json, HttpStatusCode::kParam,
+    SendData(conn, SetResponse(response, HttpStatusCode::kParam,
                                "WebSocket Data Exception."));
     mutex_.unlock();
     return;
