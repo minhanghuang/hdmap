@@ -164,13 +164,24 @@ void RealTimeData::OnMessage(cyclone::Server* server, cyclone::Connection* conn,
   }
   double x = request["x"];
   double y = request["y"];
-  auto search = engine_->GetNearestPoints<double>(x, y, 1);
-  if (search.empty()) {
-    SendData(conn, SetResponse(response, HttpStatusCode::kParam,
+  auto search_ret = engine_->GetNearestPoints<double>(x, y, 1);
+  if (search_ret.empty()) {
+    SendData(conn, SetResponse(response, HttpStatusCode::kFailed,
                                "WebSocket Data Exception."));
     mutex_.unlock();
     return;
   }
+  auto search_lane = engine_->GetLaneById(search_ret.front().id);
+  if (nullptr == search_lane) {
+    SendData(conn, SetResponse(response, HttpStatusCode::kFailed,
+                               "Get NearestLane Exception."));
+    mutex_.unlock();
+    return;
+  }
+  msgs::Lane lane_msg;
+  ConvertLaneToLaneMsg(search_lane, lane_msg);
+  SendData(conn,
+           SetResponse(lane_msg.ToJson(), HttpStatusCode::kSuccess, "ok"));
   mutex_.unlock();
   return;
 }

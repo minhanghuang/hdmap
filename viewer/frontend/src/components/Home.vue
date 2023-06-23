@@ -159,11 +159,13 @@ export default {
       const onMessage = (e) => {
         // 创建接收消息函数
         const data_str = e && e.detail.data;
+        console.log("data: ", data_str);
         console.log(data_str);
         if ("" == data_str) {
           return;
         }
         let data = JSON.parse(data_str);
+        console.log("data: ", data);
       };
       window.addEventListener("onmessageWS", onMessage);
     },
