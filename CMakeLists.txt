@@ -31,27 +31,37 @@ pkg_check_modules(NanoFlann REQUIRED nanoflann)
 pkg_check_modules(Cactus REQUIRED cactus>=1.1.0)
 
 include_directories(
-  include ${Tinyxml2_INCLUDE_DIRS} ${OpenDriveCpp_INCLUDE_DIRS}
-  ${NanoFlann_INCLUDE_DIRS} ${Cactus_INCLUDE_DIRS})
+  include
+  ${Tinyxml2_INCLUDE_DIRS}
+  ${OpenDriveCpp_INCLUDE_DIRS}
+  ${NanoFlann_INCLUDE_DIRS}
+  ${Cactus_INCLUDE_DIRS}
+)
 
-link_directories(${Tinyxml2_LIBRARY_DIRS} ${OpenDriveCpp_LIBRARY_DIRS}
-                 ${Cactus_LIBRARY_DIRS})
+link_directories(
+  ${Tinyxml2_LIBRARY_DIRS}
+  ${OpenDriveCpp_LIBRARY_DIRS}
+  ${Cactus_LIBRARY_DIRS}
+)
 
-file(
-  GLOB
-  OPENDRIVE_ENGINE_SRCS
+file(GLOB OPENDRIVE_ENGINE_SRCS
   "src/*.cc"
   "src/common/*.cc"
   "src/math/*.cc"
   "src/geometry/*.cc"
   "src/algo/kdtree/*.cc"
-  "src/algo/routing/*.cc")
+  "src/algo/routing/*.cc"
+)
 
 add_library(${TARGET_NAME} ${OPENDRIVE_ENGINE_SHARED_TYPE}
-                           ${OPENDRIVE_ENGINE_SRCS})
+  ${OPENDRIVE_ENGINE_SRCS}
+)
 
-target_link_libraries(${TARGET_NAME} ${Tinyxml2_LIBRARIES}
-                      ${OpenDriveCpp_LIBRARIES} ${Cactus_LIBRARIES})
+target_link_libraries(${TARGET_NAME}
+  ${Tinyxml2_LIBRARIES}
+  ${OpenDriveCpp_LIBRARIES}
+  ${Cactus_LIBRARIES}
+)
 
 if(BUILD_OPENDRIVE_ENGINE_TEST)
   add_subdirectory(tests)
@@ -84,26 +94,34 @@ write_basic_package_version_file(
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion)
 
-install(FILES "${PROJECT_BINARY_DIR}/pkgconfig/${TARGET_NAME}.pc"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig")
+install(FILES
+  "${PROJECT_BINARY_DIR}/pkgconfig/${TARGET_NAME}.pc"
+  DESTINATION "${CMAKE_INSTALL_DATADIR}/pkgconfig"
+)
 
-install(EXPORT ${TARGET_NAME}-targets
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/${TARGET_NAME}")
+install(EXPORT
+  ${TARGET_NAME}-targets
+  DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/${TARGET_NAME}"
+)
 
-install(FILES "${PROJECT_BINARY_DIR}/cmake/${TARGET_NAME}-config.cmake"
-              "${PROJECT_BINARY_DIR}/cmake/${TARGET_NAME}-config-version.cmake"
-        DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/${TARGET_NAME}")
+install(FILES
+  "${PROJECT_BINARY_DIR}/cmake/${TARGET_NAME}-config.cmake"
+  "${PROJECT_BINARY_DIR}/cmake/${TARGET_NAME}-config-version.cmake"
+  DESTINATION "${CMAKE_INSTALL_DATADIR}/cmake/${TARGET_NAME}"
+)
 
 install(
   DIRECTORY include/${TARGET_NAME}/
   DESTINATION include/${TARGET_NAME}
   FILES_MATCHING
   PATTERN "*.h"
-  PATTERN "*.hpp")
+  PATTERN "*.hpp"
+)
 
 install(
   TARGETS ${TARGET_NAME}
   EXPORT ${TARGET_NAME}-targets
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin)
+  RUNTIME DESTINATION bib
+)

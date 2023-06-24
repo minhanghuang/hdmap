@@ -1,0 +1,82 @@
+{
+  "scripts": {
+    "before": [
+      ""
+    ],
+    "after": [
+      ""
+    ]
+  },
+  "dependencies": {
+    "setup": {
+      "addr": "https://github.com/minhanghuang/setup.git",
+      "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}"
+      ]
+    },
+    "googletest": {
+      "addr": "https://github.com/google/googletest.git",
+      "commit": "v1.13.x",
+      "cmake_optione": [
+        "-DCMAKE_CXX_STANDARD=14",
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "tinyxml2": {
+      "addr": "https://github.com/leethomason/tinyxml2.git",
+      "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "cactus": {
+      "addr": "https://github.com/minhanghuang/cactus.git",
+      "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "cyclone": {
+      "addr": "https://github.com/minhanghuang/cyclone.git",
+      "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "opendrive-cpp": {
+      "addr": "https://github.com/minhanghuang/opendrive-cpp.git",
+      "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "yaml-cpp": {
+      "addr": "https://github.com/jbeder/yaml-cpp.git",
+      "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "nanoflann": {
+      "addr": "https://github.com/jlblancoc/nanoflann.git",
+      "cmake_optione": [
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "json": {
+      "addr": "https://github.com/nlohmann/json.git",
+      "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
+        "-DBUILD_SHARED_LIBS=ON"
+      ]
+    },
+    "opendrive-files": {
+      "addr": "https://github.com/minhanghuang/opendrive-files.git",
+      "cmake_optione": [
+        "-DBUILD_SHARED_LIBS=ON",
+        "-DCMAKE_INSTALL_PREFIX=/opt/xodr"
+      ]
+    }
+  }
+}
