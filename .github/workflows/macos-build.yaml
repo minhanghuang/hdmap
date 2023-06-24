@@ -29,7 +29,6 @@ jobs:
 
       - name: Install
         run: |
-          brew install tinyxml2
           sudo mkdir -p /opt/xodr && sudo chmod a+w /opt/xodr
           cd ${{ github.workspace }} && python3 setup.py
 
