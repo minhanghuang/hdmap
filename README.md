@@ -17,12 +17,13 @@
 ### install dependence
 
 ```bash
-python3 setup.py
+sudo python3 setup.py
 ```
 
 ### run server
 
 ```bash
+source install/setup.bash
 ./scripts/run_viewer.sh
 ```
 

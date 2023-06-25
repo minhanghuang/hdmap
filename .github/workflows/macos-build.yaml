@@ -15,6 +15,7 @@ on:
       - 'CMakeLists.txt'
       - 'scripts/**'
       - 'setup.py'
+      - 'packages.json'
       - '.github/workflows/macos-build.yaml'
 
 jobs:

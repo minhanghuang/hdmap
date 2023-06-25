@@ -73,6 +73,10 @@
     },
     "opendrive-files": {
       "addr": "https://github.com/minhanghuang/opendrive-files.git",
+      "before_script": [
+        "mkdir -p /opt/xodr",
+        "chmod a+w /opt/xodr"
+      ],
       "cmake_optione": [
         "-DBUILD_SHARED_LIBS=ON",
         "-DCMAKE_INSTALL_PREFIX=/opt/xodr"
