@@ -1,13 +1,12 @@
 #ifndef OPENDRIVE_ENGINE_SERVER_MSGS_H_
 #define OPENDRIVE_ENGINE_SERVER_MSGS_H_
 
-#include <cactus/macros.h>
+#include <hdmap/common/macros.h>
 
 #include <nlohmann/json.hpp>
 #include <vector>
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace server {
 
 using Json = nlohmann::json;
@@ -24,8 +23,8 @@ class Message {
 };
 
 class Point : public Message {
-  CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, x, 0);
-  CACTUS_REGISTER_MEMBER_BASIC_TYPE(double, y, 0);
+  ADD_MEMBER_BASIC_TYPE(double, x, 0);
+  ADD_MEMBER_BASIC_TYPE(double, y, 0);
 
  public:
   Point() = default;
@@ -34,7 +33,7 @@ class Point : public Message {
 };
 
 class Line : public Message {
-  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(std::vector<Point>, pts);
+  ADD_MEMBER_COMPLEX_TYPE(std::vector<Point>, pts);
 
  public:
   Line() = default;
@@ -48,8 +47,8 @@ class Line : public Message {
 };
 
 class Lane : public Message {
-  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Line, left_boundary);
-  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(Line, right_boundary);
+  ADD_MEMBER_COMPLEX_TYPE(Line, left_boundary);
+  ADD_MEMBER_COMPLEX_TYPE(Line, right_boundary);
 
  public:
   Lane() = default;
@@ -60,7 +59,7 @@ class Lane : public Message {
 };
 
 class Lanes : public Message {
-  CACTUS_REGISTER_MEMBER_COMPLEX_TYPE(std::vector<Lane>, lanes);
+  ADD_MEMBER_COMPLEX_TYPE(std::vector<Lane>, lanes);
 
  public:
   Lanes() = default;
@@ -75,7 +74,6 @@ class Lanes : public Message {
 
 }  // namespace msgs
 }  // namespace server
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap
 
 #endif  // OPENDRIVE_ENGINE_SERVER_MSGS_H_

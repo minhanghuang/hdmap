@@ -1,10 +1,9 @@
-#include "opendrive-engine/algo/kdtree/kdtree.h"
+#include "hdmap/algo/kdtree/kdtree.h"
 
 #include <cstddef>
 #include <vector>
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace kdtree {
 
 KDTreeAdaptor::~KDTreeAdaptor() {}
@@ -80,7 +79,6 @@ int KDTree::RadiusSearch(double x, double y, float radius,
 }
 
 void KDTree::Init(const SamplePoints& samples, const KDTreeParam& param) {
-  cactus::WriteLockGuard<cactus::AtomicRWLock> guard(rw_lock_);
   nanoflann::KDTreeSingleIndexAdaptorParams adaptor_params;
   adaptor_params.flags = param.flags;
   adaptor_params.leaf_max_size = param.leaf_max_size;
@@ -89,5 +87,4 @@ void KDTree::Init(const SamplePoints& samples, const KDTreeParam& param) {
 }
 
 }  // namespace kdtree
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap

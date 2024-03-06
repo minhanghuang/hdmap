@@ -1,5 +1,5 @@
-#ifndef OPENDRIVE_ENGINE_SERVER_H_
-#define OPENDRIVE_ENGINE_SERVER_H_
+#ifndef HDMAP_SERVER_H_
+#define HDMAP_SERVER_H_
 #include <cyclone/cyclone.h>
 #include <cyclone/options.h>
 
@@ -11,8 +11,7 @@
 #include "api.h"
 #include "global_data.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 
 class Server {
  public:
@@ -31,7 +30,6 @@ class Server {
   std::shared_ptr<server::RealTimeData> real_time_data_;
 };
 
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap
 
-#endif  // OPENDRIVE_ENGINE_SERVER_H_
+#endif  // HDMAP_SERVER_H_

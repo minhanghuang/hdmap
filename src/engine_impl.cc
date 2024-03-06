@@ -1,39 +1,42 @@
-#include "opendrive-engine/engine_impl.h"
+#include "hdmap/engine_impl.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 
-EngineImpl::EngineImpl() : param_(nullptr), data_(nullptr), kdtree_(nullptr) {}
+EngineImpl::EngineImpl() : param_(nullptr), map_(nullptr), kdtree_(nullptr) {}
 
-Status EngineImpl::Init(const common::Param& param) {
-  // factory load
-  auto factory = cactus::Factory::Instance();
-  factory->Register<common::Param>(&param, kGlobalParamObjectKey, true);
-  factory->Register<core::Map>(kGlobalCoreMapObjectKey, true);
-  factory->Register<kdtree::KDTree>(kGlobalKdtreeObjectKey, true);
-  param_ = factory->GetObject<common::Param>(kGlobalParamObjectKey);
-  data_ = factory->GetObject<core::Map>(kGlobalCoreMapObjectKey);
-  kdtree_ = factory->GetObject<kdtree::KDTree>(kGlobalKdtreeObjectKey);
-  ENGINE_INFO("Factory Load End.");
+bool EngineImpl::Init(const Param& param) {
+  param_ = std::make_shared<Param>(param);
+  map_ = std::make_shared<geometry::Map>();
+  kdtree_ = std::make_shared<kdtree::KDTree>();
+  param_->set_step(std::max<float>(param_->step(), 0.5));
 
-  // convert data
-  Convertor convertor;
-  return convertor.Start();
+  std::shared_ptr<PipelineLoading> pipeline_data =
+      std::make_shared<PipelineLoading>();
+  pipeline_data->param = param_;
+  pipeline_data->status = std::make_shared<Status>();
+  pipeline_data->opendrive_element_map =
+      std::make_shared<opendrive::element::Map>();
+  pipeline_data->map = map_;
+  pipeline_data->kdtree = kdtree_;
+
+  Pipeline pipeline;
+  pipeline.AddProcessor(
+      std::shared_ptr<ParseProcessor>(std::make_shared<OpenDriveParser>()));
+  pipeline.AddProcessor(std::shared_ptr<ConvertProcessor>(
+      std::make_shared<OpenDriveConvertor>()));
+  pipeline.execute(pipeline_data);
+
+  return pipeline.ok();
 }
 
-std::string EngineImpl::GetXodrVersion() const {
-  return data_->header()->rev_major() + "." + data_->header()->rev_minor() +
-         "." + data_->header()->version();
-}
-
-bool EngineImpl::GetPointById(const core::Id& point_id,
-                              core::Curve::Point& out_point) {
-  auto split_ret = cactus::StrSplit(point_id, "_");
-  core::Id lane_id = split_ret[0] + "_" + split_ret[1] + "_" + split_ret[2];
-  if (0 == split_ret.size() || 0 == data_->lanes().count(lane_id)) {
+bool EngineImpl::GetPointById(const std::string& point_id,
+                              geometry::Curve::Point& out_point) {
+  auto split_ret = common::Split(point_id, "_");
+  std::string lane_id = split_ret[0] + "_" + split_ret[1] + "_" + split_ret[2];
+  if (0 == split_ret.size() || 0 == map_->lanes().count(lane_id)) {
     return false;
   }
-  auto lane = data_->lanes().at(lane_id);
+  auto lane = map_->lanes().at(lane_id);
   int point_index = std::atoi(split_ret[3].c_str());
   if (!lane || point_index < 0 ||
       point_index >= lane->central_curve().pts().size()) {
@@ -51,70 +54,72 @@ bool EngineImpl::GetPointById(const core::Id& point_id,
   return true;
 }
 
-core::Lane::ConstPtr EngineImpl::GetLaneById(const core::Id& id) const {
-  if (data_->lanes().count(id)) {
-    return data_->lanes().at(id);
+geometry::Lane::ConstPtr EngineImpl::GetLaneById(const std::string& id) const {
+  if (map_->lanes().count(id)) {
+    return map_->lanes().at(id);
   }
   return nullptr;
 }
 
-core::Section::ConstPtr EngineImpl::GetSectionById(const core::Id& id) const {
-  if (data_->sections().count(id)) {
-    return data_->sections().at(id);
+geometry::Section::ConstPtr EngineImpl::GetSectionById(
+    const std::string& id) const {
+  if (map_->sections().count(id)) {
+    return map_->sections().at(id);
   }
   return nullptr;
 }
 
-core::Road::ConstPtr EngineImpl::GetRoadById(const core::Id& id) const {
-  if (data_->roads().count(id)) {
-    return data_->roads().at(id);
+geometry::Road::ConstPtr EngineImpl::GetRoadById(const std::string& id) const {
+  if (map_->roads().count(id)) {
+    return map_->roads().at(id);
   }
   return nullptr;
 }
 
-core::Lane::ConstPtrs EngineImpl::GetLanes() const {
-  core::Lane::ConstPtrs lanes;
-  for (const auto& lane_item : data_->lanes()) {
+geometry::Lane::ConstPtrs EngineImpl::GetLanes() const {
+  geometry::Lane::ConstPtrs lanes;
+  for (const auto& lane_item : map_->lanes()) {
     lanes.emplace_back(lane_item.second);
   }
   return lanes;
 }
 
-core::Section::ConstPtrs EngineImpl::GetSections() const {
-  core::Section::ConstPtrs sections;
-  for (const auto& section_item : data_->sections()) {
+geometry::Section::ConstPtrs EngineImpl::GetSections() const {
+  geometry::Section::ConstPtrs sections;
+  for (const auto& section_item : map_->sections()) {
     sections.emplace_back(section_item.second);
   }
   return sections;
 }
 
-core::Road::ConstPtrs EngineImpl::GetRoads() const {
-  core::Road::ConstPtrs roads;
-  for (const auto& road_item : data_->roads()) {
+geometry::Road::ConstPtrs EngineImpl::GetRoads() const {
+  geometry::Road::ConstPtrs roads;
+  for (const auto& road_item : map_->roads()) {
     roads.emplace_back(road_item.second);
   }
   return roads;
 }
 
-core::Header::ConstPtr EngineImpl::GetHeader() const { return data_->header(); }
+geometry::Header::ConstPtr EngineImpl::GetHeader() const {
+  return map_->header();
+}
 
 kdtree::SearchResults EngineImpl::GetNearestPoints(double x, double y,
                                                    size_t num_closest) {
   return kdtree_->Query(x, y, num_closest);
 }
 
-core::Lane::ConstPtrs EngineImpl::GetNearestLanes(double x, double y,
-                                                  size_t num_closest) {
-  core::Lane::ConstPtrs lanes;
+geometry::Lane::ConstPtrs EngineImpl::GetNearestLanes(double x, double y,
+                                                      size_t num_closest) {
+  geometry::Lane::ConstPtrs lanes;
   auto search_ret = kdtree_->Query(x, y, num_closest);
   for (const auto& it : search_ret) {
-    core::Id lane_id = common::GetLaneIdById(it.id);
+    std::string lane_id = common::GetLaneIdById(it.id);
     if (!lane_id.empty()) {
-      lanes.emplace_back(data_->lanes().at(lane_id));
+      lanes.emplace_back(map_->lanes().at(lane_id));
     }
   }
   return lanes;
 }
 
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap

@@ -1,15 +1,14 @@
-#ifndef OPENDRIVE_ENGINE_SERVER_PARAM_H_
-#define OPENDRIVE_ENGINE_SERVER_PARAM_H_
-#include <cactus/cactus.h>
+#ifndef HDMAP_SERVER_PARAM_H_
+#define HDMAP_SERVER_PARAM_H_
 #include <yaml-cpp/yaml.h>
 
 #include <iostream>
 #include <memory>
 
-#include "opendrive-engine/common/param.h"
+#include "hdmap/common/utils.h"
+#include "hdmap/common/param.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace server {
 
 struct HttpConfig {
@@ -18,23 +17,22 @@ struct HttpConfig {
   int thread_num;
 };
 
-class Param {
+class ServerParam {
  public:
-  typedef std::shared_ptr<Param> Ptr;
-  typedef std::shared_ptr<Param const> ConstPtr;
-  Param() = default;
+  typedef std::shared_ptr<ServerParam> Ptr;
+  typedef std::shared_ptr<ServerParam const> ConstPtr;
+  ServerParam() = default;
   int Load(const std::string& yaml_path);
   void Print();
   const HttpConfig& http() const;
-  const common::Param& engine_param() const;
+  const Param& engine_param() const;
 
  private:
   HttpConfig http_;
-  common::Param engine_param_;
+  Param engine_param_;
 };
 
 }  // namespace server
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap
 
-#endif  // OPENDRIVE_ENGINE_SERVER_PARAM_H_
+#endif  // HDMAP_SERVER_PARAM_H_

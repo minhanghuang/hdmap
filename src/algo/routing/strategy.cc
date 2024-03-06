@@ -1,14 +1,9 @@
-#include "opendrive-engine/algo/routing/strategy.h"
+#include "hdmap/algo/routing/strategy.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace routing {
 
-Strategy::Strategy() {
-  map_ = cactus::Factory::Instance()->GetObject<core::Map>(
-      kGlobalCoreMapObjectKey);
-}
+Strategy::Strategy() {}
 
 }  // namespace routing
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap
