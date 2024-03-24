@@ -1,24 +1,21 @@
-#include "opendrive-engine/algo/routing/routing.h"
+#include "hdmap/algo/routing/routing.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace routing {
 
-Routing::Routing() {
-  auto factory = cactus::Factory::Instance();
-  kdtree_ = factory->GetObject<kdtree::KDTree>(kGlobalKdtreeObjectKey);
-  strategy_ = std::make_unique<AStarStrategy>();
+Routing::Routing() {}
+
+Strategy::Result Routing::Start(const Strategy::Point& src_point,
+                                const Strategy::Point& dest_point) {
+  return Strategy::Result();
 }
 
-Result Routing::Start(const Point& src_point, const Point& dest_point) {
-  return Result();
-}
+std::vector<Strategy::Node> Routing::SearchNearestPoints(
+    const Strategy::Point& point) {
+  std::vector<Strategy::Node> nodes;
 
-std::vector<Node> Routing::SearchNearestPoints(const Point& point) {
-  std::vector<Node> nodes;
-
-  kdtree::SearchResults nearest_points =
-      kdtree_->Query(point.x(), point.y(), 50);
+  // kdtree::SearchResults nearest_points =
+  // kdtree_->Query(point.x(), point.y(), 50);
 
   // radius
 
@@ -28,5 +25,4 @@ std::vector<Node> Routing::SearchNearestPoints(const Point& point) {
 }
 
 }  // namespace routing
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap

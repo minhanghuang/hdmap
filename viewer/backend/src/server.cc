@@ -1,7 +1,6 @@
 #include "server.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 
 Server::Server() {}
 
@@ -32,5 +31,4 @@ int Server::Start() {
   return 0;
 }
 
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap

@@ -1,16 +1,15 @@
-#include "opendrive-engine/algo/routing/astar_strategy.h"
+#include "hdmap/algo/routing/astar_strategy.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace routing {
 
 AStarStrategy::AStarStrategy() : Strategy() {}
 
-Result AStarStrategy::Search(const Node& src_node, const Node& dest_node) {
+Strategy::Result AStarStrategy::Search(const Strategy::Node& src_node,
+                                       const Strategy::Node& dest_node) {
   Result result;
   return result;
 }
 
 }  // namespace routing
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap

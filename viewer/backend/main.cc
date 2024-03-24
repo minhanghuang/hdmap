@@ -11,13 +11,13 @@ int main(int argc, char* argv[]) {
     std::cerr << "Usage: engine_server_runner xxx.yaml" << std::endl;
     return EXIT_FAILURE;
   }
-  auto global_data = opendrive::engine::server::GlobalData::Instance();
+  auto global_data = hdmap::server::GlobalData::Instance();
   if (global_data->Init(yaml_file)) {
     std::cerr << "yaml init fault." << std::endl;
     return EXIT_FAILURE;
   }
 
-  opendrive::engine::Server server;
+  hdmap::Server server;
   server.Init();
   server.Start();
   return EXIT_SUCCESS;

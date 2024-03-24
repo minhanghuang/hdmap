@@ -1,12 +1,11 @@
 #include "api.h"
 
 #include "cyclone/define.h"
+#include "hdmap/common/param.h"
+#include "hdmap/common/status.h"
 #include "msgs.h"
-#include "opendrive-engine/common/param.h"
-#include "opendrive-engine/common/status.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace server {
 
 RequestBase::RequestBase() { engine_ = GlobalData::Instance()->GetEngine(); }
@@ -78,12 +77,10 @@ void HotUpdate::Post(cyclone::Server* server, cyclone::Connection* conn) {
                          "Request数据异常"));
     return;
   }
-  auto param = common::Param();
-  param.map_file = data_json["file"];
-  auto status = engine_->HotUpdate(param);
-  if (ErrorCode::OK != status.error_code) {
-    Response(server, conn,
-             SetResponse(response, HttpStatusCode::kFailed, status.msg));
+  auto param = Param();
+  param.set_file_path(data_json["file"]);
+  if (engine_->HotUpdate(param)) {
+    Response(server, conn, SetResponse(response, HttpStatusCode::kFailed, ""));
   }
   Response(server, conn, SetResponse(response, HttpStatusCode::kSuccess, "ok"));
 }
@@ -194,5 +191,4 @@ void RealTimeData::OnClose(cyclone::Server* server,
                            const cyclone::Connection* conn) {}
 
 }  // namespace server
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap

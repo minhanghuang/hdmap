@@ -1,5 +1,5 @@
-#ifndef OPENDRIVE_ENGINE_SERVER_API_H_
-#define OPENDRIVE_ENGINE_SERVER_API_H_
+#ifndef HDMAP_SERVER_API_H_
+#define HDMAP_SERVER_API_H_
 #include <cyclone/cyclone.h>
 #include <cyclone/define.h>
 
@@ -11,8 +11,7 @@
 #include "msgs.h"
 #include "util.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace server {
 
 enum class HttpStatusCode {
@@ -33,7 +32,7 @@ class RequestBase {
   virtual std::string SetResponse(
       const Json& data, HttpStatusCode code = HttpStatusCode::kSuccess,
       const std::string& msg = "ok") final;
-  engine::Engine::Ptr engine_;
+  Engine::Ptr engine_;
 };
 
 class OkApi : public cyclone::web::RequestHandler, public RequestBase {
@@ -103,7 +102,6 @@ class RealTimeData : public cyclone::websocket::WebSocketHandler,
 };
 
 }  // namespace server
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap
 
-#endif  // OPENDRIVE_ENGINE_SERVER_API_H_
+#endif  // HDMAP_SERVER_API_H_

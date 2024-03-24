@@ -1,6 +1,8 @@
+#include "hdmap/engine.h"
+
 #include <gtest/gtest.h>
-#include <opendrive-engine/common/param.h>
-#include <opendrive-engine/engine.h>
+#include <hdmap/common/param.h>
+#include <hdmap/engine.h>
 #include <tinyxml2.h>
 
 #include <cassert>
@@ -11,8 +13,7 @@
 #include <utility>
 #include <vector>
 
-#include "opendrive-cpp/common/common.hpp"
-#include "opendrive-engine/geometry/geometry.h"
+#include "hdmap/geometry.h"
 
 class TestEmpty : public testing::Test {
  public:
@@ -20,14 +21,14 @@ class TestEmpty : public testing::Test {
   static void TearDownTestCase();  // 在最后一个case之后执行
   void SetUp() override;           // 在每个case之前执行
   void TearDown() override;        // 在每个case之后执行
-  static opendrive::engine::Engine* GetEngine() {
-    static opendrive::engine::Engine* instance = nullptr;
+  static hdmap::Engine* GetEngine() {
+    static hdmap::Engine* instance = nullptr;
     if (!instance) {
       static std::once_flag flag;
       std::call_once(flag, [&] {
-        instance = new (std::nothrow) opendrive::engine::Engine();
-        opendrive::engine::common::Param param;
-        param.map_file = MAP_FILE;
+        instance = new (std::nothrow) hdmap::Engine();
+        hdmap::Param param;
+        param.set_file_path(MAP_FILE);
         instance->Init(param);
       });
     }
@@ -95,7 +96,7 @@ TEST_F(TestEmpty, TestPointId) {
 TEST_F(TestEmpty, TestGetNearestPoint) {
   auto engine = TestEmpty::GetEngine();
   ASSERT_TRUE(nullptr != engine);
-  opendrive::engine::geometry::Point2D point2d;  // id 207_1_-1_18_2
+  hdmap::geometry::Point2D point2d;  // id 207_1_-1_18_2
   point2d.set_x(88.6349);
   point2d.set_y(-330.582);
   auto search_ret = engine->GetNearestPoints(point2d, 1);

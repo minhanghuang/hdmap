@@ -1,34 +1,31 @@
-#ifndef OPENDRIVE_ENGINE_SERVER_GLOBAL_DATA_H_
-#define OPENDRIVE_ENGINE_SERVER_GLOBAL_DATA_H_
-#include <cactus/cactus.h>
-#include <cactus/macros.h>
-#include <opendrive-engine/engine.h>
+#ifndef HDMAP_SERVER_GLOBAL_DATA_H_
+#define HDMAP_SERVER_GLOBAL_DATA_H_
+#include <hdmap/engine.h>
 #include <yaml-cpp/yaml.h>
 
 #include <cstdlib>
 #include <iostream>
 
-#include "opendrive-engine/common/param.h"
+#include "hdmap/common/macros.h"
+#include "hdmap/common/param.h"
 #include "param.h"
 
-namespace opendrive {
-namespace engine {
+namespace hdmap {
 namespace server {
 
 class GlobalData {
  public:
   int Init(const std::string& yaml_path);
-  Param::Ptr GetParam();
-  engine::Engine::Ptr GetEngine();
+  ServerParam::Ptr GetParam();
+  Engine::Ptr GetEngine();
 
  private:
-  engine::Engine::Ptr engine_;
-  Param::Ptr param_;
-  CACTUS_DECLARE_SINGLETON(GlobalData)  // 注册单例
+  Engine::Ptr engine_;
+  ServerParam::Ptr param_;
+  HDMAP_DECLARE_SINGLETON(GlobalData)  // 注册单例
 };
 
 }  // namespace server
-}  // namespace engine
-}  // namespace opendrive
+}  // namespace hdmap
 
-#endif  // OPENDRIVE_ENGINE_SERVER_GLOBAL_DATA_H_
+#endif  // HDMAP_SERVER_GLOBAL_DATA_H_

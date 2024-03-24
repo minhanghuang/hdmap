@@ -6,10 +6,8 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(NlohmannJson REQUIRED nlohmann_json)
 pkg_check_modules(YamlCpp REQUIRED yaml-cpp)
 pkg_check_modules(Cyclone REQUIRED cyclone)
-pkg_check_modules(OpenDriveCpp REQUIRED opendrive-cpp)
 pkg_check_modules(OpenDriveEngine QUIET opendrive-engine)
 pkg_check_modules(NanoFlann REQUIRED nanoflann)
-pkg_check_modules(Cactus REQUIRED cactus)
 
 if(${OpenDriveEngine_FOUND})
   set(OpenDriveEngineLibs ${OpenDriveEngine_LIBRARIES})
@@ -21,17 +19,13 @@ include_directories(
   ${NlohmannJson_INCLUDE_DIRS}
   ${YamlCpp_INCLUDE_DIRS}
   ${Cyclone_INCLUDE_DIRS}
-  ${OpenDriveCpp_INCLUDE_DIRS}
   ${NanoFlann_INCLUDE_DIRS}
-  ${Cactus_INCLUDE_DIRS}
 )
 
 link_directories (
   ${NlohmannJson_LIBRARY_DIRS}
   ${YamlCpp_LIBRARY_DIRS}
   ${Cyclone_LIBRARY_DIRS}
-  ${OpenDriveCpp_LIBRARY_DIRS}
-  ${Cactus_LIBRARY_DIRS}
 )
 
 file(GLOB ENGINE_SERVER_SRCS
@@ -46,8 +40,6 @@ target_link_libraries(${PROJECT_NAME}_runner
   ${NlohmannJson_LIBRARIES}
   ${YamlCpp_LIBRARIES}
   ${Cyclone_LIBRARIES}
-  ${OpenDriveCpp_LIBRARIES}
-  ${Cactus_LIBRARIES}
 )
 
 file(COPY conf/engine_server.yaml
