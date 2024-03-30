@@ -61,6 +61,7 @@
     "nanoflann": {
       "addr": "https://github.com/jlblancoc/nanoflann.git",
       "cmake_optione": [
+        "-DCMAKE_INSTALL_PREFIX={install_path}",
         "-DBUILD_SHARED_LIBS=ON"
       ]
     },

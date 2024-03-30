@@ -3,6 +3,8 @@
 
 #include <tinyxml2.h>
 
+#include <algorithm>
+#include <cmath>
 #include <iostream>
 
 #include "hdmap/geometry.h"

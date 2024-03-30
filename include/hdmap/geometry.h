@@ -1,8 +1,10 @@
 #ifndef HDMAP_GEOMETRY_H_
 #define HDMAP_GEOMETRY_H_
 
+#include <memory>
 #include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <vector>
 
 #include "hdmap/common/macros.h"
