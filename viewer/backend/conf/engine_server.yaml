@@ -1,8 +1,0 @@
-engine:
-  opendrive_file: "/opt/xodr/share/xodr/carla-simulator/Town07.xodr"
-  step: 0.5
-
-http:
-  addr: "127.0.0.1"
-  port: 9070
-  thread_num: 6
