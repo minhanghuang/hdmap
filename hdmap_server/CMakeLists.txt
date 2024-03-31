@@ -11,10 +11,11 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(nanoflann REQUIRED)
 find_package(hdmap_engine REQUIRED)
+find_package(hdmap_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 
 include_directories(
-  src
+  include
 )
 
 file(GLOB_RECURSE hdmap_server_srcs
@@ -24,6 +25,7 @@ file(GLOB_RECURSE hdmap_server_srcs
 set(${target_name}_dependencies
   rclcpp
   hdmap_engine
+  hdmap_msgs
   visualization_msgs
 )
 
@@ -39,6 +41,10 @@ target_link_libraries(${target_name}
   nanoflann::nanoflann
 )
 
+install(DIRECTORY include/
+  DESTINATION include/
+)
+
 install(TARGETS ${target_name}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
@@ -49,7 +55,7 @@ install(TARGETS ${target_name}
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch config
+install(DIRECTORY launch conf rviz
   DESTINATION share/${PROJECT_NAME}
 )
 

@@ -4,7 +4,7 @@
   <name>hdmap_engine</name>
   <version>0.0.0</version>
   <description>HDMap Engine</description>
-  <maintainer email="huangminhang1996@gmail.com">minhang huang</maintainer>
+  <maintainer email="job@minhang.me">minhang huang</maintainer>
   <license>TODO: License eclaration</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
