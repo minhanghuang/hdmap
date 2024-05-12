@@ -28,11 +28,6 @@ class Engine {
    */
   bool Init(const Param& param);
 
-  /**
-   * @brief engine status
-   */
-  Status::ConstPtr status() const;
-
   bool HotUpdate(const Param& param);
 
   /**
@@ -148,11 +143,6 @@ class Engine {
   }
 
  private:
-  /**
-   * @brief engine status
-   */
-  Status::Ptr status_;
-
   /**
    * @brief engine imp ptr
    */

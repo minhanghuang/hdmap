@@ -9,9 +9,12 @@ option(BUILD_SHARED_LIBS ON)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(nanoflann REQUIRED)
+find_package(hdmap_engine REQUIRED)
+find_package(visualization_msgs REQUIRED)
 
 include_directories(
-  include
+  src
 )
 
 file(GLOB_RECURSE hdmap_server_srcs
@@ -20,6 +23,8 @@ file(GLOB_RECURSE hdmap_server_srcs
 
 set(${target_name}_dependencies
   rclcpp
+  hdmap_engine
+  visualization_msgs
 )
 
 add_executable(${target_name}
@@ -30,8 +35,8 @@ ament_target_dependencies(${target_name}
   ${${target_name}_dependencies}
 )
 
-install(DIRECTORY include/
-  DESTINATION include/
+target_link_libraries(${target_name}
+  nanoflann::nanoflann
 )
 
 install(TARGETS ${target_name}
@@ -44,7 +49,7 @@ install(TARGETS ${target_name}
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch
+install(DIRECTORY launch config
   DESTINATION share/${PROJECT_NAME}
 )
 

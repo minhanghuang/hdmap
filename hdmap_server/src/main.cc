@@ -1,21 +1,16 @@
-#include <iostream>
+#include <cstdlib>
 #include <rclcpp/rclcpp.hpp>
-#include <string>
+
+#include "server.h"
 
 int main(int argc, char* argv[]) {
-  std::cout << "hdmap server node." << std::endl;
-
   rclcpp::init(argc, argv);
-
-  auto node = rclcpp::Node::make_shared("hdmap_server");
-
-  rclcpp::WallRate rate(5);
-
-  while (rclcpp::ok()) {
-    rclcpp::spin_some(node);
-    rate.sleep();
+  auto node = std::make_shared<hdmap::HDMapServer>();
+  if (!node->Init()) {
+    HDMAP_LOG_ERROR("node init failure");
+    return EXIT_FAILURE;
   }
-
+  rclcpp::spin(node->get_node_base_interface());
   rclcpp::shutdown();
-  return 0;
+  return EXIT_SUCCESS;
 }

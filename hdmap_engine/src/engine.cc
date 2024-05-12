@@ -6,8 +6,6 @@ Engine::Engine() : impl_(std::make_shared<EngineImpl>()) {}
 
 bool Engine::Init(const Param& param) { return impl_->Init(param); }
 
-Status::ConstPtr Engine::status() const { return status_; }
-
 bool Engine::HotUpdate(const Param& param) { return impl_->Init(param); }
 
 bool Engine::GetPointById(const std::string& point_id,
