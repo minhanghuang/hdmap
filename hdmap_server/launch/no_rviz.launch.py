@@ -12,19 +12,10 @@ def generate_launch_description():
 
     return launch.LaunchDescription(
         [
-            # hdmap server
             launch_ros.actions.Node(
                 package="hdmap_server",
                 executable="hdmap_server",
                 parameters=[config],
-                output="screen",
-            ),
-            # Rviz
-            launch_ros.actions.Node(
-                package="rviz2",
-                executable="rviz2",
-                name="rviz2",
-                parameters=[{"rviz2": {"args": "-d hdmap_server.rviz"}}],
                 output="screen",
             ),
         ],
