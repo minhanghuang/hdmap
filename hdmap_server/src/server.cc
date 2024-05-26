@@ -1,16 +1,17 @@
-#include "server.h"
+#include "hdamp_server/server.h"
+
+#include <climits>
 
 namespace hdmap {
 
 HDMapServer::HDMapServer(const rclcpp::NodeOptions& options)
     : Node("hdmap_server_node", options),
+      merker_topic_("/hdmap_server/map_marker"),
+      global_map_topic_("/hdmap_server/global_map"),
       param_(std::make_shared<Param>()),
       engine_(std::make_shared<Engine>()) {
-  // declare this node's parameters
   this->declare_parameter("map_file_path", "");
-  this->declare_parameter("topic_global_map", "");
   param_->set_file_path(this->get_parameter("map_file_path").as_string());
-  global_map_topic_ = this->get_parameter("topic_global_map").as_string();
 }
 
 bool HDMapServer::Init() {
@@ -27,9 +28,14 @@ bool HDMapServer::Init() {
   }
 
   // create publisher
-  global_map_pub_ =
-      this->create_publisher<visualization_msgs::msg::MarkerArray>(
-          global_map_topic_, 1);
+  marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
+      merker_topic_, 1);
+
+  // create server
+  global_map_srv_ = this->create_service<hdmap_msgs::srv::GetGlobalMap>(
+      global_map_topic_, std::bind(&HDMapServer::GlobalMapServiceCallback, this,
+                                   std::placeholders::_1, std::placeholders::_2,
+                                   std::placeholders::_3));
 
   GenerateGlobalMap();
 
@@ -42,18 +48,17 @@ bool HDMapServer::Init() {
 
 void HDMapServer::TimerCallback() {
   if (Hz(1)) {
-    global_map_pub_->publish(*global_map_);
+    marker_pub_->publish(*marker_array_msg_);
   }
   rate_counter_++;
 }
 
 bool HDMapServer::Checkin() {
-  if (nullptr == param_ || nullptr == engine_ || param_->file_path().empty() ||
-      global_map_topic_.empty()) {
+  if (nullptr == param_ || nullptr == engine_ || param_->file_path().empty()) {
     return false;
   }
   HDMAP_LOG_INFO("map file: %s", param_->file_path().c_str());
-  HDMAP_LOG_INFO("topic global map: %s", global_map_topic_.c_str());
+  HDMAP_LOG_INFO("topic global map: %s", merker_topic_.c_str());
   return true;
 }
 
@@ -63,9 +68,10 @@ bool HDMapServer::Hz(int rate) {
 }
 
 void HDMapServer::GenerateGlobalMap() {
-  if (nullptr == global_map_) {
-    global_map_ = std::make_shared<visualization_msgs::msg::MarkerArray>();
-  }
+  marker_array_msg_ = std::make_shared<visualization_msgs::msg::MarkerArray>();
+  global_map_msg_ = std::make_shared<hdmap_msgs::msg::Map>();
+
+  //// map marker
   auto lanes = engine_->GetLanes();
   for (int i = 0; i < lanes.size(); i++) {
     visualization_msgs::msg::Marker lane_msg;
@@ -86,8 +92,144 @@ void HDMapServer::GenerateGlobalMap() {
       point_msg.set__z(point.z());
       lane_msg.points.emplace_back(point_msg);
     }
-    global_map_->markers.emplace_back(lane_msg);
+    marker_array_msg_->markers.emplace_back(lane_msg);
   }
+
+  //// global map
+  auto map = engine_->GetRoads();
+  for (const auto& road : map) {
+    hdmap_msgs::msg::Road road_msg;
+    for (const auto& section : road->sections()) {
+      hdmap_msgs::msg::Section section_msg;
+      // left lanes
+      for (const auto& lane : section->left_lanes()) {
+        hdmap_msgs::msg::Lane lane_msg;
+        int line_size = std::max<int>(
+            0, std::min<int>(
+                   lane->central_curve().pts().size(),
+                   std::min<int>(lane->left_boundary().curve().pts().size(),
+                                 lane->right_boundary().curve().pts().size())));
+        for (int i = 0; i < line_size; i++) {
+          hdmap_msgs::msg::Point point_msg;
+
+          // central curve point
+          point_msg.point.set__x(lane->central_curve().pts().at(i).x());
+          point_msg.point.set__y(lane->central_curve().pts().at(i).y());
+          point_msg.point.set__z(lane->central_curve().pts().at(i).z());
+          lane_msg.central_curve.pts.emplace_back(point_msg);
+
+          // right boundary point
+          point_msg.point.set__x(lane->left_boundary().curve().pts().at(i).x());
+          point_msg.point.set__y(lane->left_boundary().curve().pts().at(i).y());
+          point_msg.point.set__z(lane->left_boundary().curve().pts().at(i).z());
+          lane_msg.left_boundary.pts.emplace_back(point_msg);
+
+          // left boundary point
+          point_msg.point.set__x(
+              lane->right_boundary().curve().pts().at(i).x());
+          point_msg.point.set__y(
+              lane->right_boundary().curve().pts().at(i).y());
+          point_msg.point.set__z(
+              lane->right_boundary().curve().pts().at(i).z());
+          lane_msg.right_boundary.pts.emplace_back(point_msg);
+        }
+        section_msg.lanes.emplace_back(lane_msg);
+      }
+
+      // right lanes
+      for (const auto& lane : section->right_lanes()) {
+        hdmap_msgs::msg::Lane lane_msg;
+        int line_size = std::max<int>(
+            0, std::min<int>(
+                   lane->central_curve().pts().size(),
+                   std::min<int>(lane->left_boundary().curve().pts().size(),
+                                 lane->right_boundary().curve().pts().size())));
+        for (int i = 0; i < line_size; i++) {
+          hdmap_msgs::msg::Point point_msg;
+
+          // central curve point
+          point_msg.point.set__x(lane->central_curve().pts().at(i).x());
+          point_msg.point.set__y(lane->central_curve().pts().at(i).y());
+          point_msg.point.set__z(lane->central_curve().pts().at(i).z());
+          lane_msg.central_curve.pts.emplace_back(point_msg);
+
+          // right boundary point
+          point_msg.point.set__x(lane->left_boundary().curve().pts().at(i).x());
+          point_msg.point.set__y(lane->left_boundary().curve().pts().at(i).y());
+          point_msg.point.set__z(lane->left_boundary().curve().pts().at(i).z());
+          lane_msg.left_boundary.pts.emplace_back(point_msg);
+
+          // left boundary point
+          point_msg.point.set__x(
+              lane->right_boundary().curve().pts().at(i).x());
+          point_msg.point.set__y(
+              lane->right_boundary().curve().pts().at(i).y());
+          point_msg.point.set__z(
+              lane->right_boundary().curve().pts().at(i).z());
+          lane_msg.right_boundary.pts.emplace_back(point_msg);
+        }
+        section_msg.lanes.emplace_back(lane_msg);
+      }
+
+      // center lane
+      {
+        int line_size = std::max<int>(
+            0,
+            std::min<int>(section->center_lane()->central_curve().pts().size(),
+                          std::min<int>(section->center_lane()
+                                            ->left_boundary()
+                                            .curve()
+                                            .pts()
+                                            .size(),
+                                        section->center_lane()
+                                            ->right_boundary()
+                                            .curve()
+                                            .pts()
+                                            .size())));
+        hdmap_msgs::msg::Lane lane_msg;
+        for (int i = 0; i < line_size; i++) {
+          hdmap_msgs::msg::Point point_msg;
+
+          // central curve point
+          point_msg.point.set__x(
+              section->center_lane()->central_curve().pts().at(i).x());
+          point_msg.point.set__y(
+              section->center_lane()->central_curve().pts().at(i).y());
+          point_msg.point.set__z(
+              section->center_lane()->central_curve().pts().at(i).z());
+          lane_msg.central_curve.pts.emplace_back(point_msg);
+
+          point_msg.point.set__x(
+              section->center_lane()->left_boundary().curve().pts().at(i).x());
+          point_msg.point.set__y(
+              section->center_lane()->left_boundary().curve().pts().at(i).y());
+          point_msg.point.set__z(
+              section->center_lane()->left_boundary().curve().pts().at(i).z());
+          lane_msg.left_boundary.pts.emplace_back(point_msg);
+
+          point_msg.point.set__x(
+              section->center_lane()->right_boundary().curve().pts().at(i).x());
+          point_msg.point.set__y(
+              section->center_lane()->right_boundary().curve().pts().at(i).y());
+          point_msg.point.set__z(
+              section->center_lane()->right_boundary().curve().pts().at(i).z());
+          lane_msg.right_boundary.pts.emplace_back(point_msg);
+        }
+        section_msg.lanes.emplace_back(lane_msg);
+      }  // center lane
+      road_msg.sections.emplace_back(section_msg);
+    }
+    global_map_msg_->roads.emplace_back(road_msg);
+  }
+}
+
+void HDMapServer::GlobalMapServiceCallback(
+    const std::shared_ptr<rmw_request_id_t> request_header,
+    const std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Request> request,
+    std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Response> response) {
+  std::cout << "GlobalMapServiceCallback1" << std::endl;
+  response->set__map(*global_map_msg_);
+  std::cout << "GlobalMapServiceCallback2" << std::endl;
 }
 
 }  // namespace hdmap

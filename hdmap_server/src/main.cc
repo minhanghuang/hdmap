@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <rclcpp/rclcpp.hpp>
 
-#include "server.h"
+#include "hdamp_server/server.h"
 
 int main(int argc, char* argv[]) {
   rclcpp::init(argc, argv);

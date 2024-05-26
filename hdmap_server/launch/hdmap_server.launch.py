@@ -7,7 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     config = os.path.join(
-        get_package_share_directory("hdmap_server"), "config", "hdmap_server.yaml"
+        get_package_share_directory("hdmap_server"), "conf", "hdmap_server.yaml"
     )
 
     return launch.LaunchDescription(
@@ -24,7 +24,14 @@ def generate_launch_description():
                 package="rviz2",
                 executable="rviz2",
                 name="rviz2",
-                parameters=[{"rviz2": {"args": "-d hdmap_server.rviz"}}],
+                arguments=[
+                    "-d",
+                    os.path.join(
+                        get_package_share_directory("hdmap_server"),
+                        "rviz",
+                        "hdmap_server.rviz",
+                    ),
+                ],
                 output="screen",
             ),
         ],
