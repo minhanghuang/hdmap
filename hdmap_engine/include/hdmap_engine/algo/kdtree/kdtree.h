@@ -6,10 +6,10 @@
 #include <cstddef>
 #include <memory>
 #include <mutex>
-#include <nanoflann.hpp>
 #include <string>
 #include <vector>
 
+#include "hdmap_engine/3rd_party/nanoflann/nanoflann.hpp"
 #include "hdmap_engine/geometry.h"
 
 namespace hdmap {

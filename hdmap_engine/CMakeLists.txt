@@ -11,13 +11,13 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(TinyXML2 REQUIRED)
-find_package(nanoflann REQUIRED)
 
 include_directories(
   include
 )
 
 file(GLOB_RECURSE hdmap_engine_srcs
+  "include/hdmap_engine/3rd_party/*.c"
   "src/*.cc"
 )
 
@@ -35,12 +35,11 @@ ament_target_dependencies(${target_name}
   ${${target_name}_dependencies}
 )
 
-target_link_libraries(${target_name}
-  nanoflann::nanoflann
-)
-
 install(DIRECTORY include/
   DESTINATION include/
+  FILES_MATCHING
+  PATTERN "*.h"
+  PATTERN "*.hpp"
 )
 
 install(TARGETS ${target_name}

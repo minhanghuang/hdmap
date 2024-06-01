@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-#include "hdmap_engine/adapter/opendrive/spiral/odrSpiral.h"
+#include "hdmap_engine/3rd_party/odrSpiral/odrSpiral.h"
 #include "hdmap_engine/common/macros.h"
 #include "hdmap_engine/common/utils.h"
 
