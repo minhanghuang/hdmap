@@ -3,6 +3,7 @@
 
 #include <QGridLayout>
 #include <QPushButton>
+#include <geometry_msgs/msg/point_stamped.hpp>
 #include <mutex>
 #include <rclcpp/rclcpp.hpp>
 #include <rviz_common/display.hpp>
@@ -14,21 +15,30 @@
 #include <rviz_rendering/objects/line.hpp>
 #include <rviz_rendering/objects/shape.hpp>
 #include <rviz_rendering/render_system.hpp>
+#include <unordered_map>
+#include <utility>
 
 #include "hdmap_msgs/srv/get_global_map.hpp"
 
 namespace hdmap_rviz_plugins {
 
-class GlobalMapDisplay : public rviz_common::Display {
+class MapDisplay : public rviz_common::Display {
   Q_OBJECT
  public:
-  GlobalMapDisplay();
-  virtual ~GlobalMapDisplay();
+  MapDisplay();
+  virtual ~MapDisplay();
 
  protected:
   virtual void onInitialize() override;
 
  private:
+  void SetupRosService();
+
+  void SetupRosSubscriptions();
+
+  void MousePositionCallback(
+      const geometry_msgs::msg::PointStamped::SharedPtr msg);
+
   void ShowGlobalMap();
 
   void GlobalMapMsgToBillboardLines(
@@ -47,6 +57,13 @@ class GlobalMapDisplay : public rviz_common::Display {
 
   /// Display show lanes
   std::vector<std::shared_ptr<rviz_rendering::BillboardLine>> rviz_lines_;
+
+  /// mouse position
+  std::mutex mouse_position_mutex_;
+  const std::string mouse_position_topic_;
+  geometry_msgs::msg::PointStamped mouse_position_msgs_;
+  rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr
+      mouse_position_sub_;
 };
 
 }  // namespace hdmap_rviz_plugins

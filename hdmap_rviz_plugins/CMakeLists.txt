@@ -14,15 +14,16 @@ find_package(rviz_assimp_vendor REQUIRED)
 find_package(rviz_rendering REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
 find_package(hdmap_msgs REQUIRED)
 
 ament_package_xml()
 
-set(hdmap_rviz_plugins_headers_to_moc
-  include/hdmap_rviz_plugins/hdmap_rviz_plugins.h
+file(GLOB_RECURSE headers_to_moc
+  "include/*.h"
 )
 
-foreach(header "${hdmap_rviz_plugins_headers_to_moc}")
+foreach(header "${headers_to_moc}")
   qt5_wrap_cpp(hdmap_rviz_plugins_moc_files "${header}")
 endforeach()
 
@@ -44,6 +45,7 @@ set(${target_name}_dependencies
   rviz_ogre_vendor
   rviz_rendering
   std_msgs
+  geometry_msgs
   hdmap_msgs
 )
 

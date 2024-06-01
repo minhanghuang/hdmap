@@ -4,6 +4,7 @@
 #include <tinyxml2.h>
 
 #include <algorithm>
+#include <boost/filesystem.hpp>
 #include <cmath>
 #include <iostream>
 

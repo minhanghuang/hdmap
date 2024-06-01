@@ -13,6 +13,7 @@
   <depend>rviz_rendering</depend>
   <depend>rviz_ogre_vendor</depend>
   <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>hdmap_msgs</depend>
 
   <test_depend>ament_lint_auto</test_depend>

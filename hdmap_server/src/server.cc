@@ -48,7 +48,7 @@ bool HDMapServer::Init() {
 
 void HDMapServer::TimerCallback() {
   if (Hz(1)) {
-    marker_pub_->publish(*marker_array_msg_);
+    // marker_pub_->publish(*marker_array_msg_);
   }
   rate_counter_++;
 }

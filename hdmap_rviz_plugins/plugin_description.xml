@@ -1,9 +1,21 @@
 <library path="libhdmap_rviz_plugins"> <!-- lib name -->
 
-  <class name="hdmap_rviz_plugins/GlobalMapDisplay"
-         type="hdmap_rviz_plugins::GlobalMapDisplay"
-         base_class_type="rviz_common::Display">
-    <description>hdmap server rviz display</description>
+  <class
+    name="hdmap_rviz_plugins/MapDisplay"
+     type="hdmap_rviz_plugins::MapDisplay"
+     base_class_type="rviz_common::Display">
+    <description>
+        hdmap server rviz display
+    </description>
+  </class>
+
+  <class
+    name="hdmap_rviz_plugins/MouseTool"
+     type="hdmap_rviz_plugins::MouseTool"
+     base_class_type="rviz_common::Tool">
+    <description>
+        mouse rviz display
+    </description>
   </class>
 
 </library>

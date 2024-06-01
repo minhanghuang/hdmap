@@ -11,9 +11,7 @@ Panels:
   - Class: rviz_common/Selection
     Name: Selection
   - Class: rviz_common/Tool Properties
-    Expanded:
-      - /2D Goal Pose1
-      - /Publish Point1
+    Expanded: ~
     Name: Tool Properties
     Splitter Ratio: 0.5886790156364441
   - Class: rviz_common/Views
@@ -54,9 +52,9 @@ Visualization Manager:
         Reliability Policy: Reliable
         Value: /hdmap_server/map_marker
       Value: true
-    - Class: hdmap_rviz_plugins/GlobalMapDisplay
+    - Class: hdmap_rviz_plugins/MapDisplay
       Enabled: true
-      Name: GlobalMapDisplay
+      Name: MapDisplay
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -66,33 +64,7 @@ Visualization Manager:
   Tools:
     - Class: rviz_default_plugins/Interact
       Hide Inactive Objects: true
-    - Class: rviz_default_plugins/MoveCamera
-    - Class: rviz_default_plugins/Select
-    - Class: rviz_default_plugins/FocusCamera
-    - Class: rviz_default_plugins/Measure
-      Line color: 128; 128; 0
-    - Class: rviz_default_plugins/SetInitialPose
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /initialpose
-    - Class: rviz_default_plugins/SetGoal
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /goal_pose
-    - Class: rviz_default_plugins/PublishPoint
-      Single click: true
-      Topic:
-        Depth: 5
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-        Value: /clicked_point
+    - Class: hdmap_rviz_plugins/MouseTool
   Transformation:
     Current:
       Class: rviz_default_plugins/TF
@@ -134,5 +106,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1008
-  X: 72
-  Y: 60
+  X: 956
+  Y: 220

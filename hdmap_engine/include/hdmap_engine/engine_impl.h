@@ -9,6 +9,7 @@
 #include "hdmap_engine/adapter/parser.h"
 #include "hdmap_engine/algo/kdtree/kdtree.h"
 #include "hdmap_engine/algo/routing/routing.h"
+#include "hdmap_engine/common/log.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/common/status.h"
 #include "hdmap_engine/common/utils.h"
@@ -100,6 +101,8 @@ class EngineImpl {
                                             size_t num_closest);
 
  private:
+  bool Checkin();
+
   /**
    * @brief engine param
    */

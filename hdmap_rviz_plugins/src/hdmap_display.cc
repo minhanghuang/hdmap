@@ -1,16 +1,23 @@
-#include "hdmap_rviz_plugins/hdmap_rviz_plugins.h"
+#include "hdmap_rviz_plugins/hdmap_display.h"
 
 namespace hdmap_rviz_plugins {
 
-GlobalMapDisplay::GlobalMapDisplay()
-    : global_map_topic_("/hdmap_server/global_map") {}
+MapDisplay::MapDisplay()
+    : global_map_topic_("/hdmap_server/global_map"),
+      mouse_position_topic_("/hdmap_server/mouse_position") {}
 
-GlobalMapDisplay::~GlobalMapDisplay() {}
+MapDisplay::~MapDisplay() {}
 
-void GlobalMapDisplay::onInitialize() {
+void MapDisplay::onInitialize() {
   rviz_common::Display::onInitialize();
   rviz_rendering::RenderSystem::get()->prepareOverlays(scene_manager_);
   node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
+  SetupRosService();
+  SetupRosSubscriptions();
+  ShowGlobalMap();
+}
+
+void MapDisplay::SetupRosService() {
   global_map_client_ =
       node_->create_client<hdmap_msgs::srv::GetGlobalMap>(global_map_topic_);
   while (!global_map_client_->wait_for_service(std::chrono::seconds(1))) {
@@ -18,11 +25,23 @@ void GlobalMapDisplay::onInitialize() {
       return;
     }
   }
-
-  ShowGlobalMap();
 }
 
-void GlobalMapDisplay::ShowGlobalMap() {
+void MapDisplay::SetupRosSubscriptions() {
+  mouse_position_sub_ =
+      node_->create_subscription<geometry_msgs::msg::PointStamped>(
+          mouse_position_topic_, 1,
+          std::bind(&MapDisplay::MousePositionCallback, this,
+                    std::placeholders::_1));
+}
+
+void MapDisplay::MousePositionCallback(
+    const geometry_msgs::msg::PointStamped::SharedPtr msg) {
+  std::lock_guard<std::mutex> guard(mouse_position_mutex_);
+  mouse_position_msgs_ = *msg;
+}
+
+void MapDisplay::ShowGlobalMap() {
   std::lock_guard<std::mutex> guard(mutex_);
   auto request = std::make_shared<hdmap_msgs::srv::GetGlobalMap::Request>();
   auto response_callback =
@@ -35,7 +54,7 @@ void GlobalMapDisplay::ShowGlobalMap() {
       global_map_client_->async_send_request(request, response_callback);
 }
 
-void GlobalMapDisplay::GlobalMapMsgToBillboardLines(
+void MapDisplay::GlobalMapMsgToBillboardLines(
     const hdmap_msgs::msg::Map& map,
     std::vector<std::shared_ptr<rviz_rendering::BillboardLine>>& lines) {
   if (map.roads.empty()) {
@@ -99,5 +118,4 @@ void GlobalMapDisplay::GlobalMapMsgToBillboardLines(
 }  // namespace hdmap_rviz_plugins
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(hdmap_rviz_plugins::GlobalMapDisplay,
-                       rviz_common::Display)
+PLUGINLIB_EXPORT_CLASS(hdmap_rviz_plugins::MapDisplay, rviz_common::Display)

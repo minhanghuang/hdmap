@@ -20,11 +20,7 @@ Tokens Split(const std::string& tokenstring, const std::string& delimiter) {
 }
 
 bool FileExists(const std::string& file_path) {
-  if (FILE* f = fopen(file_path.c_str(), "r")) {
-    fclose(f);
-    return true;
-  }
-  return false;
+  return boost::filesystem::exists(file_path);
 }
 
 std::string GetLaneIdById(const std::string& point_id) {

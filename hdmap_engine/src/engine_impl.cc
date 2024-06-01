@@ -10,6 +10,10 @@ bool EngineImpl::Init(const Param& param) {
   kdtree_ = std::make_shared<kdtree::KDTree>();
   param_->set_step(std::max<float>(param_->step(), 0.5));
 
+  if (!Checkin()) {
+    return false;
+  }
+
   std::shared_ptr<PipelineLoading> pipeline_data =
       std::make_shared<PipelineLoading>();
   pipeline_data->param = param_;
@@ -120,6 +124,14 @@ geometry::Lane::ConstPtrs EngineImpl::GetNearestLanes(double x, double y,
     }
   }
   return lanes;
+}
+
+bool EngineImpl::Checkin() {
+  /// check file path
+  if (!common::FileExists(param_->file_path())) {
+    return false;
+  }
+  return true;
 }
 
 }  // namespace hdmap

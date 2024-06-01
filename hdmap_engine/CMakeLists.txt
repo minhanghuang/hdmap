@@ -9,11 +9,13 @@ option(BUILD_SHARED_LIBS ON)
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem system)
 find_package(tinyxml2_vendor REQUIRED)
 find_package(TinyXML2 REQUIRED)
 
 include_directories(
   include
+  ${Boost_INCLUDE_DIRS}
 )
 
 file(GLOB_RECURSE hdmap_engine_srcs
@@ -33,6 +35,11 @@ set(${target_name}_dependencies
 
 ament_target_dependencies(${target_name}
   ${${target_name}_dependencies}
+)
+
+target_link_libraries(${target_name}
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
 )
 
 install(DIRECTORY include/
