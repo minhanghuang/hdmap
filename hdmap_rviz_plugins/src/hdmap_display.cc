@@ -2,9 +2,7 @@
 
 namespace hdmap_rviz_plugins {
 
-MapDisplay::MapDisplay()
-    : global_map_topic_("/hdmap_server/global_map"),
-      mouse_position_topic_("/hdmap_server/mouse_position") {}
+MapDisplay::MapDisplay() : global_map_topic_("/hdmap_server/global_map") {}
 
 MapDisplay::~MapDisplay() {}
 
@@ -13,8 +11,9 @@ void MapDisplay::onInitialize() {
   rviz_rendering::RenderSystem::get()->prepareOverlays(scene_manager_);
   node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
   SetupRosService();
-  SetupRosSubscriptions();
+  SetupOverlay();
   ShowGlobalMap();
+  ShowCurrentRegion();
 }
 
 void MapDisplay::SetupRosService() {
@@ -27,18 +26,8 @@ void MapDisplay::SetupRosService() {
   }
 }
 
-void MapDisplay::SetupRosSubscriptions() {
-  mouse_position_sub_ =
-      node_->create_subscription<geometry_msgs::msg::PointStamped>(
-          mouse_position_topic_, 1,
-          std::bind(&MapDisplay::MousePositionCallback, this,
-                    std::placeholders::_1));
-}
-
-void MapDisplay::MousePositionCallback(
-    const geometry_msgs::msg::PointStamped::SharedPtr msg) {
-  std::lock_guard<std::mutex> guard(mouse_position_mutex_);
-  mouse_position_msgs_ = *msg;
+void MapDisplay::SetupOverlay() {
+  overlay_ = std::make_shared<OverlayComponent>();
 }
 
 void MapDisplay::ShowGlobalMap() {
@@ -52,6 +41,11 @@ void MapDisplay::ShowGlobalMap() {
       };
   auto future =
       global_map_client_->async_send_request(request, response_callback);
+}
+
+void MapDisplay::ShowCurrentRegion() {
+  overlay_->Update("Hello, Rviz");
+  overlay_->Show();
 }
 
 void MapDisplay::GlobalMapMsgToBillboardLines(

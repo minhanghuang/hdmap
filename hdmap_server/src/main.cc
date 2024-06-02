@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]) {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<hdmap::HDMapServer>();
+  auto node = std::make_shared<hdmap::XMapServer>();
   if (!node->Init()) {
     HDMAP_LOG_ERROR("node init failure");
     return EXIT_FAILURE;

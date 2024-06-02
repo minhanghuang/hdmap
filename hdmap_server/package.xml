@@ -11,6 +11,7 @@
 
   <depend>rclcpp</depend>
   <depend>visualization_msgs</depend>
+  <depend>geometry_msgs</depend>
   <depend>hdmap_engine</depend>
   <depend>hdmap_msgs</depend>
 

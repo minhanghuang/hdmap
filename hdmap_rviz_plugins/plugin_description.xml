@@ -1,4 +1,4 @@
-<library path="libhdmap_rviz_plugins"> <!-- lib name -->
+<library path="hdmap_rviz_plugins"> <!-- lib name -->
 
   <class
     name="hdmap_rviz_plugins/MapDisplay"

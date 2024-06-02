@@ -1,11 +1,19 @@
 #ifndef HDMAP_RVIZ_PLUGIN_H_
 #define HDMAP_RVIZ_PLUGIN_H_
 
+#include <QFontDatabase>
 #include <QGridLayout>
+#include <QPainter>
 #include <QPushButton>
+#include <QStaticText>
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
+#include <hdmap_msgs/srv/get_global_map.hpp>
+#include <memory>
 #include <mutex>
 #include <rclcpp/rclcpp.hpp>
+#include <regex>
 #include <rviz_common/display.hpp>
 #include <rviz_common/display_context.hpp>  // context_->getRosNodeAbstraction().lock()->get_raw_node();
 #include <rviz_common/frame_manager_iface.hpp>
@@ -18,7 +26,9 @@
 #include <unordered_map>
 #include <utility>
 
-#include "hdmap_msgs/srv/get_global_map.hpp"
+#include "util/overlay_component.h"
+#include "util/overlay_text.h"
+#include "util/overlay_utils.h"
 
 namespace hdmap_rviz_plugins {
 
@@ -34,12 +44,11 @@ class MapDisplay : public rviz_common::Display {
  private:
   void SetupRosService();
 
-  void SetupRosSubscriptions();
-
-  void MousePositionCallback(
-      const geometry_msgs::msg::PointStamped::SharedPtr msg);
+  void SetupOverlay();
 
   void ShowGlobalMap();
+
+  void ShowCurrentRegion();
 
   void GlobalMapMsgToBillboardLines(
       const hdmap_msgs::msg::Map& map,
@@ -58,12 +67,8 @@ class MapDisplay : public rviz_common::Display {
   /// Display show lanes
   std::vector<std::shared_ptr<rviz_rendering::BillboardLine>> rviz_lines_;
 
-  /// mouse position
-  std::mutex mouse_position_mutex_;
-  const std::string mouse_position_topic_;
-  geometry_msgs::msg::PointStamped mouse_position_msgs_;
-  rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr
-      mouse_position_sub_;
+  /// Display overlay text
+  std::shared_ptr<OverlayComponent> overlay_;
 };
 
 }  // namespace hdmap_rviz_plugins

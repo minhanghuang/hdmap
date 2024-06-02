@@ -4,17 +4,19 @@
 
 namespace hdmap {
 
-HDMapServer::HDMapServer(const rclcpp::NodeOptions& options)
+XMapServer::XMapServer(const rclcpp::NodeOptions& options)
     : Node("hdmap_server_node", options),
       merker_topic_("/hdmap_server/map_marker"),
       global_map_topic_("/hdmap_server/global_map"),
+      mouse_position_topic_("/hdmap_server/mouse_position"),
+      current_region_topic_("/hdmap_server/current_region"),
       param_(std::make_shared<Param>()),
       engine_(std::make_shared<Engine>()) {
   this->declare_parameter("map_file_path", "");
   param_->set_file_path(this->get_parameter("map_file_path").as_string());
 }
 
-bool HDMapServer::Init() {
+bool XMapServer::Init() {
   // check in
   if (!Checkin()) {
     HDMAP_LOG_ERROR("hdmap server check in exception");
@@ -27,33 +29,16 @@ bool HDMapServer::Init() {
     return false;
   }
 
-  // create publisher
-  marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
-      merker_topic_, 1);
-
-  // create server
-  global_map_srv_ = this->create_service<hdmap_msgs::srv::GetGlobalMap>(
-      global_map_topic_, std::bind(&HDMapServer::GlobalMapServiceCallback, this,
-                                   std::placeholders::_1, std::placeholders::_2,
-                                   std::placeholders::_3));
+  SetupRosPublisher();
+  SetupRosSubscriptions();
+  SetupRosService();
+  SetupRosTimer();
 
   GenerateGlobalMap();
-
-  // create timer
-  timer_ = this->create_wall_timer(
-      10ms /*100Hz*/, std::bind(&HDMapServer::TimerCallback, this));
-
   return true;
 }
 
-void HDMapServer::TimerCallback() {
-  if (Hz(1)) {
-    // marker_pub_->publish(*marker_array_msg_);
-  }
-  rate_counter_++;
-}
-
-bool HDMapServer::Checkin() {
+bool XMapServer::Checkin() {
   if (nullptr == param_ || nullptr == engine_ || param_->file_path().empty()) {
     return false;
   }
@@ -62,15 +47,108 @@ bool HDMapServer::Checkin() {
   return true;
 }
 
-bool HDMapServer::Hz(int rate) {
+bool XMapServer::Hz(int rate) {
   uint32_t mod = 100 / rate;
   return (rate_counter_ % mod) == 0 ? true : false;
 }
 
-void HDMapServer::GenerateGlobalMap() {
-  marker_array_msg_ = std::make_shared<visualization_msgs::msg::MarkerArray>();
-  global_map_msg_ = std::make_shared<hdmap_msgs::msg::Map>();
+void XMapServer::SetupRosPublisher() {
+  marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
+      merker_topic_, 1);
+  current_region_pub_ =
+      this->create_publisher<hdmap_msgs::msg::Region>(current_region_topic_, 1);
+}
 
+void XMapServer::SetupRosSubscriptions() {
+  mouse_position_sub_ =
+      this->create_subscription<geometry_msgs::msg::PointStamped>(
+          mouse_position_topic_, 1,
+          std::bind(&XMapServer::MousePositionCallback, this,
+                    std::placeholders::_1));
+}
+
+void XMapServer::SetupRosService() {
+  global_map_srv_ = this->create_service<hdmap_msgs::srv::GetGlobalMap>(
+      global_map_topic_, std::bind(&XMapServer::GlobalMapServiceCallback, this,
+                                   std::placeholders::_1, std::placeholders::_2,
+                                   std::placeholders::_3));
+}
+
+void XMapServer::SetupRosTimer() {
+  timers_.emplace_back(this->create_wall_timer(
+      // 100Hz
+      rclcpp::Rate(100).period(), std::bind(&XMapServer::PublishTimer, this)));
+  timers_.emplace_back(this->create_wall_timer(
+      // 10Hz
+      rclcpp::Rate(10).period(),
+      std::bind(&XMapServer::ProcessCurrentRegionTimer, this)));
+}
+
+void XMapServer::PublishTimer() {
+  if (Hz(1)) {
+    PublishGlobalMapMarkers();
+  }
+  if (Hz(10)) {
+    PublishCurrentRegion();
+  }
+  rate_counter_++;
+}
+
+void XMapServer::ProcessCurrentRegionTimer() {
+  geometry_msgs::msg::PointStamped mouse_position;
+  {
+    std::lock_guard<std::mutex> guard(mouse_position_mutex_);
+    if (mouse_position_msgs_q_.empty()) {
+      return;
+    }
+    mouse_position = mouse_position_msgs_q_.front();
+    mouse_position_msgs_q_.pop();
+  }
+  auto search_results = engine_->GetNearestPoints(mouse_position.point.x,
+                                                  mouse_position.point.y, 1);
+  if (search_results.empty()) {
+    return;
+  }
+  geometry::Curve::Point point;  // lane point
+  if (!engine_->GetPointById(search_results.begin()->id, point)) {
+    return;
+  }
+  {
+    std::lock_guard<std::mutex> guard(current_region_mutex_);
+    current_region_msg_.header.stamp = this->now();
+    current_region_msg_.id = point.id();
+    current_region_msg_.point.x = point.x();
+    current_region_msg_.point.y = point.y();
+    current_region_msg_.heading = point.heading();
+  }
+}
+
+void XMapServer::PublishGlobalMapMarkers() {
+  // marker_pub_->publish(marker_array_msg_);
+}
+
+void XMapServer::PublishCurrentRegion() {
+  std::lock_guard<std::mutex> guard(current_region_mutex_);
+  current_region_pub_->publish(current_region_msg_);
+}
+
+void XMapServer::GlobalMapServiceCallback(
+    const std::shared_ptr<rmw_request_id_t> request_header,
+    const std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Request> request,
+    std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Response> response) {
+  response->set__map(global_map_msg_);
+}
+
+void XMapServer::MousePositionCallback(
+    const geometry_msgs::msg::PointStamped::SharedPtr msg) {
+  std::lock_guard<std::mutex> guard(mouse_position_mutex_);
+  if (!mouse_position_msgs_q_.empty()) {
+    mouse_position_msgs_q_.pop();
+  }
+  mouse_position_msgs_q_.push(*msg);
+}
+
+void XMapServer::GenerateGlobalMap() {
   //// map marker
   auto lanes = engine_->GetLanes();
   for (int i = 0; i < lanes.size(); i++) {
@@ -92,7 +170,7 @@ void HDMapServer::GenerateGlobalMap() {
       point_msg.set__z(point.z());
       lane_msg.points.emplace_back(point_msg);
     }
-    marker_array_msg_->markers.emplace_back(lane_msg);
+    marker_array_msg_.markers.emplace_back(lane_msg);
   }
 
   //// global map
@@ -219,17 +297,8 @@ void HDMapServer::GenerateGlobalMap() {
       }  // center lane
       road_msg.sections.emplace_back(section_msg);
     }
-    global_map_msg_->roads.emplace_back(road_msg);
+    global_map_msg_.roads.emplace_back(road_msg);
   }
-}
-
-void HDMapServer::GlobalMapServiceCallback(
-    const std::shared_ptr<rmw_request_id_t> request_header,
-    const std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Request> request,
-    std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Response> response) {
-  std::cout << "GlobalMapServiceCallback1" << std::endl;
-  response->set__map(*global_map_msg_);
-  std::cout << "GlobalMapServiceCallback2" << std::endl;
 }
 
 }  // namespace hdmap
