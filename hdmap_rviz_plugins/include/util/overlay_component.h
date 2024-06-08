@@ -16,8 +16,10 @@
 #include <rclcpp/rclcpp.hpp>
 #include <regex>
 #include <string>
+#include <vector>
 
 #include "util/overlay_text.h"
+#include "util/overlay_ui.h"
 #include "util/overlay_utils.h"
 
 namespace hdmap_rviz_plugins {
@@ -32,7 +34,9 @@ class OverlayComponent {
 
   void Append(const std::string& data);
 
-  void Update(const std::string& data);
+  void Update(const std::vector<std::string>& data);
+
+  void Update(OverlayUI* ui);
 
   void Show();
 

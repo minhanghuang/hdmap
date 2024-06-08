@@ -9,6 +9,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
+#include <hdmap_msgs/msg/region.hpp>
 #include <hdmap_msgs/srv/get_global_map.hpp>
 #include <memory>
 #include <mutex>
@@ -28,7 +29,7 @@
 
 #include "util/overlay_component.h"
 #include "util/overlay_text.h"
-#include "util/overlay_utils.h"
+#include "util/overlay_ui.h"
 
 namespace hdmap_rviz_plugins {
 
@@ -42,13 +43,19 @@ class MapDisplay : public rviz_common::Display {
   virtual void onInitialize() override;
 
  private:
+  void SetupRosSubscriptions();
+
   void SetupRosService();
+
+  void SetupRosTimer();
 
   void SetupOverlay();
 
   void ShowGlobalMap();
 
   void ShowCurrentRegion();
+
+  void CurrentRegionCallback(const hdmap_msgs::msg::Region::SharedPtr msg);
 
   void GlobalMapMsgToBillboardLines(
       const hdmap_msgs::msg::Map& map,
@@ -61,14 +68,25 @@ class MapDisplay : public rviz_common::Display {
    */
   rclcpp::Node::SharedPtr node_;
 
+  /// ros timer
+  std::vector<rclcpp::TimerBase::SharedPtr> timers_;
+
+  /// ros service global map
   const std::string global_map_topic_;
   rclcpp::Client<hdmap_msgs::srv::GetGlobalMap>::SharedPtr global_map_client_;
+
+  /// ros sub current region
+  std::mutex current_region_mutex_;
+  const std::string current_region_topic_;
+  hdmap_msgs::msg::Region current_region_msg_;
+  rclcpp::Subscription<hdmap_msgs::msg::Region>::SharedPtr current_region_sub_;
 
   /// Display show lanes
   std::vector<std::shared_ptr<rviz_rendering::BillboardLine>> rviz_lines_;
 
   /// Display overlay text
   std::shared_ptr<OverlayComponent> overlay_;
+  std::shared_ptr<CurrentRegionOverlayUI> overlap_ui_;
 };
 
 }  // namespace hdmap_rviz_plugins

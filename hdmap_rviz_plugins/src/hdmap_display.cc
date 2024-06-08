@@ -2,7 +2,9 @@
 
 namespace hdmap_rviz_plugins {
 
-MapDisplay::MapDisplay() : global_map_topic_("/hdmap_server/global_map") {}
+MapDisplay::MapDisplay()
+    : global_map_topic_("/hdmap_server/global_map"),
+      current_region_topic_("/hdmap_server/current_region") {}
 
 MapDisplay::~MapDisplay() {}
 
@@ -10,10 +12,18 @@ void MapDisplay::onInitialize() {
   rviz_common::Display::onInitialize();
   rviz_rendering::RenderSystem::get()->prepareOverlays(scene_manager_);
   node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
+  SetupRosSubscriptions();
   SetupRosService();
+  SetupRosTimer();
   SetupOverlay();
   ShowGlobalMap();
-  ShowCurrentRegion();
+}
+
+void MapDisplay::SetupRosSubscriptions() {
+  current_region_sub_ = node_->create_subscription<hdmap_msgs::msg::Region>(
+      current_region_topic_, 1,
+      std::bind(&MapDisplay::CurrentRegionCallback, this,
+                std::placeholders::_1));
 }
 
 void MapDisplay::SetupRosService() {
@@ -26,8 +36,16 @@ void MapDisplay::SetupRosService() {
   }
 }
 
+void MapDisplay::SetupRosTimer() {
+  timers_.emplace_back(node_->create_wall_timer(
+      // 10Hz
+      rclcpp::Rate(10).period(),
+      std::bind(&MapDisplay::ShowCurrentRegion, this)));
+}
+
 void MapDisplay::SetupOverlay() {
   overlay_ = std::make_shared<OverlayComponent>();
+  overlap_ui_ = std::make_shared<CurrentRegionOverlayUI>();
 }
 
 void MapDisplay::ShowGlobalMap() {
@@ -44,8 +62,28 @@ void MapDisplay::ShowGlobalMap() {
 }
 
 void MapDisplay::ShowCurrentRegion() {
-  overlay_->Update("Hello, Rviz");
+  hdmap_msgs::msg::Region current_region;
+  {
+    std::lock_guard<std::mutex> guard(mutex_);
+    if (current_region_msg_.id.empty()) {
+      return;
+    }
+    current_region = current_region_msg_;
+  }
+  *overlap_ui_->mutable_id() = current_region_msg_.id;
+  overlap_ui_->mutable_point()->clear();
+  overlap_ui_->mutable_point()->emplace_back(current_region_msg_.point.x);
+  overlap_ui_->mutable_point()->emplace_back(current_region_msg_.point.y);
+  overlap_ui_->mutable_point()->emplace_back(current_region_msg_.heading);
+  overlay_->Clean();
+  overlay_->Update(overlap_ui_.get());
   overlay_->Show();
+}
+
+void MapDisplay::CurrentRegionCallback(
+    const hdmap_msgs::msg::Region::SharedPtr msg) {
+  std::lock_guard<std::mutex> guard(mutex_);
+  current_region_msg_ = *msg;
 }
 
 void MapDisplay::GlobalMapMsgToBillboardLines(

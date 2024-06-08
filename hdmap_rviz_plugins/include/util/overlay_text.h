@@ -3,20 +3,20 @@
 
 #include <QColor>
 #include <string>
+#include <vector>
 
 namespace hdmap_rviz_plugins {
 
 class OverlayText {
  public:
   OverlayText()
-      : height_(40),
-        width_(200),
+      : height_(80),
+        width_(600),
         bg_color_(QColor(0, 0, 0, 0)),  // black
         fg_color_(QColor(255, 100, 0)),
         font_("Liberation Sans"),
         font_size_(14),
-        line_width_(12),
-        data_("") {}
+        line_width_(12) {}
 
   int height() const { return height_; }
 
@@ -25,6 +25,16 @@ class OverlayText {
   int width() const { return width_; }
 
   void set_width(int width) { width_ = width; }
+
+  int CalcHeight(int row_num) {
+    height_ = row_num * row_height_;
+    return height_;
+  }
+
+  int CalcWidth(int word_num) {
+    width_ = word_num * word_width_;
+    return width_;
+  }
 
   QColor bg_color() const { return bg_color_; }
 
@@ -50,13 +60,17 @@ class OverlayText {
 
   void set_line_width(int line_width) { line_width_ = line_width; }
 
-  std::string data() const { return data_; }
+  std::vector<std::string> data() const { return data_; }
 
-  void set_data(const std::string& data) { data_ = data; }
+  void set_data(const std::vector<std::string>& data) { data_ = data; }
 
-  std::string& mutable_data() { return data_; }
+  std::vector<std::string>& mutable_data() { return data_; }
 
  private:
+  const int row_height_ = 30;
+
+  const int word_width_ = 40;
+
   /**
    * @brief texture height
    */
@@ -95,7 +109,7 @@ class OverlayText {
   /**
    * @brief display text
    */
-  std::string data_;
+  std::vector<std::string> data_;
 };
 
 }  // namespace hdmap_rviz_plugins
