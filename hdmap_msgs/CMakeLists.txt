@@ -30,6 +30,7 @@ set(msg_files
   "msg/Section.msg"
   "msg/Road.msg"
   "msg/Map.msg"
+  "msg/Region.msg"
   "srv/GetGlobalMap.srv"
 )
 
