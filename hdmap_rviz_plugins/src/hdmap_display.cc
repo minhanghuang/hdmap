@@ -70,11 +70,11 @@ void MapDisplay::ShowCurrentRegion() {
     }
     current_region = current_region_msg_;
   }
-  *overlap_ui_->mutable_id() = current_region_msg_.id;
+  *overlap_ui_->mutable_id() = current_region.id;
   overlap_ui_->mutable_point()->clear();
-  overlap_ui_->mutable_point()->emplace_back(current_region_msg_.point.x);
-  overlap_ui_->mutable_point()->emplace_back(current_region_msg_.point.y);
-  overlap_ui_->mutable_point()->emplace_back(current_region_msg_.heading);
+  overlap_ui_->mutable_point()->emplace_back(current_region.point.x);
+  overlap_ui_->mutable_point()->emplace_back(current_region.point.y);
+  overlap_ui_->mutable_point()->emplace_back(current_region.heading);
   overlay_->Clean();
   overlay_->Update(overlap_ui_.get());
   overlay_->Show();
