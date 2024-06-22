@@ -48,6 +48,27 @@ double ManhattanDistance(T x0, T y0, T x1, T y1) {
 }
 
 /**
+ * @brief Returns the minimum value among the provided arguments.
+ *
+ * This function takes a variable number of arguments and returns the minimum
+ * value among them. It uses a fold expression available in C++17 and later
+ * to efficiently compute the minimum value.
+ *
+ * @tparam T The type of the arguments. All arguments must be of the same type.
+ * @tparam Args The types of the remaining arguments (variadic template).
+ * @param first The first argument.
+ * @param args The remaining arguments.
+ * @return The minimum value among the provided arguments.
+ */
+template <typename T, typename... Args>
+auto MinValue(const T& first, const Args&... args) ->
+    typename std::common_type<T, Args...>::type {
+  using CommonType = typename std::common_type<T, Args...>::type;
+  return (std::min)(
+      {static_cast<CommonType>(first), static_cast<CommonType>(args)...});
+}
+
+/**
  * @brief 计算偏离点
  *
  * @tparam T element::Point

@@ -42,6 +42,19 @@ target_link_libraries(${target_name}
   ${Boost_SYSTEM_LIBRARY}
 )
 
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+
+  ament_add_gtest(${target_name}_kdtree_test
+    test/kdtree_test.cc
+  )
+  if(TARGET ${target_name}_kdtree_test)
+    target_link_libraries(${target_name}_kdtree_test
+      hdmap_engine
+    )
+  endif()
+endif()
+
 install(DIRECTORY include/
   DESTINATION include/
   FILES_MATCHING
