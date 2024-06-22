@@ -26,7 +26,13 @@ int MouseTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
   mouse_position_msgs_.point.set__x(event.x);
   mouse_position_msgs_.point.set__y(event.y);
   mouse_position_pub_->publish(mouse_position_msgs_);
-  return rviz_common::Tool::processMouseEvent(event);
+
+  // 3D view can be rotated using the mouse
+  if (event.panel->getViewController()) {
+    event.panel->getViewController()->handleMouseEvent(event);
+    setCursor(event.panel->getViewController()->getCursor());
+  }
+  return 0;
 }
 
 }  // namespace hdmap_rviz_plugins

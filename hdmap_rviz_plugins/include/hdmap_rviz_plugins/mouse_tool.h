@@ -10,8 +10,9 @@
 #include <rviz_common/display_context.hpp>  // context_->getRosNodeAbstraction().lock()->get_raw_node();
 #include <rviz_common/frame_manager_iface.hpp>
 #include <rviz_common/panel.hpp>
-#include <rviz_common/properties/ros_topic_property.hpp>
+#include <rviz_common/render_panel.hpp>
 #include <rviz_common/tool.hpp>
+#include <rviz_common/view_controller.hpp>
 #include <rviz_common/viewport_mouse_event.hpp>
 #include <rviz_rendering/objects/billboard_line.hpp>
 #include <rviz_rendering/objects/line.hpp>
