@@ -53,6 +53,16 @@ if(BUILD_TESTING)
       hdmap_engine
     )
   endif()
+
+  ament_add_gtest(${target_name}_common_test
+    test/common_test.cc
+  )
+  if(TARGET ${target_name}_common_test)
+    target_link_libraries(${target_name}_common_test
+      hdmap_engine
+    )
+  endif()
+
 endif()
 
 install(DIRECTORY include/

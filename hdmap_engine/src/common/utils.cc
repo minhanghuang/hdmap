@@ -24,12 +24,15 @@ bool FileExists(const std::string& file_path) {
 }
 
 std::string GetLaneIdById(const std::string& point_id) {
-  std::string lane_id;
   auto split_ret = Split(point_id, "_");
   if (5 != split_ret.size()) {
-    return lane_id;
+    return std::string("");
   }
-  return split_ret[0] + "_" + split_ret[1] + "_" + split_ret[2];
+  if (!std::none_of(split_ret.begin(), split_ret.end(),
+                    [](const std::string& s) { return s.empty(); })) {
+    return std::string("");
+  }
+  return std::string(split_ret[0] + "_" + split_ret[1] + "_" + split_ret[2]);
 }
 
 }  // namespace common
