@@ -1,6 +1,10 @@
 #ifndef MOUSE_RVIZ_PLUGIN_H_
 #define MOUSE_RVIZ_PLUGIN_H_
 
+#include <OgreCamera.h>
+#include <OgreRay.h>
+#include <OgreViewport.h>
+
 #include <QGridLayout>
 #include <QPushButton>
 #include <geometry_msgs/msg/point_stamped.hpp>
@@ -13,6 +17,7 @@
 #include <rviz_common/render_panel.hpp>
 #include <rviz_common/tool.hpp>
 #include <rviz_common/view_controller.hpp>
+#include <rviz_common/view_manager.hpp>
 #include <rviz_common/viewport_mouse_event.hpp>
 #include <rviz_rendering/objects/billboard_line.hpp>
 #include <rviz_rendering/objects/line.hpp>

@@ -22,10 +22,21 @@ void MouseTool::deactivate() {}
 
 int MouseTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
   std::lock_guard<std::mutex> guard(mutex_);
-  mouse_position_msgs_.header.stamp = node_->get_clock()->now();
-  mouse_position_msgs_.point.set__x(event.x);
-  mouse_position_msgs_.point.set__y(event.y);
-  mouse_position_pub_->publish(mouse_position_msgs_);
+  Ogre::Camera* camera = context_->getViewManager()->getCurrent()->getCamera();
+  Ogre::Viewport* viewport = camera->getViewport();
+  float screen_x = static_cast<float>(event.x) / viewport->getActualWidth();
+  float screen_y = static_cast<float>(event.y) / viewport->getActualHeight();
+  Ogre::Ray ray = camera->getCameraToViewportRay(screen_x, screen_y);
+  Ogre::Plane ground_plane(Ogre::Vector3::UNIT_Z, 0);
+  std::pair<bool, Ogre::Real> result = ray.intersects(ground_plane);
+  if (result.first) {
+    Ogre::Vector3 intersection_point = ray.getPoint(result.second);
+    mouse_position_msgs_.header.stamp = node_->get_clock()->now();
+    mouse_position_msgs_.point.set__x(intersection_point.x);
+    mouse_position_msgs_.point.set__y(intersection_point.y);
+    mouse_position_msgs_.point.set__z(intersection_point.z);
+    mouse_position_pub_->publish(mouse_position_msgs_);
+  }
 
   // 3D view can be rotated using the mouse
   if (event.panel->getViewController()) {
