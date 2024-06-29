@@ -18,6 +18,9 @@
 #include <rviz_common/display.hpp>
 #include <rviz_common/display_context.hpp>  // context_->getRosNodeAbstraction().lock()->get_raw_node();
 #include <rviz_common/frame_manager_iface.hpp>
+#include <rviz_common/interaction/selection_handler.hpp>
+#include <rviz_common/interaction/selection_manager.hpp>
+#include <rviz_common/interactive_object.hpp>
 #include <rviz_common/panel.hpp>
 #include <rviz_common/properties/ros_topic_property.hpp>
 #include <rviz_rendering/objects/billboard_line.hpp>
@@ -27,6 +30,7 @@
 #include <unordered_map>
 #include <utility>
 
+#include "util/current_region.h"
 #include "util/overlay_component.h"
 #include "util/overlay_text.h"
 #include "util/overlay_ui.h"
@@ -83,6 +87,9 @@ class MapDisplay : public rviz_common::Display {
 
   /// Display show lanes
   std::vector<std::shared_ptr<rviz_rendering::BillboardLine>> rviz_lines_;
+
+  /// Display current lane
+  std::shared_ptr<CurrentRegion> current_region_;
 
   /// Display overlay text
   std::shared_ptr<OverlayComponent> overlay_;

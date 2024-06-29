@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <climits>
 #include <functional>
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <hdmap_msgs/msg/map.hpp>

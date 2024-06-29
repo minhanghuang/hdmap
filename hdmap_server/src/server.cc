@@ -1,7 +1,5 @@
 #include "hdamp_server/server.h"
 
-#include <climits>
-
 namespace hdmap {
 
 XMapServer::XMapServer(const rclcpp::NodeOptions& options)
@@ -109,17 +107,62 @@ void XMapServer::ProcessCurrentRegionTimer() {
   if (search_results.empty()) {
     return;
   }
-  geometry::Curve::Point point;  // lane point
-  if (!engine_->GetPointById(search_results.begin()->id, point)) {
+  auto search_result = search_results.begin();
+
+  // lane point
+  geometry::Curve::Point point;
+  if (!engine_->GetPointById(search_result->id, point)) {
     return;
   }
+
+  // lane
+  hdmap_msgs::msg::Lane lane_msg;
+  geometry::Lane::ConstPtr lane = nullptr;
+  const std::string lane_id = common::GetLaneIdById(point.id());
+  lane = engine_->GetLaneById(lane_id);
+  if (nullptr != lane) {
+    if (!lane->left_boundary().curve().pts().empty() &&
+        !lane->right_boundary().curve().pts().empty()) {
+      lane_msg.id = lane->id();
+      // TODO: lane type
+      lane_msg.lane_type = hdmap_msgs::msg::Lane::LANE_TYPE_STRAIGHT;
+      const int line_size =
+          common::MinValue(lane->central_curve().pts().size(),
+                           lane->left_boundary().curve().pts().size(),
+                           lane->right_boundary().curve().pts().size());
+      for (int i = 0; i < line_size; i++) {
+        hdmap_msgs::msg::Point point_msg;
+        // // central curve point
+        // point_msg.point.set__x(lane->central_curve().pts().at(i).x());
+        // point_msg.point.set__y(lane->central_curve().pts().at(i).y());
+        // point_msg.point.set__z(lane->central_curve().pts().at(i).z());
+        // lane_msg.central_curve.pts.emplace_back(point_msg);
+
+        // right boundary point
+        point_msg.point.set__x(lane->left_boundary().curve().pts().at(i).x());
+        point_msg.point.set__y(lane->left_boundary().curve().pts().at(i).y());
+        point_msg.point.set__z(lane->left_boundary().curve().pts().at(i).z());
+        lane_msg.left_boundary.pts.emplace_back(point_msg);
+
+        // left boundary point
+        point_msg.point.set__x(lane->right_boundary().curve().pts().at(i).x());
+        point_msg.point.set__y(lane->right_boundary().curve().pts().at(i).y());
+        point_msg.point.set__z(lane->right_boundary().curve().pts().at(i).z());
+        lane_msg.right_boundary.pts.emplace_back(point_msg);
+      }
+    }
+  }
+
+  // fill msg
   {
     std::lock_guard<std::mutex> guard(current_region_mutex_);
     current_region_msg_.header.stamp = this->now();
     current_region_msg_.id = point.id();
+    current_region_msg_.distance = search_result->dist;
     current_region_msg_.point.x = point.x();
     current_region_msg_.point.y = point.y();
     current_region_msg_.heading = point.heading();
+    current_region_msg_.lane = lane_msg;
   }
 }
 
@@ -196,13 +239,13 @@ void XMapServer::GenerateGlobalMap() {
           point_msg.point.set__z(lane->central_curve().pts().at(i).z());
           lane_msg.central_curve.pts.emplace_back(point_msg);
 
-          // right boundary point
+          // left boundary point
           point_msg.point.set__x(lane->left_boundary().curve().pts().at(i).x());
           point_msg.point.set__y(lane->left_boundary().curve().pts().at(i).y());
           point_msg.point.set__z(lane->left_boundary().curve().pts().at(i).z());
           lane_msg.left_boundary.pts.emplace_back(point_msg);
 
-          // left boundary point
+          // right boundary point
           point_msg.point.set__x(
               lane->right_boundary().curve().pts().at(i).x());
           point_msg.point.set__y(
@@ -231,13 +274,13 @@ void XMapServer::GenerateGlobalMap() {
           point_msg.point.set__z(lane->central_curve().pts().at(i).z());
           lane_msg.central_curve.pts.emplace_back(point_msg);
 
-          // right boundary point
+          // left boundary point
           point_msg.point.set__x(lane->left_boundary().curve().pts().at(i).x());
           point_msg.point.set__y(lane->left_boundary().curve().pts().at(i).y());
           point_msg.point.set__z(lane->left_boundary().curve().pts().at(i).z());
           lane_msg.left_boundary.pts.emplace_back(point_msg);
 
-          // left boundary point
+          // right boundary point
           point_msg.point.set__x(
               lane->right_boundary().curve().pts().at(i).x());
           point_msg.point.set__y(

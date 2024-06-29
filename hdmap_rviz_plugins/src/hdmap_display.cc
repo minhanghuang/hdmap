@@ -12,6 +12,8 @@ void MapDisplay::onInitialize() {
   rviz_common::Display::onInitialize();
   rviz_rendering::RenderSystem::get()->prepareOverlays(scene_manager_);
   node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
+  current_region_ =
+      std::make_shared<CurrentRegion>(scene_manager_, scene_node_);
   SetupRosSubscriptions();
   SetupRosService();
   SetupRosTimer();
@@ -38,8 +40,7 @@ void MapDisplay::SetupRosService() {
 
 void MapDisplay::SetupRosTimer() {
   timers_.emplace_back(node_->create_wall_timer(
-      // 10Hz
-      rclcpp::Rate(10).period(),
+      rclcpp::Rate(5).period(),
       std::bind(&MapDisplay::ShowCurrentRegion, this)));
 }
 
@@ -70,6 +71,8 @@ void MapDisplay::ShowCurrentRegion() {
     }
     current_region = current_region_msg_;
   }
+
+  /// overlay text
   *overlap_ui_->mutable_id() = current_region.id;
   overlap_ui_->mutable_point()->clear();
   overlap_ui_->mutable_point()->emplace_back(current_region.point.x);
@@ -78,6 +81,38 @@ void MapDisplay::ShowCurrentRegion() {
   overlay_->Clean();
   overlay_->Update(overlap_ui_.get());
   overlay_->Show();
+
+  /// current lane
+  current_region_->mutable_boundary()->clear();
+  if (!current_region.lane.left_boundary.pts.empty() &&
+      !current_region.lane.right_boundary.pts.empty()) {
+    const int line_size = std::max<int>(
+        0, std::min<int>(current_region.lane.left_boundary.pts.size(),
+                         current_region.lane.right_boundary.pts.size()));
+    if (line_size > 0) {
+      current_region_->mutable_boundary()->setMaxPointsPerLine(line_size * 2 +
+                                                               1);
+      // left boundary pts
+      for (int i = 0; i < line_size; i++) {
+        current_region_->mutable_boundary()->addPoint(
+            Ogre::Vector3(current_region.lane.left_boundary.pts.at(i).point.x,
+                          current_region.lane.left_boundary.pts.at(i).point.y,
+                          current_region.lane.left_boundary.pts.at(i).point.z));
+      }
+      // right boundary pts
+      for (int i = line_size - 1; i >= 0; i--) {
+        current_region_->mutable_boundary()->addPoint(Ogre::Vector3(
+            current_region.lane.right_boundary.pts.at(i).point.x,
+            current_region.lane.right_boundary.pts.at(i).point.y,
+            current_region.lane.right_boundary.pts.at(i).point.z));
+      }
+      // left first point
+      current_region_->mutable_boundary()->addPoint(Ogre::Vector3(
+          current_region.lane.left_boundary.pts.begin()->point.x,
+          current_region.lane.left_boundary.pts.begin()->point.y,
+          current_region.lane.left_boundary.pts.begin()->point.z));
+    }
+  }
 }
 
 void MapDisplay::CurrentRegionCallback(
@@ -100,6 +135,9 @@ void MapDisplay::GlobalMapMsgToBillboardLines(
             0, std::min<int>(lane.central_curve.pts.size(),
                              std::min<int>(lane.left_boundary.pts.size(),
                                            lane.left_boundary.pts.size())));
+        if (0 == line_size) {
+          continue;
+        }
         {
           /// fill central line
           auto rviz_line = std::make_shared<rviz_rendering::BillboardLine>(
