@@ -26,6 +26,9 @@
 #include <vector>
 
 #include "hdmap_msgs/srv/get_global_map.hpp"
+#include "util/overlay_component.h"
+#include "util/overlay_text.h"
+#include "util/overlay_ui.h"
 
 namespace hdmap_rviz_plugins {
 
@@ -65,6 +68,8 @@ class MouseTool : public rviz_common::Tool {
   virtual int processMouseEvent(
       rviz_common::ViewportMouseEvent& event) override;
 
+  void SetupOverlay();
+
  private Q_SLOTS:
 
  private:
@@ -76,6 +81,10 @@ class MouseTool : public rviz_common::Tool {
   geometry_msgs::msg::PointStamped mouse_position_msgs_;
   rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr
       mouse_position_pub_;
+
+  /// Display mouse position overlay text
+  std::shared_ptr<OverlayComponent> overlay_;
+  std::shared_ptr<MousePositionOverlayUI> overlap_ui_;
 };
 
 }  // namespace hdmap_rviz_plugins

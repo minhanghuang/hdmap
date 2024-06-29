@@ -2,9 +2,10 @@
 
 namespace hdmap_rviz_plugins {
 
-OverlayComponent::OverlayComponent()
-    : text_(std::make_shared<OverlayText>()),
-      object_(std::make_shared<OverlayObject>("OverlayTextDisplay")) {}
+OverlayComponent::OverlayComponent(const std::string& name)
+    : name_(name),
+      text_(std::make_shared<OverlayText>()),
+      object_(std::make_shared<OverlayObject>(name_)) {}
 
 void OverlayComponent::Clean() {
   std::lock_guard<std::mutex> guard(mutex_);
@@ -31,9 +32,17 @@ void OverlayComponent::Update(OverlayUI* ui) {
 }
 
 void OverlayComponent::Show() {
-  object_->updateTextureSize(
-      text_->CalcWidth(text_->data().at(1).size()),
-      text_->CalcHeight(text_->data().size()));
+  unsigned int hor_size = 1;
+  unsigned int ver_size = 1;
+  for (const auto& data : text_->data()) {
+    if (!data.empty() && hor_size < data.size()) {
+      hor_size = data.size();
+    }
+  }
+  ver_size = std::max<unsigned int>(1, text_->data().size());
+  object_->updateTextureSize(text_->CalcWidth(hor_size),
+                             text_->CalcHeight(ver_size));
+
   rviz_2d_overlay_plugins::ScopedPixelBuffer buffer = object_->getBuffer();
   QImage image = buffer.getQImage(*object_, text_->mutable_bg_color());
   QPainter painter(&image);
@@ -80,6 +89,14 @@ void OverlayComponent::Show() {
   object_->setDimensions(object_->getTextureWidth(),
                          object_->getTextureHeight());
   object_->show();
+}
+
+const std::string& OverlayComponent::name() const { return name_; }
+
+void OverlayComponent::SetPosition(double hor_dist, double ver_dist,
+                                   HorizontalAlignment hor_alignment,
+                                   VerticalAlignment ver_alignment) {
+  object_->setPosition(hor_dist, ver_dist, hor_alignment, ver_alignment);
 }
 
 }  // namespace hdmap_rviz_plugins

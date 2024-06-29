@@ -45,8 +45,10 @@ void MapDisplay::SetupRosTimer() {
 }
 
 void MapDisplay::SetupOverlay() {
-  overlay_ = std::make_shared<OverlayComponent>();
+  overlay_ = std::make_shared<OverlayComponent>("current_region");
   overlap_ui_ = std::make_shared<CurrentRegionOverlayUI>();
+  overlay_->SetPosition(10, 10, HorizontalAlignment::LEFT,
+                        VerticalAlignment::TOP);
 }
 
 void MapDisplay::ShowGlobalMap() {

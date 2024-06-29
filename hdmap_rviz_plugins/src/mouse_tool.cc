@@ -14,6 +14,7 @@ void MouseTool::onInitialize() {
   mouse_position_pub_ =
       node_->create_publisher<geometry_msgs::msg::PointStamped>(
           mouse_position_topic_, 1);
+  SetupOverlay();
 }
 
 void MouseTool::activate() {}
@@ -31,6 +32,15 @@ int MouseTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
   std::pair<bool, Ogre::Real> result = ray.intersects(ground_plane);
   if (result.first) {
     Ogre::Vector3 intersection_point = ray.getPoint(result.second);
+    /// show
+    overlap_ui_->set_x(intersection_point.x);
+    overlap_ui_->set_y(intersection_point.y);
+    overlap_ui_->set_z(intersection_point.z);
+    overlay_->Clean();
+    overlay_->Update(overlap_ui_.get());
+    overlay_->Show();
+
+    /// pub
     mouse_position_msgs_.header.stamp = node_->get_clock()->now();
     mouse_position_msgs_.point.set__x(intersection_point.x);
     mouse_position_msgs_.point.set__y(intersection_point.y);
@@ -44,6 +54,13 @@ int MouseTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
     setCursor(event.panel->getViewController()->getCursor());
   }
   return 0;
+}
+
+void MouseTool::SetupOverlay() {
+  overlay_ = std::make_shared<OverlayComponent>("mouse_position");
+  overlap_ui_ = std::make_shared<MousePositionOverlayUI>();
+  overlay_->SetPosition(0, 25, HorizontalAlignment::LEFT,
+                        VerticalAlignment::BOTTOM);
 }
 
 }  // namespace hdmap_rviz_plugins

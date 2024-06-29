@@ -28,7 +28,9 @@ using namespace rviz_2d_overlay_plugins;
 
 class OverlayComponent {
  public:
-  OverlayComponent();
+  using Ptr = std::shared_ptr<OverlayComponent>;
+  using ConstPtr = std::shared_ptr<OverlayComponent const>;
+  OverlayComponent(const std::string& name);
 
   void Clean();
 
@@ -40,8 +42,17 @@ class OverlayComponent {
 
   void Show();
 
+  const std::string& name() const;
+
+  void SetPosition(
+      double hor_dist, double ver_dist,
+      HorizontalAlignment hor_alignment = HorizontalAlignment::LEFT,
+      VerticalAlignment ver_alignment = VerticalAlignment::TOP);
+
  private:
   std::mutex mutex_;
+
+  const std::string name_;
 
   std::shared_ptr<OverlayText> text_;
 

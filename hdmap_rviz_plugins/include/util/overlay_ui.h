@@ -66,6 +66,38 @@ class CurrentRegionOverlayUI : public OverlayUI {
   std::vector<double> point_;  // [x, y, heading]
 };
 
+class MousePositionOverlayUI : public OverlayUI {
+ public:
+  MousePositionOverlayUI() : x_(0), y_(0), z_(0) {}
+
+  virtual std::vector<std::string> Format() override {
+    std::vector<std::string> text;  // 1.1, 2.3, 0.1
+
+    std::string xyz;
+    xyz.append(std::to_string(x_));
+    xyz.append(", ");
+    xyz.append(std::to_string(y_));
+    xyz.append(", ");
+    xyz.append(std::to_string(z_));
+    text.emplace_back(xyz);
+
+    return text;
+  }
+
+  void set_x(double x) { x_ = x; }
+
+  void set_y(double y) { y_ = y; }
+
+  void set_z(double z) { z_ = z; }
+
+ private:
+  double x_;
+
+  double y_;
+
+  double z_;
+};
+
 }  // namespace hdmap_rviz_plugins
 
 #endif  // RVIZ_PLUGIN_OVERLAY_UI_H_
