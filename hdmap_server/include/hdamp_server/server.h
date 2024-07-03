@@ -93,10 +93,11 @@ class XMapServer : public rclcpp::Node {
 
   /// ros pub
   // marker
-  const std::string merker_topic_;
-  visualization_msgs::msg::MarkerArray marker_array_msg_;
-  rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
-      marker_pub_;
+  // const std::string merker_topic_;
+  // visualization_msgs::msg::MarkerArray marker_array_msg_;
+  // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
+  //     marker_pub_;
+
   // current region
   std::mutex current_region_mutex_;
   const std::string current_region_topic_;

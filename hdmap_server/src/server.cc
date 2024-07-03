@@ -4,7 +4,7 @@ namespace hdmap {
 
 XMapServer::XMapServer(const rclcpp::NodeOptions& options)
     : Node("hdmap_server_node", options),
-      merker_topic_("/hdmap_server/map_marker"),
+      // merker_topic_("/hdmap_server/map_marker"),
       global_map_topic_("/hdmap_server/global_map"),
       mouse_position_topic_("/hdmap_server/mouse_position"),
       current_region_topic_("/hdmap_server/current_region"),
@@ -41,7 +41,7 @@ bool XMapServer::Checkin() {
     return false;
   }
   HDMAP_LOG_INFO("map file: %s", param_->file_path().c_str());
-  HDMAP_LOG_INFO("topic global map: %s", merker_topic_.c_str());
+  // HDMAP_LOG_INFO("topic global map: %s", merker_topic_.c_str());
   return true;
 }
 
@@ -51,8 +51,8 @@ bool XMapServer::Hz(int rate) {
 }
 
 void XMapServer::SetupRosPublisher() {
-  marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
-      merker_topic_, 1);
+  // marker_pub_ = this->create_publisher<visualization_msgs::msg::MarkerArray>(
+  //     merker_topic_, 1);
   current_region_pub_ =
       this->create_publisher<hdmap_msgs::msg::Region>(current_region_topic_, 1);
 }
@@ -192,29 +192,29 @@ void XMapServer::MousePositionCallback(
 }
 
 void XMapServer::GenerateGlobalMap() {
-  //// map marker
-  auto lanes = engine_->GetLanes();
-  for (int i = 0; i < lanes.size(); i++) {
-    visualization_msgs::msg::Marker lane_msg;
-    lane_msg.header.frame_id = "map";
-    lane_msg.header.stamp = this->now();
-    lane_msg.ns = "markers";
-    lane_msg.id = i;
-    lane_msg.action = visualization_msgs::msg::Marker::ADD;
-    lane_msg.type = visualization_msgs::msg::Marker::LINE_STRIP;
-    lane_msg.pose.orientation.w = 1.0;
-    lane_msg.scale.x = 0.1;  // 线段宽度
-    lane_msg.color.r = 1.0;  // RGB
-    lane_msg.color.a = 1.0;  // 透明度
-    for (const auto& point : lanes.at(i)->central_curve().pts()) {
-      geometry_msgs::msg::Point point_msg;
-      point_msg.set__x(point.x());
-      point_msg.set__y(point.y());
-      point_msg.set__z(point.z());
-      lane_msg.points.emplace_back(point_msg);
-    }
-    marker_array_msg_.markers.emplace_back(lane_msg);
-  }
+  // //// map marker
+  // auto lanes = engine_->GetLanes();
+  // for (int i = 0; i < lanes.size(); i++) {
+  //   visualization_msgs::msg::Marker lane_msg;
+  //   lane_msg.header.frame_id = "map";
+  //   lane_msg.header.stamp = this->now();
+  //   lane_msg.ns = "markers";
+  //   lane_msg.id = i;
+  //   lane_msg.action = visualization_msgs::msg::Marker::ADD;
+  //   lane_msg.type = visualization_msgs::msg::Marker::LINE_STRIP;
+  //   lane_msg.pose.orientation.w = 1.0;
+  //   lane_msg.scale.x = 0.1;
+  //   lane_msg.color.r = 1.0;  // RGB
+  //   lane_msg.color.a = 1.0;  // Alpha
+  //   for (const auto& point : lanes.at(i)->central_curve().pts()) {
+  //     geometry_msgs::msg::Point point_msg;
+  //     point_msg.set__x(point.x());
+  //     point_msg.set__y(point.y());
+  //     point_msg.set__z(point.z());
+  //     lane_msg.points.emplace_back(point_msg);
+  //   }
+  //   marker_array_msg_.markers.emplace_back(lane_msg);
+  // }
 
   //// global map
   auto map = engine_->GetRoads();
