@@ -1,6 +1,8 @@
 #ifndef HDMAP_ADAPTER_OPRNDRIVE_PARSER_H_
 #define HDMAP_ADAPTER_OPRNDRIVE_PARSER_H_
 
+#include <hdmap_common/util.h>
+
 #include <algorithm>
 #include <cstdlib>
 #include <memory>
@@ -12,7 +14,6 @@
 #include "hdmap_engine/algo/kdtree/kdtree.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/common/status.h"
-#include "hdmap_engine/common/utils.h"
 #include "hdmap_engine/geometry.h"
 
 namespace hdmap {

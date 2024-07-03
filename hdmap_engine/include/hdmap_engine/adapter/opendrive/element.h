@@ -1,6 +1,8 @@
 #ifndef HDMAP_ADAPTER_OPENDRIVE_ELEMENT_H_
 #define HDMAP_ADAPTER_OPENDRIVE_ELEMENT_H_
 
+#include <hdmap_common/util.h>
+
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -14,7 +16,6 @@
 
 #include "hdmap_engine/3rd_party/odrSpiral/odrSpiral.h"
 #include "hdmap_engine/common/macros.h"
-#include "hdmap_engine/common/utils.h"
 
 namespace hdmap {
 namespace opendrive {

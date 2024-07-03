@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5.1)
-project(hdmap_engine VERSION 1.0.0)
+project(hdmap_common VERSION 1.0.0)
 
 set(target_name ${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 17)
@@ -10,29 +10,22 @@ option(BUILD_SHARED_LIBS ON)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem system)
-find_package(tinyxml2_vendor REQUIRED)
-find_package(TinyXML2 REQUIRED)
-find_package(hdmap_common REQUIRED)
 
 include_directories(
   include
   ${Boost_INCLUDE_DIRS}
 )
 
-file(GLOB_RECURSE hdmap_engine_srcs
-  "include/hdmap_engine/3rd_party/*.c"
+file(GLOB_RECURSE ${target_name}_srcs
   "src/*.cc"
 )
 
 add_library(${target_name} SHARED
-  ${hdmap_engine_srcs}
+  ${${target_name}_srcs}
 )
 
 set(${target_name}_dependencies
   rclcpp
-  tinyxml2_vendor
-  TinyXML2
-  hdmap_common
 )
 
 ament_target_dependencies(${target_name}
@@ -47,12 +40,14 @@ target_link_libraries(${target_name}
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
 
-  ament_add_gtest(${target_name}_kdtree_test
-    test/kdtree_test.cc
+  ament_add_gtest(${target_name}_util_test
+    test/util_test.cc
   )
-  if(TARGET ${target_name}_kdtree_test)
-    target_link_libraries(${target_name}_kdtree_test
-      hdmap_engine
+  if(TARGET ${target_name}_util_test)
+    target_link_libraries(${target_name}_util_test
+      ${Boost_FILESYSTEM_LIBRARY}
+      ${Boost_SYSTEM_LIBRARY}
+      ${target_name}
     )
   endif()
 endif()

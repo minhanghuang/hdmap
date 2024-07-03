@@ -118,7 +118,7 @@ void XMapServer::ProcessCurrentRegionTimer() {
   // lane
   hdmap_msgs::msg::Lane lane_msg;
   geometry::Lane::ConstPtr lane = nullptr;
-  const std::string lane_id = common::GetLaneIdById(point.id());
+  const std::string lane_id = common::GetLaneIdByPointId(point.id());
   lane = engine_->GetLaneById(lane_id);
   if (nullptr != lane) {
     if (!lane->left_boundary().curve().pts().empty() &&

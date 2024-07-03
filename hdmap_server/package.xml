@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>hdmap_server</name>
-  <version>0.0.0</version>
+  <version>1.0.0</version>
   <description>hdmap server</description>
   <maintainer email="job@minhang.me">minhang huang</maintainer>
   <license>TODO: License declaration</license>
@@ -12,8 +12,9 @@
   <depend>rclcpp</depend>
   <depend>visualization_msgs</depend>
   <depend>geometry_msgs</depend>
-  <depend>hdmap_engine</depend>
+  <depend>hdmap_common</depend>
   <depend>hdmap_msgs</depend>
+  <depend>hdmap_engine</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

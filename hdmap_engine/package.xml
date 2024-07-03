@@ -2,8 +2,8 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>hdmap_engine</name>
-  <version>0.0.0</version>
-  <description>HDMap Engine</description>
+  <version>1.0.0</version>
+  <description>hdmap engine</description>
   <maintainer email="job@minhang.me">minhang huang</maintainer>
   <license>TODO: License eclaration</license>
 
@@ -11,6 +11,7 @@
 
   <depend>rclcpp</depend>
   <depend>tinyxml2_vendor</depend>
+  <depend>hdmap_common</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -118,7 +118,7 @@ geometry::Lane::ConstPtrs EngineImpl::GetNearestLanes(double x, double y,
   geometry::Lane::ConstPtrs lanes;
   auto search_ret = kdtree_->Query(x, y, num_closest);
   for (const auto& it : search_ret) {
-    std::string lane_id = common::GetLaneIdById(it.id);
+    std::string lane_id = common::GetLaneIdByPointId(it.id);
     if (!lane_id.empty()) {
       lanes.emplace_back(map_->lanes().at(lane_id));
     }
@@ -128,7 +128,7 @@ geometry::Lane::ConstPtrs EngineImpl::GetNearestLanes(double x, double y,
 
 bool EngineImpl::Checkin() {
   /// check file path
-  if (!common::FileExists(param_->file_path())) {
+  if (!fs::exists(param_->file_path())) {
     return false;
   }
   return true;

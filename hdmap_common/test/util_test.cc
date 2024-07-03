@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <hdmap_engine/common/utils.h>
+#include <hdmap_common/util.h>
 
 #include <string>
 #include <vector>
@@ -19,14 +19,14 @@ TEST_F(TestCommon, TestSplit) {
 TEST_F(TestCommon, TestGetLaneIdById) {
   {
     const std::string point_id = "0_1_0_100_1";
-    const std::string lane_id = hdmap::common::GetLaneIdById(point_id);
+    const std::string lane_id = hdmap::common::GetLaneIdByPointId(point_id);
     ASSERT_TRUE(!lane_id.empty());
     ASSERT_TRUE("0_1_0" == lane_id);
   }
 
   {
     const std::string point_id = "0_1_0_100_";
-    const std::string lane_id = hdmap::common::GetLaneIdById(point_id);
+    const std::string lane_id = hdmap::common::GetLaneIdByPointId(point_id);
     std::cout << "lane_id: " << lane_id << std::endl;
     ASSERT_TRUE(lane_id.empty());
   }

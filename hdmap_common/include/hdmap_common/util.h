@@ -1,51 +1,17 @@
-#ifndef HDMAP_COMMON_UTILS_H_
-#define HDMAP_COMMON_UTILS_H_
+#ifndef HDMAP_COMMON_UTIL_H_
+#define HDMAP_COMMON_UTIL_H_
 
-#include <tinyxml2.h>
-
-#include <algorithm>
-#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
+#include <chrono>
 #include <cmath>
-#include <iostream>
-
-#include "hdmap_engine/geometry.h"
+#include <memory>
+#include <string>
 
 namespace hdmap {
 namespace common {
 
-using Tokens = std::vector<std::string>;
-
-Tokens Split(const std::string& tokenstring, const std::string& delimiter);
-
-bool FileExists(const std::string& file_path);
-
-std::string GetLaneIdById(const std::string& point_id);
-
-template <typename T>
-T Square(const T value) {
-  return value * value;
-}
-
-template <typename T>
-double EuclideanDistance(const T& p0, const T& p1) {
-  return std::sqrt(std::pow(p0.x() - p1.x(), 2.0) +
-                   std::pow(p0.y() - p1.y(), 2.0));
-}
-
-template <typename T>
-double EuclideanDistance(T x0, T y0, T x1, T y1) {
-  return std::sqrt(std::pow(x0 - x1, 2.0) + std::pow(y0 - y1, 2.0));
-}
-
-template <typename T>
-double ManhattanDistance(const T& p0, const T& p1) {
-  return std::abs(p0.x() - p1.x()) + std::abs(p0.y() - p1.y());
-}
-
-template <typename T>
-double ManhattanDistance(T x0, T y0, T x1, T y1) {
-  return std::abs(x0 - x1) + std::abs(y0 - y1);
-}
+std::vector<std::string> Split(const std::string& input,
+                               const std::string& delimiter);
 
 /**
  * @brief Returns the minimum value among the provided arguments.
@@ -67,6 +33,8 @@ auto MinValue(const T& first, const Args&... args) ->
   return (std::min)(
       {static_cast<CommonType>(first), static_cast<CommonType>(args)...});
 }
+
+std::string GetLaneIdByPointId(const std::string& point_id);
 
 /**
  * @brief 计算偏离点
@@ -150,4 +118,4 @@ int GetGtPtrPoloy3(const std::vector<T1>& items, T2 target) {
 }  // namespace common
 }  // namespace hdmap
 
-#endif  // HDMAP_COMMON_UTILS_H_
+#endif  // HDMAP_COMMON_UTIL_H_

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(hdmap_rviz_plugins)
 
 set(target_name ${PROJECT_NAME})
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(ament_cmake REQUIRED)
@@ -15,6 +15,7 @@ find_package(rviz_rendering REQUIRED)
 find_package(rviz_common REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(hdmap_common REQUIRED)
 find_package(hdmap_msgs REQUIRED)
 
 ament_package_xml()
@@ -46,6 +47,7 @@ set(${target_name}_dependencies
   rviz_rendering
   std_msgs
   geometry_msgs
+  hdmap_common
   hdmap_msgs
 )
 

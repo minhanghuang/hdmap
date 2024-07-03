@@ -1,6 +1,9 @@
 #ifndef HDMAP_ENGINE_IMPL_H_
 #define HDMAP_ENGINE_IMPL_H_
 
+#include <hdmap_common/fs.h>
+#include <hdmap_common/util.h>
+
 #include <memory>
 #include <string>
 
@@ -12,7 +15,6 @@
 #include "hdmap_engine/common/log.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/common/status.h"
-#include "hdmap_engine/common/utils.h"
 
 namespace hdmap {
 

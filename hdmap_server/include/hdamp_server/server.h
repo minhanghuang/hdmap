@@ -1,8 +1,8 @@
 #ifndef HDMAP_SERVER_H_
 #define HDMAP_SERVER_H_
+#include <hdmap_common/util.h>
 #include <hdmap_engine/common/log.h>
 #include <hdmap_engine/common/param.h>
-#include <hdmap_engine/common/utils.h>
 #include <hdmap_engine/engine.h>
 
 #include <algorithm>
@@ -21,8 +21,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
-
-using namespace std::chrono_literals;
 
 namespace hdmap {
 
