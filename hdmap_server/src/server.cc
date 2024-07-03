@@ -10,8 +10,8 @@ XMapServer::XMapServer(const rclcpp::NodeOptions& options)
       current_region_topic_("/hdmap_server/current_region"),
       param_(std::make_shared<Param>()),
       engine_(std::make_shared<Engine>()) {
-  this->declare_parameter("map_file_path", "");
-  param_->set_file_path(this->get_parameter("map_file_path").as_string());
+  this->declare_parameter<std::string>("map_path", "");
+  param_->set_file_path(this->get_parameter("map_path").as_string());
 }
 
 bool XMapServer::Init() {

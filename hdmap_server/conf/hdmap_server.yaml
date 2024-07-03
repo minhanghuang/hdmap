@@ -1,5 +1,4 @@
 hdmap_server_node:
   ros__parameters:
-    map_file_path: "/opt/xodr/share/xodr/carla-simulator/Town01.xodr"
     map_type: 0 # 0: opendrive
     accuracy: 0.5 # map accuracy(uint: m)
