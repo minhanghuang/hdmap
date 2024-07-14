@@ -1,5 +1,5 @@
-#ifndef HDMAP_STATUS_H_
-#define HDMAP_STATUS_H_
+#ifndef HDMAP_ENGINE_STATUS_H_
+#define HDMAP_ENGINE_STATUS_H_
 
 #include <string>
 
@@ -130,4 +130,4 @@ class Status {
 
 }  // namespace hdmap
 
-#endif  // HDMAP_STATUS_H_
+#endif  // HDMAP_ENGINE_STATUS_H_

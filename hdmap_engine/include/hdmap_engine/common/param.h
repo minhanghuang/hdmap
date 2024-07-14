@@ -1,5 +1,5 @@
-#ifndef HDMAP_COMMON_PARAM_H_
-#define HDMAP_COMMON_PARAM_H_
+#ifndef HDMAP_ENGINE_COMMON_PARAM_H_
+#define HDMAP_ENGINE_COMMON_PARAM_H_
 
 #include <memory>
 #include <string>
@@ -19,4 +19,4 @@ class Param {
 
 }  // namespace hdmap
 
-#endif  // HDMAP_COMMON_PARAM_H_
+#endif  // HDMAP_ENGINE_COMMON_PARAM_H_

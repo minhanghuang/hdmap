@@ -1,4 +1,4 @@
-#include "hdmap_engine/algo/routing/routing.h"
+#include "hdmap_engine/core/routing/routing.h"
 
 namespace hdmap {
 namespace routing {

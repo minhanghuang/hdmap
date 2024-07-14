@@ -1,5 +1,5 @@
-#ifndef HDMAP_GEOMETRY_H_
-#define HDMAP_GEOMETRY_H_
+#ifndef HDMAP_ENGINE_GEOMETRY_H_
+#define HDMAP_ENGINE_GEOMETRY_H_
 
 #include <memory>
 #include <string>
@@ -192,4 +192,4 @@ class Map {
 }  // namespace geometry
 }  // namespace hdmap
 
-#endif  // HDMAP_GEOMETRY_H_
+#endif  // HDMAP_ENGINE_GEOMETRY_H_

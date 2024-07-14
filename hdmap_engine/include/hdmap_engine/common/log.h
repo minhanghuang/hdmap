@@ -1,5 +1,5 @@
-#ifndef HDMAP_COMMON_LOG_H_
-#define HDMAP_COMMON_LOG_H_
+#ifndef HDMAP_ENGINE_COMMON_LOG_H_
+#define HDMAP_ENGINE_COMMON_LOG_H_
 
 #include <rclcpp/rclcpp.hpp>
 
@@ -19,4 +19,4 @@ namespace hdmap {
 
 }  // namespace hdmap
 
-#endif  // HDMAP_COMMON_LOG_H_
+#endif  // HDMAP_ENGINE_COMMON_LOG_H_

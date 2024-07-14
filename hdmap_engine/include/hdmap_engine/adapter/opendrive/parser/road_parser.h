@@ -1,5 +1,5 @@
-#ifndef HDMAP_ADAPTER_OPENDRIVE_PARSER_ROAD_H_
-#define HDMAP_ADAPTER_OPENDRIVE_PARSER_ROAD_H_
+#ifndef HDMAP_ENGINE_ADAPTER_OPENDRIVE_PARSER_ROAD_H_
+#define HDMAP_ENGINE_ADAPTER_OPENDRIVE_PARSER_ROAD_H_
 
 #include "hdmap_engine/adapter/opendrive/parser/base_parser.h"
 #include "hdmap_engine/adapter/opendrive/parser/section_parser.h"
@@ -34,4 +34,4 @@ class RoadXmlParser : public SectionXmlParser {
 }  // namespace opendrive
 }  // namespace hdmap
 
-#endif  // HDMAP_ADAPTER_OPENDRIVE_PARSER_ROAD_H_
+#endif  // HDMAP_ENGINE_ADAPTER_OPENDRIVE_PARSER_ROAD_H_

@@ -1,5 +1,5 @@
-#ifndef HDMAP_ALGO_ROUTING_STRATEGY_H_
-#define HDMAP_ALGO_ROUTING_STRATEGY_H_
+#ifndef HDMAP_ENGINE_CORE_ROUTING_STRATEGY_H_
+#define HDMAP_ENGINE_CORE_ROUTING_STRATEGY_H_
 
 #include <memory>
 #include <string>
@@ -45,4 +45,4 @@ class Strategy {
 }  // namespace routing
 }  // namespace hdmap
 
-#endif  // HDMAP_ALGO_ROUTING_STRATEGY_H_
+#endif  // HDMAP_ENGINE_CORE_ROUTING_STRATEGY_H_

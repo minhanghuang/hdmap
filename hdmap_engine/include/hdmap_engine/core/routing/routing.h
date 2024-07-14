@@ -1,14 +1,14 @@
-#ifndef HDMAP_ALGO_ROUTING_H_
-#define HDMAP_ALGO_ROUTING_H_
+#ifndef HDMAP_ENGINE_CORE_ROUTING_H_
+#define HDMAP_ENGINE_CORE_ROUTING_H_
 
 #include <memory>
 #include <string>
 #include <vector>
 
-#include "hdmap_engine/algo/kdtree/kdtree.h"
-#include "hdmap_engine/algo/routing/astar_strategy.h"
-#include "hdmap_engine/algo/routing/strategy.h"
 #include "hdmap_engine/common/status.h"
+#include "hdmap_engine/core/kdtree/kdtree.h"
+#include "hdmap_engine/core/routing/astar_strategy.h"
+#include "hdmap_engine/core/routing/strategy.h"
 #include "hdmap_engine/geometry.h"
 
 namespace hdmap {
@@ -36,4 +36,4 @@ class Routing {
 }  // namespace routing
 }  // namespace hdmap
 
-#endif  //  HDMAP_ALGO_ROUTING_H_
+#endif  //  HDMAP_ENGINE_CORE_ROUTING_H_

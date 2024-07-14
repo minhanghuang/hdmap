@@ -1,4 +1,4 @@
-#include "hdmap_engine/algo/routing/astar_strategy.h"
+#include "hdmap_engine/core/routing/astar_strategy.h"
 
 namespace hdmap {
 namespace routing {

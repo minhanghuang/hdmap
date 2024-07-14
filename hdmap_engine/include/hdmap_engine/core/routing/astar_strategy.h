@@ -1,11 +1,11 @@
-#ifndef HDMAP_ALGO_ROUTING_ASTAR_STRATEGY_H_
-#define HDMAP_ALGO_ROUTING_ASTAR_STRATEGY_H_
+#ifndef HDMAP_ENGINE_CORE_ROUTING_ASTAR_STRATEGY_H_
+#define HDMAP_ENGINE_CORE_ROUTING_ASTAR_STRATEGY_H_
 
 #include <string>
 #include <vector>
 
-#include "hdmap_engine/algo/routing/strategy.h"
 #include "hdmap_engine/common/status.h"
+#include "hdmap_engine/core/routing/strategy.h"
 
 namespace hdmap {
 namespace routing {
@@ -20,4 +20,4 @@ class AStarStrategy : public Strategy {
 }  // namespace routing
 }  // namespace hdmap
 
-#endif  // HDMAP_ALGO_ROUTING_ASTAR_STRATEGY_H_
+#endif  // HDMAP_ENGINE_CORE_ROUTING_ASTAR_STRATEGY_H_

@@ -1,11 +1,11 @@
-#ifndef HDMAP_ADAPTER_CONVERTOR_H_
-#define HDMAP_ADAPTER_CONVERTOR_H_
+#ifndef HDMAP_ENGINE_ADAPTER_CONVERTOR_H_
+#define HDMAP_ENGINE_ADAPTER_CONVERTOR_H_
 
 #include "hdmap_engine/adapter/opendrive/parser/map_parser.h"
-#include "hdmap_engine/algo/kdtree/kdtree.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/common/pipeline.h"
 #include "hdmap_engine/common/status.h"
+#include "hdmap_engine/core/kdtree/kdtree.h"
 
 namespace hdmap {
 
@@ -26,4 +26,4 @@ class ConvertProcessor : public Processor {
 
 }  // namespace hdmap
 
-#endif  // HDMAP_ADAPTER_CONVERTOR_H_
+#endif  // HDMAP_ENGINE_ADAPTER_CONVERTOR_H_

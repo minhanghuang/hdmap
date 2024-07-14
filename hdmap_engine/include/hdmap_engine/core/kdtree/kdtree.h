@@ -1,5 +1,5 @@
-#ifndef HDMAP_ALGO_KDTREE_H_
-#define HDMAP_ALGO_KDTREE_H_
+#ifndef HDMAP_ENGINE_CORE_KDTREE_H_
+#define HDMAP_ENGINE_CORE_KDTREE_H_
 
 #include <array>
 #include <cmath>
@@ -118,4 +118,4 @@ class KDTree {
 }  // namespace kdtree
 }  // namespace hdmap
 
-#endif  // HDMAP_ALGO_KDTREE_H_
+#endif  // HDMAP_ENGINE_CORE_KDTREE_H_

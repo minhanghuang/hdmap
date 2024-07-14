@@ -1,5 +1,5 @@
-#ifndef HDMAP_ADAPTER_OPENDRIVE_ELEMENT_H_
-#define HDMAP_ADAPTER_OPENDRIVE_ELEMENT_H_
+#ifndef HDMAP_ENGINE_ADAPTER_OPENDRIVE_ELEMENT_H_
+#define HDMAP_ENGINE_ADAPTER_OPENDRIVE_ELEMENT_H_
 
 #include <hdmap_common/util.h>
 
@@ -670,4 +670,4 @@ class Map {
 }  // namespace opendrive
 }  // namespace hdmap
 
-#endif  // HDMAP_ADAPTER_OPENDRIVE_ELEMENT_H_
+#endif  // HDMAP_ENGINE_ADAPTER_OPENDRIVE_ELEMENT_H_

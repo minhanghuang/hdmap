@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <hdmap_engine/algo/kdtree/kdtree.h>
+#include <hdmap_engine/core/kdtree/kdtree.h>
 #include <hdmap_engine/engine.h>
 
 #include <cstdint>

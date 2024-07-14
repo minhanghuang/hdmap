@@ -1,5 +1,5 @@
-#ifndef HDMAP_COMMON_PIPELINE_H_
-#define HDMAP_COMMON_PIPELINE_H_
+#ifndef HDMAP_ENGINE_COMMON_PIPELINE_H_
+#define HDMAP_ENGINE_COMMON_PIPELINE_H_
 
 #include <memory>
 #include <string>
@@ -8,9 +8,9 @@
 #include <vector>
 
 #include "hdmap_engine/adapter/opendrive/element.h"
-#include "hdmap_engine/algo/kdtree/kdtree.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/common/status.h"
+#include "hdmap_engine/core/kdtree/kdtree.h"
 #include "hdmap_engine/geometry.h"
 
 namespace hdmap {
@@ -87,4 +87,4 @@ class Pipeline final {
 
 }  // namespace hdmap
 
-#endif  // HDMAP_COMMON_PIPELINE_H_
+#endif  // HDMAP_ENGINE_COMMON_PIPELINE_H_

@@ -1,5 +1,5 @@
-#ifndef HDMAP_ADAPTER_OPENDRIVE_BASE_PARSER_H_
-#define HDMAP_ADAPTER_OPENDRIVE_BASE_PARSER_H_
+#ifndef HDMAP_ENGINE_ADAPTER_OPENDRIVE_BASE_PARSER_H_
+#define HDMAP_ENGINE_ADAPTER_OPENDRIVE_BASE_PARSER_H_
 
 #include <tinyxml2.h>
 
@@ -84,4 +84,4 @@ class XmlParser {
 }  // namespace opendrive
 }  // namespace hdmap
 
-#endif  // HDMAP_ADAPTER_OPENDRIVE_BASE_PARSER_H_
+#endif  // HDMAP_ENGINE_ADAPTER_OPENDRIVE_BASE_PARSER_H_

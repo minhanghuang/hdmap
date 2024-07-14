@@ -11,9 +11,9 @@
 
 #include "hdmap_engine/adapter/convertor.h"
 #include "hdmap_engine/adapter/opendrive/element.h"
-#include "hdmap_engine/algo/kdtree/kdtree.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/common/status.h"
+#include "hdmap_engine/core/kdtree/kdtree.h"
 #include "hdmap_engine/geometry.h"
 
 namespace hdmap {

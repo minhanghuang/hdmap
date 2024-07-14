@@ -1,5 +1,5 @@
-#ifndef HDMAP_ADAPTER_OPENDRIVE_PARSER_H_
-#define HDMAP_ADAPTER_OPENDRIVE_PARSER_H_
+#ifndef HDMAP_ENGINE_ADAPTER_OPENDRIVE_PARSER_H_
+#define HDMAP_ENGINE_ADAPTER_OPENDRIVE_PARSER_H_
 
 #include "hdmap_engine/adapter/opendrive/parser/header_parser.h"
 #include "hdmap_engine/adapter/opendrive/parser/map_parser.h"
@@ -23,4 +23,4 @@ class OpenDriveParser : public ParseProcessor {
 
 }  // namespace hdmap
 
-#endif  // HDMAP_ADAPTER_OPENDRIVE_PARSER_H_
+#endif  // HDMAP_ENGINE_ADAPTER_OPENDRIVE_PARSER_H_

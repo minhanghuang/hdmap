@@ -1,5 +1,5 @@
-#ifndef HDMAP_COMMON_MACROS_H_
-#define HDMAP_COMMON_MACROS_H_
+#ifndef HDMAP_ENGINE_COMMON_MACROS_H_
+#define HDMAP_ENGINE_COMMON_MACROS_H_
 
 #include <memory>
 #include <mutex>
@@ -60,4 +60,4 @@ namespace hdmap {
 
 }  // namespace hdmap
 
-#endif  // HDMAP_COMMON_MACROS_H_
+#endif  // HDMAP_ENGINE_COMMON_MACROS_H_

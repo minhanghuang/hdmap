@@ -1,4 +1,4 @@
-#include "hdmap_engine/algo/kdtree/kdtree.h"
+#include "hdmap_engine/core/kdtree/kdtree.h"
 
 namespace hdmap {
 namespace kdtree {
