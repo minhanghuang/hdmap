@@ -28,8 +28,6 @@ class Engine {
    */
   bool Init(const Param& param);
 
-  bool HotUpdate(const Param& param);
-
   /**
    * @brief Get lane point by point id
    *
