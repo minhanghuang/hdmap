@@ -11,6 +11,11 @@ std::vector<std::string> Split(const std::string& input,
   return result;
 }
 
+std::string GenerateUuid() {
+  boost::uuids::random_generator gen;
+  return boost::uuids::to_string(gen());
+}
+
 std::string GetLaneIdByPointId(const std::string& point_id) {
   auto split_ret = Split(point_id, "_");
   if (5 != split_ret.size()) {

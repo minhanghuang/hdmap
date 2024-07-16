@@ -2,6 +2,9 @@
 #define HDMAP_COMMON_UTIL_H_
 
 #include <boost/algorithm/string.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
 #include <chrono>
 #include <cmath>
 #include <memory>
@@ -12,6 +15,17 @@ namespace common {
 
 std::vector<std::string> Split(const std::string& input,
                                const std::string& delimiter);
+
+/**
+ * @brief Generates a random UUID (Universally Unique Identifier) version 4.
+ *
+ * This function creates a UUID using random numbers. The generated UUID
+ * follows the format: xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+ * where x is any hexadecimal digit and y is one of 8, 9, A, or B.
+ *
+ * @return std::string A string representation of the generated UUID.
+ */
+std::string GenerateUuid();
 
 /**
  * @brief Returns the minimum value among the provided arguments.
