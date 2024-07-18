@@ -24,6 +24,7 @@ set(msg_files
   "msg/Region.msg"
   "msg/MapFileInfo.msg"
   "srv/GetGlobalMap.srv"
+  "srv/SendMapFile.srv"
 )
 
 set(dependencies

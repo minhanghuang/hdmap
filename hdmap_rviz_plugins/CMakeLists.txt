@@ -9,6 +9,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rviz_ogre_vendor REQUIRED)
 find_package(Qt5 REQUIRED COMPONENTS Widgets)
 find_package(pluginlib REQUIRED)
+find_package(Boost REQUIRED COMPONENTS filesystem system)
 find_package(rclcpp REQUIRED)
 find_package(rviz_assimp_vendor REQUIRED)
 find_package(rviz_rendering REQUIRED)
@@ -61,12 +62,14 @@ target_include_directories(${target_name} PUBLIC
 )
 include_directories(${target_name}
   include
+  ${Boost_INCLUDE_DIRS}
 )
 
 target_link_libraries(${target_name} PUBLIC
   rviz_ogre_vendor::OgreMain
   rviz_ogre_vendor::OgreOverlay
   Qt5::Widgets
+  ${Boost_FILESYSTEM_LIBRARY}
 )
 
 target_compile_definitions(${target_name} PRIVATE "RVIZ_DEFAULT_PLUGINS_BUILDING_LIBRARY")

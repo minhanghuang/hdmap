@@ -1,26 +1,28 @@
 #ifndef HDMAP_SERVER_H_
 #define HDMAP_SERVER_H_
-#include <hdmap_common/util.h>
-#include <hdmap_engine/common/log.h>
-#include <hdmap_engine/common/param.h>
-#include <hdmap_engine/engine.h>
-
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <climits>
 #include <functional>
 #include <geometry_msgs/msg/point_stamped.hpp>
-#include <hdmap_msgs/msg/map.hpp>
-#include <hdmap_msgs/msg/region.hpp>
-#include <hdmap_msgs/msg/road.hpp>
-#include <hdmap_msgs/msg/section.hpp>
-#include <hdmap_msgs/srv/get_global_map.hpp>
 #include <memory>
 #include <queue>
 #include <rclcpp/rclcpp.hpp>
 #include <vector>
 #include <visualization_msgs/msg/marker_array.hpp>
+
+#include "hdmap_common/util.h"
+#include "hdmap_engine/common/log.h"
+#include "hdmap_engine/common/param.h"
+#include "hdmap_engine/engine.h"
+#include "hdmap_msgs/msg/map.hpp"
+#include "hdmap_msgs/msg/map_file_info.hpp"
+#include "hdmap_msgs/msg/region.hpp"
+#include "hdmap_msgs/msg/road.hpp"
+#include "hdmap_msgs/msg/section.hpp"
+#include "hdmap_msgs/srv/get_global_map.hpp"
+#include "hdmap_msgs/srv/send_map_file.hpp"
 
 namespace hdmap {
 
@@ -58,8 +60,15 @@ class XMapServer : public rclcpp::Node {
       const std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Request> request,
       std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Response> response);
 
+  void SendMapServiceCallback(
+      const std::shared_ptr<rmw_request_id_t> request_header,
+      const std::shared_ptr<hdmap_msgs::srv::SendMapFile::Request> request,
+      std::shared_ptr<hdmap_msgs::srv::SendMapFile::Response> response);
+
   void MousePositionCallback(
       const geometry_msgs::msg::PointStamped::SharedPtr msg);
+
+  void ReloadMap(const hdmap_msgs::msg::MapFileInfo& msg);
 
   void GenerateGlobalMap();
 
@@ -81,7 +90,7 @@ class XMapServer : public rclcpp::Node {
   /**
    * @brief hdmap engine ptr
    */
-  std::shared_ptr<Engine> engine_;
+  std::unique_ptr<Engine> engine_;
 
   /// ros sub
   // moues position
@@ -97,7 +106,6 @@ class XMapServer : public rclcpp::Node {
   // visualization_msgs::msg::MarkerArray marker_array_msg_;
   // rclcpp::Publisher<visualization_msgs::msg::MarkerArray>::SharedPtr
   //     marker_pub_;
-
   // current region
   std::mutex current_region_mutex_;
   const std::string current_region_topic_;
@@ -105,9 +113,14 @@ class XMapServer : public rclcpp::Node {
   rclcpp::Publisher<hdmap_msgs::msg::Region>::SharedPtr current_region_pub_;
 
   /// ros service
+  // get map
   const std::string global_map_topic_;
   hdmap_msgs::msg::Map global_map_msg_;
   rclcpp::Service<hdmap_msgs::srv::GetGlobalMap>::SharedPtr global_map_srv_;
+  // load map
+  const std::string send_map_topic_;
+  hdmap_msgs::msg::Map send_map_msg_;
+  rclcpp::Service<hdmap_msgs::srv::SendMapFile>::SharedPtr send_map_srv_;
 };
 
 }  // namespace hdmap

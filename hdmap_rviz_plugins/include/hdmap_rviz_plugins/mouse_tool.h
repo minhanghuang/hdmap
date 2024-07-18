@@ -1,12 +1,14 @@
-#ifndef MOUSE_RVIZ_PLUGIN_H_
-#define MOUSE_RVIZ_PLUGIN_H_
+#ifndef HDMAP_RVIZ_PLUGIN_SELECT_FILE_BUTTON_TOOL_H_
+#define HDMAP_RVIZ_PLUGIN_SELECT_FILE_BUTTON_TOOL_H_
 
 #include <OgreCamera.h>
 #include <OgreRay.h>
 #include <OgreViewport.h>
 
+#include <QFileDialog>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QVBoxLayout>
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <mutex>
 #include <rclcpp/rclcpp.hpp>
@@ -25,7 +27,11 @@
 #include <rviz_rendering/render_system.hpp>
 #include <vector>
 
+#include "hdmap_common/fs.h"
+#include "hdmap_common/util.h"
+#include "hdmap_msgs/msg/map_file_info.hpp"
 #include "hdmap_msgs/srv/get_global_map.hpp"
+#include "util/event_manager.h"
 #include "util/overlay_component.h"
 #include "util/overlay_text.h"
 #include "util/overlay_ui.h"
@@ -68,9 +74,12 @@ class MouseTool : public rviz_common::Tool {
   virtual int processMouseEvent(
       rviz_common::ViewportMouseEvent& event) override;
 
-  void SetupOverlay();
+ private:
+  void SetupRos();
 
- private Q_SLOTS:
+  bool SetupOverlay();
+
+  bool ProcessButton();
 
  private:
   rclcpp::Node::SharedPtr node_;
@@ -78,9 +87,12 @@ class MouseTool : public rviz_common::Tool {
   std::mutex mutex_;
 
   const std::string mouse_position_topic_;
-  geometry_msgs::msg::PointStamped mouse_position_msgs_;
+  geometry_msgs::msg::PointStamped mouse_position_msg_;
   rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr
       mouse_position_pub_;
+
+  /// Select file
+  hdmap_msgs::msg::MapFileInfo map_file_info_msg_;
 
   /// Display mouse position overlay text
   std::shared_ptr<OverlayComponent> overlay_;
@@ -89,4 +101,4 @@ class MouseTool : public rviz_common::Tool {
 
 }  // namespace hdmap_rviz_plugins
 
-#endif  // MOUSE_RVIZ_PLUGIN_H_
+#endif  // HDMAP_RVIZ_PLUGIN_SELECT_FILE_BUTTON_TOOL_H_

@@ -1,5 +1,5 @@
-#ifndef HDMAP_RVIZ_PLUGIN_H_
-#define HDMAP_RVIZ_PLUGIN_H_
+#ifndef HDMAP_RVIZ_PLUGIN_DISPLAY_H_
+#define HDMAP_RVIZ_PLUGIN_DISPLAY_H_
 
 #include <QFontDatabase>
 #include <QGridLayout>
@@ -9,8 +9,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/format.hpp>
 #include <geometry_msgs/msg/point_stamped.hpp>
-#include <hdmap_msgs/msg/region.hpp>
-#include <hdmap_msgs/srv/get_global_map.hpp>
 #include <memory>
 #include <mutex>
 #include <rclcpp/rclcpp.hpp>
@@ -30,7 +28,12 @@
 #include <unordered_map>
 #include <utility>
 
+#include "hdmap_msgs/msg/map_file_info.hpp"
+#include "hdmap_msgs/msg/region.hpp"
+#include "hdmap_msgs/srv/get_global_map.hpp"
+#include "hdmap_msgs/srv/send_map_file.hpp"
 #include "util/current_region.h"
+#include "util/event_manager.h"
 #include "util/overlay_component.h"
 #include "util/overlay_text.h"
 #include "util/overlay_ui.h"
@@ -53,13 +56,23 @@ class MapDisplay : public rviz_common::Display {
 
   void SetupRosTimer();
 
+  void SetupRvizEvent();
+
   void SetupOverlay();
 
-  void ShowGlobalMap();
+  void CallGlobalMap();
+
+  void CallSendMap(const hdmap_msgs::msg::MapFileInfo& map_file_info);
 
   void ShowCurrentRegion();
 
   void CurrentRegionCallback(const hdmap_msgs::msg::Region::SharedPtr msg);
+
+  void SelectFileCallback(const hdmap_msgs::msg::MapFileInfo::SharedPtr msg);
+
+  void HandleEventFromMouseCursor(void* msg);
+
+  void HandleEventFromSelectFile(void* msg);
 
   void GlobalMapMsgToBillboardLines(
       const hdmap_msgs::msg::Map& map,
@@ -75,11 +88,16 @@ class MapDisplay : public rviz_common::Display {
   /// ros timer
   std::vector<rclcpp::TimerBase::SharedPtr> timers_;
 
-  /// ros service global map
+  /// ros service
+  // global map
   const std::string global_map_topic_;
   rclcpp::Client<hdmap_msgs::srv::GetGlobalMap>::SharedPtr global_map_client_;
+  // send map
+  const std::string send_map_topic_;
+  rclcpp::Client<hdmap_msgs::srv::SendMapFile>::SharedPtr send_map_client_;
 
-  /// ros sub current region
+  /// ros sub
+  // current region
   std::mutex current_region_mutex_;
   const std::string current_region_topic_;
   hdmap_msgs::msg::Region current_region_msg_;
@@ -98,4 +116,4 @@ class MapDisplay : public rviz_common::Display {
 
 }  // namespace hdmap_rviz_plugins
 
-#endif  // HDMAP_RVIZ_PLUGIN_H_
+#endif  // HDMAP_RVIZ_PLUGIN_DISPLAY_H_

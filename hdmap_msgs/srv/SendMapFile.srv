@@ -1,0 +1,4 @@
+hdmap_msgs/MapFileInfo map_file_info
+
+---
+hdmap_msgs/Map map

@@ -6,10 +6,11 @@ XMapServer::XMapServer(const rclcpp::NodeOptions& options)
     : Node("hdmap_server_node", options),
       // merker_topic_("/hdmap_server/map_marker"),
       global_map_topic_("/hdmap_server/global_map"),
+      send_map_topic_("/hdmap_server/send_map_file"),
       mouse_position_topic_("/hdmap_server/mouse_position"),
       current_region_topic_("/hdmap_server/current_region"),
       param_(std::make_shared<Param>()),
-      engine_(std::make_shared<Engine>()) {
+      engine_(std::make_unique<Engine>()) {
   this->declare_parameter<std::string>("map_path", "");
   param_->set_file_path(this->get_parameter("map_path").as_string());
 }
@@ -26,13 +27,13 @@ bool XMapServer::Init() {
     HDMAP_LOG_ERROR("engine load map file exception");
     return false;
   }
+  HDMAP_LOG_INFO("engine load map file success");
+  GenerateGlobalMap();
 
   SetupRosPublisher();
   SetupRosSubscriptions();
   SetupRosService();
   SetupRosTimer();
-
-  GenerateGlobalMap();
   return true;
 }
 
@@ -70,6 +71,11 @@ void XMapServer::SetupRosService() {
       global_map_topic_, std::bind(&XMapServer::GlobalMapServiceCallback, this,
                                    std::placeholders::_1, std::placeholders::_2,
                                    std::placeholders::_3));
+
+  send_map_srv_ = this->create_service<hdmap_msgs::srv::SendMapFile>(
+      send_map_topic_, std::bind(&XMapServer::SendMapServiceCallback, this,
+                                 std::placeholders::_1, std::placeholders::_2,
+                                 std::placeholders::_3));
 }
 
 void XMapServer::SetupRosTimer() {
@@ -179,6 +185,19 @@ void XMapServer::GlobalMapServiceCallback(
     const std::shared_ptr<rmw_request_id_t> request_header,
     const std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Request> request,
     std::shared_ptr<hdmap_msgs::srv::GetGlobalMap::Response> response) {
+  std::cout << "[debug] GlobalMapServiceCallback" << std::endl;
+  std::cout << "[debug] GlobalMapServiceCallback" << std::endl;
+  std::cout << "[debug] GlobalMapServiceCallback" << std::endl;
+  std::cout << "[debug] GlobalMapServiceCallback" << std::endl;
+  response->set__map(global_map_msg_);
+}
+
+void XMapServer::SendMapServiceCallback(
+    const std::shared_ptr<rmw_request_id_t> request_header,
+    const std::shared_ptr<hdmap_msgs::srv::SendMapFile::Request> request,
+    std::shared_ptr<hdmap_msgs::srv::SendMapFile::Response> response) {
+  // reload map(block)
+  ReloadMap(request->map_file_info);
   response->set__map(global_map_msg_);
 }
 
@@ -189,6 +208,21 @@ void XMapServer::MousePositionCallback(
     mouse_position_msgs_q_.pop();
   }
   mouse_position_msgs_q_.push(*msg);
+}
+
+void XMapServer::ReloadMap(const hdmap_msgs::msg::MapFileInfo& msg) {
+  /// check in
+  if (!hdmap::fs::exists(msg.file_path) ||
+      hdmap_msgs::msg::MapFileInfo::MAP_TYPE_UNKNOWN == msg.map_type) {
+    return;
+  }
+  HDMAP_LOG_INFO("reload map file: %s", msg.file_path.c_str());
+  param_->set_file_path(msg.file_path);
+  param_->set_step(msg.resolution);
+  engine_ = std::make_unique<Engine>();
+  engine_->Init(*param_);
+  GenerateGlobalMap();
+  HDMAP_LOG_INFO("reload map done");
 }
 
 void XMapServer::GenerateGlobalMap() {
@@ -217,6 +251,8 @@ void XMapServer::GenerateGlobalMap() {
   // }
 
   //// global map
+  global_map_msg_.roads.clear();
+  global_map_msg_.id.clear();
   auto map = engine_->GetRoads();
   for (const auto& road : map) {
     hdmap_msgs::msg::Road road_msg;
