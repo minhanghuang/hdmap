@@ -1,5 +1,5 @@
-#ifndef MOUSE_RVIZ_PLUGIN_H_
-#define MOUSE_RVIZ_PLUGIN_H_
+#ifndef HDMAP_RVIZ_PLUGIN_SELECT_FILE_TOOL_H_
+#define HDMAP_RVIZ_PLUGIN_SELECT_FILE_TOOL_H_
 
 #include <OgreCamera.h>
 #include <OgreRay.h>
@@ -32,18 +32,18 @@
 
 namespace hdmap_rviz_plugins {
 
-class MouseTool : public rviz_common::Tool {
+class SelectFileTool : public rviz_common::Tool {
   Q_OBJECT
  public:
   /**
    * @brief Constructor
    */
-  MouseTool();
+  SelectFileTool();
 
   /**
    * @brief Destructor
    */
-  virtual ~MouseTool();
+  virtual ~SelectFileTool();
 
   /**
    * @brief RViz callback on initialize
@@ -89,4 +89,4 @@ class MouseTool : public rviz_common::Tool {
 
 }  // namespace hdmap_rviz_plugins
 
-#endif  // MOUSE_RVIZ_PLUGIN_H_
+#endif  // HDMAP_RVIZ_PLUGIN_SELECT_FILE_TOOL_H_

@@ -1,5 +1,5 @@
-#ifndef HDMAP_RVIZ_PLUGIN_H_
-#define HDMAP_RVIZ_PLUGIN_H_
+#ifndef HDMAP_RVIZ_PLUGIN_HDMAP_DISPLAY_H_
+#define HDMAP_RVIZ_PLUGIN_HDMAP_DISPLAY_H_
 
 #include <QFontDatabase>
 #include <QGridLayout>
@@ -98,4 +98,4 @@ class MapDisplay : public rviz_common::Display {
 
 }  // namespace hdmap_rviz_plugins
 
-#endif  // HDMAP_RVIZ_PLUGIN_H_
+#endif  // HDMAP_RVIZ_PLUGIN_HDMAP_DISPLAY_H_

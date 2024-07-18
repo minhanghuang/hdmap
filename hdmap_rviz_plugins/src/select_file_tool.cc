@@ -1,14 +1,14 @@
-#include "hdmap_rviz_plugins/mouse_tool.h"
+#include "hdmap_rviz_plugins/select_file_tool.h"
 
 namespace hdmap_rviz_plugins {
 
-MouseTool::MouseTool()
+SelectFileTool::SelectFileTool()
     : rviz_common::Tool(),
       mouse_position_topic_("/hdmap_server/mouse_position") {}
 
-MouseTool::~MouseTool() {}
+SelectFileTool::~SelectFileTool() {}
 
-void MouseTool::onInitialize() {
+void SelectFileTool::onInitialize() {
   Tool::onInitialize();
   node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
   mouse_position_pub_ =
@@ -17,11 +17,11 @@ void MouseTool::onInitialize() {
   SetupOverlay();
 }
 
-void MouseTool::activate() {}
+void SelectFileTool::activate() {}
 
-void MouseTool::deactivate() {}
+void SelectFileTool::deactivate() {}
 
-int MouseTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
+int SelectFileTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
   std::lock_guard<std::mutex> guard(mutex_);
   Ogre::Camera* camera = context_->getViewManager()->getCurrent()->getCamera();
   Ogre::Viewport* viewport = camera->getViewport();
@@ -56,7 +56,7 @@ int MouseTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
   return 0;
 }
 
-void MouseTool::SetupOverlay() {
+void SelectFileTool::SetupOverlay() {
   overlay_ = std::make_shared<OverlayComponent>("mouse_position");
   overlap_ui_ = std::make_shared<MousePositionOverlayUI>();
   overlay_->SetPosition(0, 25, HorizontalAlignment::LEFT,
@@ -66,4 +66,4 @@ void MouseTool::SetupOverlay() {
 }  // namespace hdmap_rviz_plugins
 
 #include <pluginlib/class_list_macros.hpp>
-PLUGINLIB_EXPORT_CLASS(hdmap_rviz_plugins::MouseTool, rviz_common::Tool)
+PLUGINLIB_EXPORT_CLASS(hdmap_rviz_plugins::SelectFileTool, rviz_common::Tool)
