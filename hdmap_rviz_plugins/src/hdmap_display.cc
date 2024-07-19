@@ -4,6 +4,7 @@ namespace hdmap_rviz_plugins {
 
 MapDisplay::MapDisplay()
     : global_map_topic_("/hdmap_server/global_map"),
+      send_map_topic_("/hdmap_server/send_map_file"),
       current_region_topic_("/hdmap_server/current_region"),
       mouse_position_topic_("/hdmap_server/mouse_position") {}
 
@@ -21,7 +22,7 @@ void MapDisplay::onInitialize() {
   SetupRosTimer();
   SetupOverlay();
   SetupRvizEvent();
-  ShowGlobalMap();
+  CallGlobalMap();
 }
 
 void MapDisplay::SetupRosSubscriptions() {
@@ -40,6 +41,8 @@ void MapDisplay::SetupRosPublisher() {
 void MapDisplay::SetupRosService() {
   global_map_client_ =
       node_->create_client<hdmap_msgs::srv::GetGlobalMap>(global_map_topic_);
+  send_map_client_ =
+      node_->create_client<hdmap_msgs::srv::SendMapFile>(send_map_topic_);
   while (!global_map_client_->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
       return;
@@ -65,9 +68,13 @@ void MapDisplay::SetupRvizEvent() {
       EventManager::EventType::kMouseCursorEvent,
       std::bind(&MapDisplay::HandleEventFromMouseCursor, this,
                 std::placeholders::_1));
+  EventManager::GetInstance()->RegisterCallback(
+      EventManager::EventType::kSelectFileEvent,
+      std::bind(&MapDisplay::HandleEventFromSelectFile, this,
+                std::placeholders::_1));
 }
 
-void MapDisplay::ShowGlobalMap() {
+void MapDisplay::CallGlobalMap() {
   std::lock_guard<std::mutex> guard(mutex_);
   auto request = std::make_shared<hdmap_msgs::srv::GetGlobalMap::Request>();
   auto response_callback =
@@ -78,6 +85,21 @@ void MapDisplay::ShowGlobalMap() {
       };
   auto future =
       global_map_client_->async_send_request(request, response_callback);
+}
+
+void MapDisplay::CallSendMap(
+    const hdmap_msgs::msg::MapFileInfo& map_file_info) {
+  std::lock_guard<std::mutex> guard(mutex_);
+  auto request = std::make_shared<hdmap_msgs::srv::SendMapFile::Request>();
+  request->map_file_info = map_file_info;
+  auto response_callback =
+      [this](
+          rclcpp::Client<hdmap_msgs::srv::SendMapFile>::SharedFuture future) {
+        auto response = future.get();
+        GlobalMapMsgToBillboardLines(response->map, rviz_lines_);
+      };
+  auto future =
+      send_map_client_->async_send_request(request, response_callback);
 }
 
 void MapDisplay::ShowCurrentRegion() {
@@ -143,6 +165,13 @@ void MapDisplay::HandleEventFromMouseCursor(void* msg) {
   geometry_msgs::msg::PointStamped* raw_msg =
       static_cast<geometry_msgs::msg::PointStamped*>(msg);
   mouse_position_pub_->publish(*raw_msg);
+}
+
+void MapDisplay::HandleEventFromSelectFile(void* msg) {
+  hdmap_msgs::msg::MapFileInfo* raw_msg =
+      static_cast<hdmap_msgs::msg::MapFileInfo*>(msg);
+  this->CallSendMap(*raw_msg);
+  
 }
 
 void MapDisplay::GlobalMapMsgToBillboardLines(

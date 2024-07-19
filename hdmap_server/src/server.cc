@@ -6,6 +6,7 @@ XMapServer::XMapServer(const rclcpp::NodeOptions& options)
     : Node("hdmap_server_node", options),
       // merker_topic_("/hdmap_server/map_marker"),
       global_map_topic_("/hdmap_server/global_map"),
+      send_map_topic_("/hdmap_server/send_map_file"),
       mouse_position_topic_("/hdmap_server/mouse_position"),
       current_region_topic_("/hdmap_server/current_region"),
       param_(std::make_shared<Param>()),
@@ -182,6 +183,15 @@ void XMapServer::GlobalMapServiceCallback(
   response->set__map(global_map_msg_);
 }
 
+void XMapServer::SendMapServiceCallback(
+    const std::shared_ptr<rmw_request_id_t> request_header,
+    const std::shared_ptr<hdmap_msgs::srv::SendMapFile::Request> request,
+    std::shared_ptr<hdmap_msgs::srv::SendMapFile::Response> response) {
+  // reload map(block)
+  ReloadMap(request->map_file_info);
+  response->set__map(global_map_msg_);
+}
+
 void XMapServer::MousePositionCallback(
     const geometry_msgs::msg::PointStamped::SharedPtr msg) {
   std::lock_guard<std::mutex> guard(mouse_position_mutex_);
@@ -189,6 +199,21 @@ void XMapServer::MousePositionCallback(
     mouse_position_msgs_q_.pop();
   }
   mouse_position_msgs_q_.push(*msg);
+}
+
+void XMapServer::ReloadMap(const hdmap_msgs::msg::MapFileInfo& msg) {
+  /// check in
+  if (!hdmap::fs::exists(msg.file_path) ||
+      hdmap_msgs::msg::MapFileInfo::MAP_TYPE_UNKNOWN == msg.map_type) {
+    return;
+  }
+  HDMAP_LOG_INFO("reload map file: %s", msg.file_path.c_str());
+  param_->set_file_path(msg.file_path);
+  param_->set_step(msg.resolution);
+  engine_ = std::make_unique<Engine>();
+  engine_->Init(*param_);
+  GenerateGlobalMap();
+  HDMAP_LOG_INFO("reload map done");
 }
 
 void XMapServer::GenerateGlobalMap() {

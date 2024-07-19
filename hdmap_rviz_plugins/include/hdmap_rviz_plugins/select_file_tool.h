@@ -5,8 +5,10 @@
 #include <OgreRay.h>
 #include <OgreViewport.h>
 
+#include <QFileDialog>
 #include <QGridLayout>
 #include <QPushButton>
+#include <QVBoxLayout>
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <mutex>
 #include <rclcpp/rclcpp.hpp>
@@ -26,7 +28,10 @@
 #include <shared_mutex>
 #include <vector>
 
+#include "hdmap_common/fs.h"
 #include "hdmap_common/rw_lock.h"
+#include "hdmap_common/util.h"
+#include "hdmap_msgs/msg/map_file_info.hpp"
 #include "hdmap_msgs/srv/get_global_map.hpp"
 #include "util/event_manager.h"
 #include "util/overlay_component.h"
@@ -71,17 +76,20 @@ class SelectFileTool : public rviz_common::Tool {
   virtual int processMouseEvent(
       rviz_common::ViewportMouseEvent& event) override;
 
+ private:
   void SetupOverlay();
 
- private Q_SLOTS:
+  bool ProcessButton();
 
- private:
   rclcpp::Node::SharedPtr node_;
 
   std::shared_mutex mutex_;
 
   /// mouse position
   geometry_msgs::msg::PointStamped mouse_position_msgs_;
+
+  /// select file
+  hdmap_msgs::msg::MapFileInfo map_file_info_msg_;
 
   /// Display mouse position overlay text
   std::shared_ptr<OverlayComponent> overlay_;

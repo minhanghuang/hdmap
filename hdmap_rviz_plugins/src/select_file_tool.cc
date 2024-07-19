@@ -12,7 +12,7 @@ void SelectFileTool::onInitialize() {
   SetupOverlay();
 }
 
-void SelectFileTool::activate() {}
+void SelectFileTool::activate() { this->ProcessButton(); }
 
 void SelectFileTool::deactivate() {}
 
@@ -56,6 +56,25 @@ void SelectFileTool::SetupOverlay() {
   overlap_ui_ = std::make_shared<MousePositionOverlayUI>();
   overlay_->SetPosition(0, 25, HorizontalAlignment::LEFT,
                         VerticalAlignment::BOTTOM);
+}
+
+bool SelectFileTool::ProcessButton() {
+  const QString file_path =
+      QFileDialog::getOpenFileName(nullptr, tr("Select File"), "",
+                                   tr("OpenDRIVE/XML Files (*.xodr *.xml);;"
+                                      "OpenDRIVE Files (*.xodr);;"
+                                      "XML Files (*.xml)"));
+  if (!hdmap::fs::exists(file_path.toStdString())) {
+    return false;
+  }
+  map_file_info_msg_.header.stamp = node_->get_clock()->now();
+  map_file_info_msg_.uuid = hdmap::common::GenerateUuid();
+  map_file_info_msg_.file_path = file_path.toStdString();
+  map_file_info_msg_.map_type =
+      hdmap_msgs::msg::MapFileInfo::MAP_TYPE_OPENDRIVE;
+  EventManager::GetInstance()->TriggerEvent(
+      EventManager::EventType::kSelectFileEvent, &map_file_info_msg_);
+  return true;
 }
 
 }  // namespace hdmap_rviz_plugins
