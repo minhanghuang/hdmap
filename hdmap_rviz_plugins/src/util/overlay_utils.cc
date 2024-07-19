@@ -34,7 +34,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  *********************************************************************/
 
-#include "util/overlay_utils.h"
+#include "hdmap_rviz_plugins/util/overlay_utils.h"
 
 // #include <rviz_common/logging.hpp>
 

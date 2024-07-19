@@ -18,9 +18,9 @@
 #include <string>
 #include <vector>
 
-#include "util/overlay_text.h"
-#include "util/overlay_ui.h"
-#include "util/overlay_utils.h"
+#include "overlay_text.h"
+#include "overlay_ui.h"
+#include "overlay_utils.h"
 
 namespace hdmap_rviz_plugins {
 
