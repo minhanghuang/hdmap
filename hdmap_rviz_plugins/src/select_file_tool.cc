@@ -2,18 +2,13 @@
 
 namespace hdmap_rviz_plugins {
 
-SelectFileTool::SelectFileTool()
-    : rviz_common::Tool(),
-      mouse_position_topic_("/hdmap_server/mouse_position") {}
+SelectFileTool::SelectFileTool() : rviz_common::Tool() {}
 
 SelectFileTool::~SelectFileTool() {}
 
 void SelectFileTool::onInitialize() {
   Tool::onInitialize();
   node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
-  mouse_position_pub_ =
-      node_->create_publisher<geometry_msgs::msg::PointStamped>(
-          mouse_position_topic_, 1);
   SetupOverlay();
 }
 
@@ -22,7 +17,7 @@ void SelectFileTool::activate() {}
 void SelectFileTool::deactivate() {}
 
 int SelectFileTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
-  std::lock_guard<std::mutex> guard(mutex_);
+  hdmap::common::WriteLock(mutex_);
   Ogre::Camera* camera = context_->getViewManager()->getCurrent()->getCamera();
   Ogre::Viewport* viewport = camera->getViewport();
   float screen_x = static_cast<float>(event.x) / viewport->getActualWidth();
@@ -40,12 +35,12 @@ int SelectFileTool::processMouseEvent(rviz_common::ViewportMouseEvent& event) {
     overlay_->Update(overlap_ui_.get());
     overlay_->Show();
 
-    /// pub
     mouse_position_msgs_.header.stamp = node_->get_clock()->now();
     mouse_position_msgs_.point.set__x(intersection_point.x);
     mouse_position_msgs_.point.set__y(intersection_point.y);
     mouse_position_msgs_.point.set__z(intersection_point.z);
-    mouse_position_pub_->publish(mouse_position_msgs_);
+    EventManager::GetInstance()->TriggerEvent(
+        EventManager::EventType::kMouseCursorEvent, &mouse_position_msgs_);
   }
 
   // 3D view can be rotated using the mouse

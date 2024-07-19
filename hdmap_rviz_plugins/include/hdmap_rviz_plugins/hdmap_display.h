@@ -31,6 +31,7 @@
 #include <utility>
 
 #include "util/current_region.h"
+#include "util/event_manager.h"
 #include "util/overlay_component.h"
 #include "util/overlay_text.h"
 #include "util/overlay_ui.h"
@@ -49,17 +50,23 @@ class MapDisplay : public rviz_common::Display {
  private:
   void SetupRosSubscriptions();
 
+  void SetupRosPublisher();
+
   void SetupRosService();
 
   void SetupRosTimer();
 
   void SetupOverlay();
 
+  void SetupRvizEvent();
+
   void ShowGlobalMap();
 
   void ShowCurrentRegion();
 
   void CurrentRegionCallback(const hdmap_msgs::msg::Region::SharedPtr msg);
+
+  void HandleEventFromMouseCursor(void* msg);
 
   void GlobalMapMsgToBillboardLines(
       const hdmap_msgs::msg::Map& map,
@@ -79,11 +86,19 @@ class MapDisplay : public rviz_common::Display {
   const std::string global_map_topic_;
   rclcpp::Client<hdmap_msgs::srv::GetGlobalMap>::SharedPtr global_map_client_;
 
-  /// ros sub current region
+  /// ros sub
+  // current region
   std::mutex current_region_mutex_;
   const std::string current_region_topic_;
   hdmap_msgs::msg::Region current_region_msg_;
   rclcpp::Subscription<hdmap_msgs::msg::Region>::SharedPtr current_region_sub_;
+
+  /// ros pub
+  // mouse position
+  const std::string mouse_position_topic_;
+  geometry_msgs::msg::PointStamped mouse_position_msgs_;
+  rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr
+      mouse_position_pub_;
 
   /// Display show lanes
   std::vector<std::shared_ptr<rviz_rendering::BillboardLine>> rviz_lines_;

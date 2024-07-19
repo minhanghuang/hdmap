@@ -23,9 +23,12 @@
 #include <rviz_rendering/objects/line.hpp>
 #include <rviz_rendering/objects/shape.hpp>
 #include <rviz_rendering/render_system.hpp>
+#include <shared_mutex>
 #include <vector>
 
+#include "hdmap_common/rw_lock.h"
 #include "hdmap_msgs/srv/get_global_map.hpp"
+#include "util/event_manager.h"
 #include "util/overlay_component.h"
 #include "util/overlay_text.h"
 #include "util/overlay_ui.h"
@@ -75,12 +78,10 @@ class SelectFileTool : public rviz_common::Tool {
  private:
   rclcpp::Node::SharedPtr node_;
 
-  std::mutex mutex_;
+  std::shared_mutex mutex_;
 
-  const std::string mouse_position_topic_;
+  /// mouse position
   geometry_msgs::msg::PointStamped mouse_position_msgs_;
-  rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr
-      mouse_position_pub_;
 
   /// Display mouse position overlay text
   std::shared_ptr<OverlayComponent> overlay_;

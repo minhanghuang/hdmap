@@ -4,7 +4,8 @@ namespace hdmap_rviz_plugins {
 
 MapDisplay::MapDisplay()
     : global_map_topic_("/hdmap_server/global_map"),
-      current_region_topic_("/hdmap_server/current_region") {}
+      current_region_topic_("/hdmap_server/current_region"),
+      mouse_position_topic_("/hdmap_server/mouse_position") {}
 
 MapDisplay::~MapDisplay() {}
 
@@ -15,9 +16,11 @@ void MapDisplay::onInitialize() {
   current_region_ =
       std::make_shared<CurrentRegion>(scene_manager_, scene_node_);
   SetupRosSubscriptions();
+  SetupRosPublisher();
   SetupRosService();
   SetupRosTimer();
   SetupOverlay();
+  SetupRvizEvent();
   ShowGlobalMap();
 }
 
@@ -26,6 +29,12 @@ void MapDisplay::SetupRosSubscriptions() {
       current_region_topic_, 1,
       std::bind(&MapDisplay::CurrentRegionCallback, this,
                 std::placeholders::_1));
+}
+
+void MapDisplay::SetupRosPublisher() {
+  mouse_position_pub_ =
+      node_->create_publisher<geometry_msgs::msg::PointStamped>(
+          mouse_position_topic_, 1);
 }
 
 void MapDisplay::SetupRosService() {
@@ -49,6 +58,13 @@ void MapDisplay::SetupOverlay() {
   overlap_ui_ = std::make_shared<CurrentRegionOverlayUI>();
   overlay_->SetPosition(10, 10, HorizontalAlignment::LEFT,
                         VerticalAlignment::TOP);
+}
+
+void MapDisplay::SetupRvizEvent() {
+  EventManager::GetInstance()->RegisterCallback(
+      EventManager::EventType::kMouseCursorEvent,
+      std::bind(&MapDisplay::HandleEventFromMouseCursor, this,
+                std::placeholders::_1));
 }
 
 void MapDisplay::ShowGlobalMap() {
@@ -121,6 +137,12 @@ void MapDisplay::CurrentRegionCallback(
     const hdmap_msgs::msg::Region::SharedPtr msg) {
   std::lock_guard<std::mutex> guard(mutex_);
   current_region_msg_ = *msg;
+}
+
+void MapDisplay::HandleEventFromMouseCursor(void* msg) {
+  geometry_msgs::msg::PointStamped* raw_msg =
+      static_cast<geometry_msgs::msg::PointStamped*>(msg);
+  mouse_position_pub_->publish(*raw_msg);
 }
 
 void MapDisplay::GlobalMapMsgToBillboardLines(
