@@ -13,7 +13,6 @@
 #include <visualization_msgs/msg/marker_array.hpp>
 
 #include "hdmap_common/util.h"
-#include "hdmap_engine/common/log.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/engine.h"
 #include "hdmap_msgs/msg/map.hpp"

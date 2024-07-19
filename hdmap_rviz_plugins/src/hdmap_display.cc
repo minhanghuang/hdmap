@@ -171,7 +171,6 @@ void MapDisplay::HandleEventFromSelectFile(void* msg) {
   hdmap_msgs::msg::MapFileInfo* raw_msg =
       static_cast<hdmap_msgs::msg::MapFileInfo*>(msg);
   this->CallSendMap(*raw_msg);
-  
 }
 
 void MapDisplay::GlobalMapMsgToBillboardLines(
