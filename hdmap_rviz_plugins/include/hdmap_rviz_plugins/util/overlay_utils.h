@@ -128,4 +128,4 @@ class OverlayObject {
 };
 }  // namespace rviz_2d_overlay_plugins
 
-#endif  // RVIZ_2D_OVERLAY_PLUGINS_OVERLAY_UTILS_HPP
+#endif  // HDMAP_RVIZ_2D_OVERLAY_PLUGINS_OVERLAY_UTILS_HPP

@@ -17,6 +17,18 @@ std::vector<std::string> Split(const std::string& input,
                                const std::string& delimiter);
 
 /**
+ * @brief Shortens a file path if it exceeds a specified maximum length.
+ *
+ * @param path The original file path.
+ * @param max_length Maximum allowed length (default: 50).
+ * @return Shortened path if original exceeds max_length, otherwise original
+ * path.
+ *
+ * @example "/very/long/path/to/file.txt" -> "/very/lo.../to/file.txt"
+ */
+std::string ShortenPath(const std::string& path, size_t max_length = 50);
+
+/**
  * @brief Generates a random UUID (Universally Unique Identifier) version 4.
  *
  * This function creates a UUID using random numbers. The generated UUID

@@ -1,5 +1,5 @@
-#ifndef RVIZ_PLUGIN_OVERLAY_TEXT_H_
-#define RVIZ_PLUGIN_OVERLAY_TEXT_H_
+#ifndef HDMAP_RVIZ_PLUGIN_OVERLAY_TEXT_H_
+#define HDMAP_RVIZ_PLUGIN_OVERLAY_TEXT_H_
 
 #include <QColor>
 #include <string>
@@ -114,4 +114,4 @@ class OverlayText {
 
 }  // namespace hdmap_rviz_plugins
 
-#endif  // RVIZ_PLUGIN_OVERLAY_TEXT_H_
+#endif  // HDMAP_RVIZ_PLUGIN_OVERLAY_TEXT_H_

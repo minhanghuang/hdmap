@@ -6,14 +6,17 @@ MapDisplay::MapDisplay()
     : global_map_topic_("/hdmap_server/global_map"),
       send_map_topic_("/hdmap_server/send_map_file"),
       current_region_topic_("/hdmap_server/current_region"),
-      mouse_position_topic_("/hdmap_server/mouse_position") {}
+      mouse_position_topic_("/hdmap_server/mouse_position"),
+      file_loaded_(false) {}
 
 MapDisplay::~MapDisplay() {}
 
 void MapDisplay::onInitialize() {
   rviz_common::Display::onInitialize();
   rviz_rendering::RenderSystem::get()->prepareOverlays(scene_manager_);
-  node_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
+  scene_manager_ = context_->getSceneManager();
+  scene_node_ = scene_manager_->getRootSceneNode()->createChildSceneNode();
+  nh_ = context_->getRosNodeAbstraction().lock()->get_raw_node();
   current_region_ =
       std::make_shared<CurrentRegion>(scene_manager_, scene_node_);
   SetupRosSubscriptions();
@@ -26,23 +29,22 @@ void MapDisplay::onInitialize() {
 }
 
 void MapDisplay::SetupRosSubscriptions() {
-  current_region_sub_ = node_->create_subscription<hdmap_msgs::msg::Region>(
+  current_region_sub_ = nh_->create_subscription<hdmap_msgs::msg::Region>(
       current_region_topic_, 1,
       std::bind(&MapDisplay::CurrentRegionCallback, this,
                 std::placeholders::_1));
 }
 
 void MapDisplay::SetupRosPublisher() {
-  mouse_position_pub_ =
-      node_->create_publisher<geometry_msgs::msg::PointStamped>(
-          mouse_position_topic_, 1);
+  mouse_position_pub_ = nh_->create_publisher<geometry_msgs::msg::PointStamped>(
+      mouse_position_topic_, 1);
 }
 
 void MapDisplay::SetupRosService() {
   global_map_client_ =
-      node_->create_client<hdmap_msgs::srv::GetGlobalMap>(global_map_topic_);
+      nh_->create_client<hdmap_msgs::srv::GetGlobalMap>(global_map_topic_);
   send_map_client_ =
-      node_->create_client<hdmap_msgs::srv::SendMapFile>(send_map_topic_);
+      nh_->create_client<hdmap_msgs::srv::SendMapFile>(send_map_topic_);
   while (!global_map_client_->wait_for_service(std::chrono::seconds(1))) {
     if (!rclcpp::ok()) {
       return;
@@ -51,16 +53,23 @@ void MapDisplay::SetupRosService() {
 }
 
 void MapDisplay::SetupRosTimer() {
-  timers_.emplace_back(node_->create_wall_timer(
-      rclcpp::Rate(5).period(),
-      std::bind(&MapDisplay::ShowCurrentRegion, this)));
+  timers_.emplace_back(
+      nh_->create_wall_timer(rclcpp::Rate(5).period(),
+                             std::bind(&MapDisplay::ShowCurrentRegion, this)));
 }
 
 void MapDisplay::SetupOverlay() {
-  overlay_ = std::make_shared<OverlayComponent>("current_region");
-  overlap_ui_ = std::make_shared<CurrentRegionOverlayUI>();
-  overlay_->SetPosition(10, 10, HorizontalAlignment::LEFT,
-                        VerticalAlignment::TOP);
+  current_region_overlay_ =
+      std::make_shared<OverlayComponent<CurrentRegionOverlayUI>>(
+          "current_region");
+  current_region_overlay_->SetPosition(10, 10, HorizontalAlignment::LEFT,
+                                       VerticalAlignment::TOP);
+
+  mouse_position_overlay_ =
+      std::make_shared<OverlayComponent<MousePositionOverlayUI>>(
+          "mouse_position");
+  mouse_position_overlay_->SetPosition(0, 25, HorizontalAlignment::LEFT,
+                                       VerticalAlignment::BOTTOM);
 }
 
 void MapDisplay::SetupRvizEvent() {
@@ -81,7 +90,7 @@ void MapDisplay::CallGlobalMap() {
       [this](
           rclcpp::Client<hdmap_msgs::srv::GetGlobalMap>::SharedFuture future) {
         auto response = future.get();
-        GlobalMapMsgToBillboardLines(response->map, rviz_lines_);
+        ConvertToBillboardLines(response->map);
       };
   auto future =
       global_map_client_->async_send_request(request, response_callback);
@@ -89,14 +98,22 @@ void MapDisplay::CallGlobalMap() {
 
 void MapDisplay::CallSendMap(
     const hdmap_msgs::msg::MapFileInfo& map_file_info) {
-  std::lock_guard<std::mutex> guard(mutex_);
+  {
+    hdmap::common::WriteLock(map_file_info_mutex_);
+    map_file_info_ = map_file_info;
+  }
   auto request = std::make_shared<hdmap_msgs::srv::SendMapFile::Request>();
   request->map_file_info = map_file_info;
   auto response_callback =
       [this](
           rclcpp::Client<hdmap_msgs::srv::SendMapFile>::SharedFuture future) {
         auto response = future.get();
-        GlobalMapMsgToBillboardLines(response->map, rviz_lines_);
+        if (!response->map.roads.empty()) {
+          ConvertToBillboardLines(response->map);
+          file_loaded_ = true;
+        } else {
+          file_loaded_ = false;
+        }
       };
   auto future =
       send_map_client_->async_send_request(request, response_callback);
@@ -113,14 +130,21 @@ void MapDisplay::ShowCurrentRegion() {
   }
 
   /// overlay text
-  *overlap_ui_->mutable_id() = current_region.id;
-  overlap_ui_->mutable_point()->clear();
-  overlap_ui_->mutable_point()->emplace_back(current_region.point.x);
-  overlap_ui_->mutable_point()->emplace_back(current_region.point.y);
-  overlap_ui_->mutable_point()->emplace_back(current_region.heading);
-  overlay_->Clean();
-  overlay_->Update(overlap_ui_.get());
-  overlay_->Show();
+  auto current_region_overlap_ui = current_region_overlay_->ui();
+  {
+    hdmap::common::ReadLock(map_file_info_mutex_);
+    *current_region_overlap_ui->mutable_file_path() = map_file_info_.file_path;
+  }
+  *current_region_overlap_ui->mutable_id() = current_region.id;
+  current_region_overlap_ui->mutable_point()->clear();
+  current_region_overlap_ui->mutable_point()->emplace_back(
+      current_region.point.x);
+  current_region_overlap_ui->mutable_point()->emplace_back(
+      current_region.point.y);
+  current_region_overlap_ui->mutable_point()->emplace_back(
+      current_region.heading);
+  current_region_overlay_->Clean();
+  current_region_overlay_->Show();
 
   /// current lane
   current_region_->mutable_boundary()->clear();
@@ -164,7 +188,17 @@ void MapDisplay::CurrentRegionCallback(
 void MapDisplay::HandleEventFromMouseCursor(void* msg) {
   geometry_msgs::msg::PointStamped* raw_msg =
       static_cast<geometry_msgs::msg::PointStamped*>(msg);
-  mouse_position_pub_->publish(*raw_msg);
+  if (file_loaded_) {
+    // pub mouse position
+    mouse_position_pub_->publish(*raw_msg);
+    // show mouse position
+    auto mouse_position_overlap_ui = mouse_position_overlay_->ui();
+    mouse_position_overlap_ui->set_x(raw_msg->point.x);
+    mouse_position_overlap_ui->set_y(raw_msg->point.y);
+    mouse_position_overlap_ui->set_z(raw_msg->point.z);
+    mouse_position_overlay_->Clean();
+    mouse_position_overlay_->Show();
+  }
 }
 
 void MapDisplay::HandleEventFromSelectFile(void* msg) {
@@ -173,14 +207,20 @@ void MapDisplay::HandleEventFromSelectFile(void* msg) {
   this->CallSendMap(*raw_msg);
 }
 
-void MapDisplay::GlobalMapMsgToBillboardLines(
-    const hdmap_msgs::msg::Map& map,
-    std::vector<std::shared_ptr<rviz_rendering::BillboardLine>>& lines) {
-  if (map.roads.empty()) {
+void MapDisplay::ConvertToBillboardLines(const hdmap_msgs::msg::Map& msg) {
+  if (msg.roads.empty()) {
     return;
   }
-  lines.clear();
-  for (const auto& road : map.roads) {
+
+  if (!rviz_lines_.empty()) {
+    // destroy lines
+    for (auto& line : rviz_lines_) {
+      line->clear();
+    }
+    rviz_lines_.clear();
+  }
+
+  for (const auto& road : msg.roads) {
     for (const auto& section : road.sections) {
       for (const auto& lane : section.lanes) {
         const int line_size = std::max<int>(
@@ -190,51 +230,43 @@ void MapDisplay::GlobalMapMsgToBillboardLines(
         if (0 == line_size) {
           continue;
         }
-        {
-          /// fill central line
-          auto rviz_line = std::make_shared<rviz_rendering::BillboardLine>(
-              scene_manager_, scene_node_);
-          rviz_line->setMaxPointsPerLine(line_size);
-          rviz_line->setNumLines(1);
-          for (int i = 0; i < line_size; i++) {
-            rviz_line->addPoint(
-                Ogre::Vector3(lane.central_curve.pts.at(i).point.x,
-                              lane.central_curve.pts.at(i).point.y,
-                              lane.central_curve.pts.at(i).point.z));
-          }
-          rviz_lines_.emplace_back(rviz_line);
+        auto rviz_line =
+            std::make_shared<MapDisplay::RvizLine>(scene_manager_, scene_node_);
+        rviz_line->setMaxPointsPerLine(line_size);
+        rviz_line->setNumLines(3);
+
+        /// fill central line
+        for (int i = 0; i < line_size; i++) {
+          rviz_line->addPoint(
+              Ogre::Vector3(lane.central_curve.pts.at(i).point.x,
+                            lane.central_curve.pts.at(i).point.y,
+                            lane.central_curve.pts.at(i).point.z));
         }
-        {
-          /// fill left boundary line
-          auto rviz_line = std::make_shared<rviz_rendering::BillboardLine>(
-              scene_manager_, scene_node_);
-          rviz_line->setMaxPointsPerLine(line_size);
-          rviz_line->setNumLines(1);
-          for (int i = 0; i < line_size; i++) {
-            rviz_line->addPoint(
-                Ogre::Vector3(lane.left_boundary.pts.at(i).point.x,
-                              lane.left_boundary.pts.at(i).point.y,
-                              lane.left_boundary.pts.at(i).point.z));
-          }
-          rviz_lines_.emplace_back(rviz_line);
+        rviz_line->finishLine();
+
+        /// fill left boundary line
+        for (int i = 0; i < line_size; i++) {
+          rviz_line->addPoint(
+              Ogre::Vector3(lane.left_boundary.pts.at(i).point.x,
+                            lane.left_boundary.pts.at(i).point.y,
+                            lane.left_boundary.pts.at(i).point.z));
         }
-        {
-          /// fill right boundary line
-          auto rviz_line = std::make_shared<rviz_rendering::BillboardLine>(
-              scene_manager_, scene_node_);
-          rviz_line->setMaxPointsPerLine(line_size);
-          rviz_line->setNumLines(1);
-          for (int i = 0; i < line_size; i++) {
-            rviz_line->addPoint(
-                Ogre::Vector3(lane.right_boundary.pts.at(i).point.x,
-                              lane.right_boundary.pts.at(i).point.y,
-                              lane.right_boundary.pts.at(i).point.z));
-          }
-          rviz_lines_.emplace_back(rviz_line);
+        rviz_line->finishLine();
+
+        /// fill right boundary line
+        for (int i = 0; i < line_size; i++) {
+          rviz_line->addPoint(
+              Ogre::Vector3(lane.right_boundary.pts.at(i).point.x,
+                            lane.right_boundary.pts.at(i).point.y,
+                            lane.right_boundary.pts.at(i).point.z));
         }
+
+        rviz_lines_.emplace_back(rviz_line);
       }
     }
   }
+
+  context_->queueRender();
 }
 
 }  // namespace hdmap_rviz_plugins

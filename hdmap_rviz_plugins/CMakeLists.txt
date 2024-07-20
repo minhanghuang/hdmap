@@ -22,7 +22,8 @@ find_package(hdmap_msgs REQUIRED)
 ament_package_xml()
 
 file(GLOB_RECURSE headers_to_moc
-  "include/hdmap_rviz_plugins/*.h"
+  "include/hdmap_rviz_plugins/hdmap_display.h"
+  "include/hdmap_rviz_plugins/select_file_tool.h"
 )
 
 foreach(header "${headers_to_moc}")

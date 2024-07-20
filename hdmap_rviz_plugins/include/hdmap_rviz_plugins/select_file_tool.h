@@ -34,9 +34,6 @@
 #include "hdmap_msgs/msg/map_file_info.hpp"
 #include "hdmap_msgs/srv/get_global_map.hpp"
 #include "util/event_manager.h"
-#include "util/overlay_component.h"
-#include "util/overlay_text.h"
-#include "util/overlay_ui.h"
 
 namespace hdmap_rviz_plugins {
 
@@ -77,8 +74,6 @@ class SelectFileTool : public rviz_common::Tool {
       rviz_common::ViewportMouseEvent& event) override;
 
  private:
-  void SetupOverlay();
-
   bool ProcessButton();
 
   rclcpp::Node::SharedPtr node_;
@@ -90,10 +85,6 @@ class SelectFileTool : public rviz_common::Tool {
 
   /// select file
   hdmap_msgs::msg::MapFileInfo map_file_info_msg_;
-
-  /// Display mouse position overlay text
-  std::shared_ptr<OverlayComponent> overlay_;
-  std::shared_ptr<MousePositionOverlayUI> overlap_ui_;
 };
 
 }  // namespace hdmap_rviz_plugins

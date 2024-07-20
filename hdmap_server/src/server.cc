@@ -71,6 +71,10 @@ void XMapServer::SetupRosService() {
       global_map_topic_, std::bind(&XMapServer::GlobalMapServiceCallback, this,
                                    std::placeholders::_1, std::placeholders::_2,
                                    std::placeholders::_3));
+  send_map_srv_ = this->create_service<hdmap_msgs::srv::SendMapFile>(
+      send_map_topic_, std::bind(&XMapServer::SendMapServiceCallback, this,
+                                 std::placeholders::_1, std::placeholders::_2,
+                                 std::placeholders::_3));
 }
 
 void XMapServer::SetupRosTimer() {
@@ -205,6 +209,7 @@ void XMapServer::ReloadMap(const hdmap_msgs::msg::MapFileInfo& msg) {
   /// check in
   if (!hdmap::fs::exists(msg.file_path) ||
       hdmap_msgs::msg::MapFileInfo::MAP_TYPE_UNKNOWN == msg.map_type) {
+    HDMAP_LOG_ERROR("%s file not found.", msg.file_path.c_str());
     return;
   }
   HDMAP_LOG_INFO("reload map file: %s", msg.file_path.c_str());
@@ -242,6 +247,7 @@ void XMapServer::GenerateGlobalMap() {
   // }
 
   //// global map
+  global_map_msg_.roads.clear();
   auto map = engine_->GetRoads();
   for (const auto& road : map) {
     hdmap_msgs::msg::Road road_msg;

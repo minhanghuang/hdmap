@@ -11,6 +11,14 @@ std::vector<std::string> Split(const std::string& input,
   return result;
 }
 
+std::string ShortenPath(const std::string& path, size_t max_length) {
+  if (path.length() <= max_length) {
+    return path;
+  }
+  size_t keep = (max_length - 3) / 2;
+  return path.substr(0, keep) + "..." + path.substr(path.length() - keep);
+}
+
 std::string GenerateUuid() {
   boost::uuids::random_generator gen;
   return boost::uuids::to_string(gen());

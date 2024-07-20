@@ -25,9 +25,13 @@
 #include <rviz_rendering/objects/line.hpp>
 #include <rviz_rendering/objects/shape.hpp>
 #include <rviz_rendering/render_system.hpp>
+#include <shared_mutex>
 #include <unordered_map>
 #include <utility>
+#include <vector>
 
+#include "hdmap_common/log.h"
+#include "hdmap_common/rw_lock.h"
 #include "hdmap_msgs/msg/map_file_info.hpp"
 #include "hdmap_msgs/msg/region.hpp"
 #include "hdmap_msgs/srv/get_global_map.hpp"
@@ -43,6 +47,10 @@ namespace hdmap_rviz_plugins {
 class MapDisplay : public rviz_common::Display {
   Q_OBJECT
  public:
+  using RvizLine = rviz_rendering::BillboardLine;
+  using RvizLinePtr = std::shared_ptr<RvizLine>;
+  using RvizLinaPtrs = std::vector<RvizLinePtr>;
+
   MapDisplay();
   virtual ~MapDisplay();
 
@@ -74,16 +82,14 @@ class MapDisplay : public rviz_common::Display {
 
   void HandleEventFromSelectFile(void* msg);
 
-  void GlobalMapMsgToBillboardLines(
-      const hdmap_msgs::msg::Map& map,
-      std::vector<std::shared_ptr<rviz_rendering::BillboardLine>>& lines);
+  void ConvertToBillboardLines(const hdmap_msgs::msg::Map& msg);
 
   std::mutex mutex_;
 
   /**
    * @brief ros node
    */
-  rclcpp::Node::SharedPtr node_;
+  rclcpp::Node::SharedPtr nh_;
 
   /// ros timer
   std::vector<rclcpp::TimerBase::SharedPtr> timers_;
@@ -98,27 +104,33 @@ class MapDisplay : public rviz_common::Display {
 
   /// ros sub
   // current region
-  std::mutex current_region_mutex_;
   const std::string current_region_topic_;
+  std::shared_mutex current_region_mutex_;
   hdmap_msgs::msg::Region current_region_msg_;
   rclcpp::Subscription<hdmap_msgs::msg::Region>::SharedPtr current_region_sub_;
 
   /// ros pub
   // mouse position
   const std::string mouse_position_topic_;
-  geometry_msgs::msg::PointStamped mouse_position_msgs_;
   rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr
       mouse_position_pub_;
 
+  /// select file loaded
+  std::atomic<bool> file_loaded_;
+  std::shared_mutex map_file_info_mutex_;
+  hdmap_msgs::msg::MapFileInfo map_file_info_;
+
   /// Display show lanes
-  std::vector<std::shared_ptr<rviz_rendering::BillboardLine>> rviz_lines_;
+  RvizLinaPtrs rviz_lines_;
 
   /// Display current lane
   std::shared_ptr<CurrentRegion> current_region_;
 
-  /// Display overlay text
-  std::shared_ptr<OverlayComponent> overlay_;
-  std::shared_ptr<CurrentRegionOverlayUI> overlap_ui_;
+  /// Display overlay
+  std::shared_ptr<OverlayComponent<CurrentRegionOverlayUI>>
+      current_region_overlay_;
+  std::shared_ptr<OverlayComponent<MousePositionOverlayUI>>
+      mouse_position_overlay_;
 };
 
 }  // namespace hdmap_rviz_plugins

@@ -1,9 +1,11 @@
-#ifndef RVIZ_PLUGIN_OVERLAY_UI_H_
-#define RVIZ_PLUGIN_OVERLAY_UI_H_
+#ifndef HDMAP_RVIZ_PLUGIN_OVERLAY_UI_H_
+#define HDMAP_RVIZ_PLUGIN_OVERLAY_UI_H_
 
 #include <string>
 #include <unordered_map>
 #include <vector>
+
+#include "hdmap_common/util.h"
 
 namespace hdmap_rviz_plugins {
 
@@ -28,6 +30,12 @@ class CurrentRegionOverlayUI : public OverlayUI {
   CurrentRegionOverlayUI() { point_.reserve(3); }
   virtual std::vector<std::string> Format() override {
     std::vector<std::string> ret;
+    // file path
+    std::string file_path_text;
+    file_path_text.append("file: ");
+    file_path_text.append(hdmap::common::ShortenPath(file_path_));
+    ret.emplace_back(file_path_text);
+
     // id
     std::string id_text;
     id_text.append("id: ");
@@ -52,6 +60,10 @@ class CurrentRegionOverlayUI : public OverlayUI {
     return ret;
   }
 
+  std::string file_path() const { return file_path_; }
+
+  std::string* mutable_file_path() { return &file_path_; }
+
   std::string id() const { return id_; }
 
   std::string* mutable_id() { return &id_; }
@@ -61,6 +73,8 @@ class CurrentRegionOverlayUI : public OverlayUI {
   std::vector<double>* mutable_point() { return &point_; }
 
  private:
+  std::string file_path_;  // map file path(abs)
+
   std::string id_;  // lane id
 
   std::vector<double> point_;  // [x, y, heading]
@@ -100,4 +114,4 @@ class MousePositionOverlayUI : public OverlayUI {
 
 }  // namespace hdmap_rviz_plugins
 
-#endif  // RVIZ_PLUGIN_OVERLAY_UI_H_
+#endif  // HDMAP_RVIZ_PLUGIN_OVERLAY_UI_H_
