@@ -162,11 +162,12 @@ void XMapServer::ProcessCurrentRegionTimer() {
   {
     std::lock_guard<std::mutex> guard(current_region_mutex_);
     current_region_msg_.header.stamp = this->now();
-    current_region_msg_.id = point.id();
+    current_region_msg_.id = lane_msg.id;  // lane id
     current_region_msg_.distance = search_result->dist;
     current_region_msg_.point.x = point.x();
     current_region_msg_.point.y = point.y();
     current_region_msg_.heading = point.heading();
+    current_region_msg_.s = point.start_position();
     current_region_msg_.lane = lane_msg;
   }
 }

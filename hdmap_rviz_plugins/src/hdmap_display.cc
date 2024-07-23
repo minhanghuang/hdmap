@@ -143,6 +143,7 @@ void MapDisplay::ShowCurrentRegion() {
       current_region.point.y);
   current_region_overlap_ui->mutable_point()->emplace_back(
       current_region.heading);
+  current_region_overlap_ui->set_s(current_region.s);
   current_region_overlay_->Clean();
   current_region_overlay_->Show();
 

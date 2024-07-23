@@ -8,4 +8,6 @@ geometry_msgs/Point point
 
 float64 heading
 
+float64 s
+
 Lane lane

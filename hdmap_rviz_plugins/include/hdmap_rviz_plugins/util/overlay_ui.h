@@ -52,6 +52,12 @@ class CurrentRegionOverlayUI : public OverlayUI {
     point_text.append("]");
     ret.emplace_back(point_text);
 
+    // s
+    std::string s_text;
+    s_text.append("s: ");
+    s_text.append(std::to_string(s_));
+    ret.emplace_back(s_text);
+
     // heading
     std::string heading_text;
     heading_text.append("heading: ");
@@ -72,12 +78,18 @@ class CurrentRegionOverlayUI : public OverlayUI {
 
   std::vector<double>* mutable_point() { return &point_; }
 
+  double s() const { return s_; }
+
+  void set_s(double s) { s_ = s; }
+
  private:
   std::string file_path_;  // map file path(abs)
 
   std::string id_;  // lane id
 
   std::vector<double> point_;  // [x, y, heading]
+
+  double s_;
 };
 
 class MousePositionOverlayUI : public OverlayUI {
