@@ -13,6 +13,7 @@ XMapServer::XMapServer(const rclcpp::NodeOptions& options)
       engine_(std::make_shared<Engine>()) {
   this->declare_parameter<std::string>("map_path", "");
   param_->set_file_path(this->get_parameter("map_path").as_string());
+  param_->set_step(0.1);
 }
 
 bool XMapServer::Init() {

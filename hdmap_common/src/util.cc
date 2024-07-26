@@ -11,6 +11,12 @@ std::vector<std::string> Split(const std::string& input,
   return result;
 }
 
+bool ApproximatelyEqual(double a, double b, double tolerance) {
+  // Calculate the relative difference using Boost's function
+  // and compare it to the specified tolerance
+  return boost::math::relative_difference(a, b) <= tolerance;
+}
+
 std::string ShortenPath(const std::string& path, size_t max_length) {
   if (path.length() <= max_length) {
     return path;

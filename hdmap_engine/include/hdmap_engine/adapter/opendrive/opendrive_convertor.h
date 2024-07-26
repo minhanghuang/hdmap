@@ -9,6 +9,7 @@
 #include <string>
 #include <utility>
 
+#include "hdmap_common/log.h"
 #include "hdmap_engine/adapter/convertor.h"
 #include "hdmap_engine/adapter/opendrive/element.h"
 #include "hdmap_engine/common/param.h"

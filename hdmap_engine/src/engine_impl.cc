@@ -8,7 +8,7 @@ bool EngineImpl::Init(const Param& param) {
   param_ = std::make_shared<Param>(param);
   map_ = std::make_shared<geometry::Map>();
   kdtree_ = std::make_shared<kdtree::KDTree>();
-  param_->set_step(std::max<float>(param_->step(), 0.5));
+  param_->set_step(0.1);
 
   if (!Checkin()) {
     return false;

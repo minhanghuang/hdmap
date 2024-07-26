@@ -2,11 +2,13 @@
 #define HDMAP_COMMON_UTIL_H_
 
 #include <boost/algorithm/string.hpp>
+#include <boost/math/special_functions/relative_difference.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <chrono>
 #include <cmath>
+#include <limits>
 #include <memory>
 #include <string>
 
@@ -15,6 +17,28 @@ namespace common {
 
 std::vector<std::string> Split(const std::string& input,
                                const std::string& delimiter);
+
+/**
+ * @brief Determines if two double values are approximately equal using Boost.
+ *
+ * This function uses the Boost.Math library's relative_difference function
+ * to compare two double values for approximate equality. It calculates the
+ * relative difference between the two values and compares it against a
+ * specified tolerance.
+ *
+ * @param a The first double value to compare.
+ * @param b The second double value to compare.
+ * @param tolerance The maximum relative difference allowed for the values
+ *                  to be considered approximately equal. Defaults to
+ *                  std::numeric_limits<double>::epsilon().
+ * @return true if the values are approximately equal, false otherwise.
+ *
+ * @note This function handles special cases like comparing with zero or
+ *       very small numbers more robustly than naive implementations.
+ */
+bool ApproximatelyEqual(
+    double a, double b,
+    double tolerance = std::numeric_limits<double>::epsilon());
 
 /**
  * @brief Shortens a file path if it exceeds a specified maximum length.

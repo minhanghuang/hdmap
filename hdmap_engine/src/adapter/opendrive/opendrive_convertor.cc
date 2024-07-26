@@ -255,7 +255,8 @@ void OpenDriveConvertor::CenterLaneSampling(
 
     if (last_point) {
       break;
-    } else if (section_ds - section->length() >= 1e-10) {
+    } else if ((section_ds + pipeline_data_->param->step() >=
+                section->length())) {
       //  last point
       road_ds -= (section_ds - section->length());
       section_ds = section->length();
@@ -278,6 +279,7 @@ void OpenDriveConvertor::LaneSampling(const opendrive::element::Lane& ele_lane,
   std::string point_id = "";
   for (const auto& refe_point : *refe_line) {
     lane_width = ele_lane.GetLaneWidth(refe_point.start_position()) * lane_dir;
+    std::cout << refe_point.start_position() << ": " << lane_width << std::endl;
     point_id = lane->id() + "_" + std::to_string(point_idx++);
 
     // left boundary point

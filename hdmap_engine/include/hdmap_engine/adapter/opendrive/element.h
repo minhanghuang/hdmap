@@ -1,19 +1,19 @@
 #ifndef HDMAP_ENGINE_ADAPTER_OPENDRIVE_ELEMENT_H_
 #define HDMAP_ENGINE_ADAPTER_OPENDRIVE_ELEMENT_H_
 
-#include <hdmap_common/util.h>
-
 #include <algorithm>
 #include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <limits>
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "hdmap_common/util.h"
 #include "hdmap_engine/3rd_party/odrSpiral/odrSpiral.h"
 #include "hdmap_engine/common/macros.h"
 
@@ -481,6 +481,9 @@ class Lane {
         return 0.;
       }
       auto width = widths_.at(width_index);
+      // std::cout << "sssss: " << road_ds << "   " << width.a() << " "
+      //           << width.b() << "  " << width.c() << "  " << width.d() << " "
+      //           << width.s() << std::endl;
       return width.GetOffsetValue(road_ds);
     }
     return 0.;

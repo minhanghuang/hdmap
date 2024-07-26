@@ -1,6 +1,7 @@
 #ifndef HDMAP_ENGINE_ADAPTER_PARSER_H_
 #define HDMAP_ENGINE_ADAPTER_PARSER_H_
 
+#include "hdmap_common/log.h"
 #include "hdmap_engine/adapter/opendrive/parser/map_parser.h"
 #include "hdmap_engine/common/param.h"
 #include "hdmap_engine/common/pipeline.h"

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<OpenDRIVE xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header revMajor="1" revMinor="4" name="" version="1" date="Thu, Aug 27 13:19:49 2020" north="0" south="0" east="0" west="0" vendor="LGSVL">
+        <geoReference> +proj=tmerc +lat_0=37.3808103266543 +lon_0=-121.908405648939 +k=1 +x_0=596640.8 +y_0=4137677.2 +datum=WGS84 +units=m +no_defs </geoReference>
+    </header>
+    <road name="Road 11" length="14.755472183227539" id="0" junction="-1">
+        <planView>
+            <geometry s="0" x="1.6810801029205322" y="-109.51596832275391" hdg="2.0847234725952148" length="5.4086771011352539">
+                <line />
+            </geometry>
+            <geometry s="5.4086771011352539" x="-0.97781002521514893" y="-104.80601501464844" hdg="2.0847229957580566" length="5.0210785865783691">
+                <paramPoly3 aU="0" bU="3.7657890319824219" cU="3.3855600357055664" dU="-2.30483341217041" aV="0" bV="2.1162203722724371E-07" cV="-2.9091370105743408" dV="1.5966897010803223" />
+            </geometry>
+            <geometry s="10.059743881225586" x="-5.4434475898742676" y="-85.9249038696289" hdg="1.7742021083831787" length="0.18410515785217285">
+                <line />
+            </geometry>
+        </planView>
+        <lanes>
+            <laneSection s="0">
+                <left>
+                    <lane id="1" type="driving" level="false">
+                        <width sOffset="0" a="5.40036153793335" b="-0.43303218483924866" c="0" d="0" />
+                        <width sOffset="0.98370033502578735" a="4.9743876457214355" b="-0.43297284841537476" c="6.8941553763579577E-05" d="8.5826732174609788E-06" />
+                        <roadMark sOffset="0" type="solid" weight="standard" color="standard" laneChange="none" />
+                    </lane>
+                </left>
+                <center>
+                    <lane id="0" type="driving" level="false">
+                        <roadMark sOffset="0" type="solid" weight="standard" color="standard" laneChange="none" />
+                    </lane>
+                </center>
+            </laneSection>
+        </lanes>
+    </road>
+</OpenDRIVE>

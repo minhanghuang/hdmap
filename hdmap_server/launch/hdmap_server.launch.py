@@ -10,7 +10,7 @@ def generate_launch_description():
         get_package_share_directory("hdmap_server"), "conf", "hdmap_server.yaml"
     )
     map_path = os.path.join(
-        get_package_share_directory("hdmap_server"), "conf", "Town01.xodr"
+        get_package_share_directory("hdmap_server"), "conf", "a.xml"
     )
 
     return launch.LaunchDescription(
